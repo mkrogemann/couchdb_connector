@@ -1,0 +1,8 @@
+{
+  "_id" : "_design/test_create",
+  "views" : {
+    "test_create" : {
+      "map" : "function(doc){ emit(null, doc)}"
+    }
+  }
+}

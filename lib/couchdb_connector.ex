@@ -11,7 +11,7 @@ defmodule Couchdb.Connector do
   Throughout the following examples, you will need a map holding the database
   properties. Build one as follows:
 
-      iex>db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_test", port: 5984}
+      db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_test", port: 5984}
       %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
 
   ### Storage Examples
@@ -49,7 +49,26 @@ defmodule Couchdb.Connector do
   The Reader module provides functions to retrieve documents or uuids from
   CouchDB
 
+      db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_test", port: 5984}
+      %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
+
+      Couchdb.Connector.fetch_uuid(db_props)
+      :ok, "{\\"uuids\\":[\\"1a013a4ce3...\\"]}\\n"}
+
+      Couchdb.Connector.get(db_props, "_not_there_")
+      :error, "{\\"error\\":\\"not_found\\",\\"reason\\":\\"missing\\"}\\n"}
+
+
   ### View Examples
+
+      db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_test", port: 5984}
+      %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
+
+      view_code = File.read!("my_view.json")
+      Couchdb.Connector.create_view db_props, "my_design", view_code
+
+      Couchdb.Connector.document_by_key(db_props, "design_name", "view_name", "key")
+      {:ok, "{\\"total_rows\\":3,\\"offset\\":1,\\"rows\\":[\\r\\n{\\"id\\":\\"5c09dbf93fd...\\", ...}
 
   """
 
@@ -116,6 +135,28 @@ defmodule Couchdb.Connector do
   """
   def fetch_uuid db_props do
     Reader.fetch_uuid(db_props)
+  end
+
+  @doc """
+  Fetch all documents in given view
+  """
+  def fetch_all db_props, design, view do
+    View.fetch_all(db_props, design, view)
+  end
+
+  @doc """
+  Create a view with given code in the given design document
+  """
+  def create_view db_props, design, code do
+    View.create_view(db_props, design, code)
+  end
+
+  @doc """
+  Find and return one document with given key in given view. Will return an
+  empty list if no document with given key exists
+  """
+  def document_by_key db_props, design, view, key, stale \\ :update_after do
+    View.document_by_key(db_props, design, view, key, stale)
   end
 
   def start_link(_repo, _options) do

@@ -1,5 +1,7 @@
 # CouchdbConnector
 
+[![Build Status](https://travis-ci.org/locolupo/couchdb_connector.svg)](https://travis-ci.org/locolupo/couchdb_connector)
+
 ## Description
 
 A connector for CouchDB, the Erlang-based, JSON document database.

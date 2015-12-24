@@ -50,7 +50,7 @@ defmodule Couchdb.Connector.Mixfile do
       files: ["lib", "mix.exs", "README*", "LICENSE*"],
       maintainers: ["Markus Krogemann", "Marcel Wolf"],
       licenses: ["Apache 2.0"],
-      links: %{"GitHub" => "https://github.com/codecentric/couchdb_connector"}
+      links: %{"GitHub" => "https://github.com/locolupo/couchdb_connector"}
     ]
   end
 end

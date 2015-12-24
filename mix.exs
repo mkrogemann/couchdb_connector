@@ -10,7 +10,7 @@ defmodule Couchdb.Connector.Mixfile do
      description: description,
      package: package,
      deps: deps,
-     test_coverage: [tool: Coverex.Task]]
+     test_coverage: [tool: Coverex.Task, coveralls: true]]
   end
 
   def application do

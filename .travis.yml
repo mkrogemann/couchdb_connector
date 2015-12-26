@@ -7,4 +7,6 @@ elixir:
   - 1.1.0
 otp_release:
   - 18.0
+install:
+  - mix local.hex --force  
 script: "MIX_ENV=test mix do deps.get, deps.compile, test --trace, test --cover"

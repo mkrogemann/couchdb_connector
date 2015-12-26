@@ -28,7 +28,7 @@ defmodule Couchdb.Connector.ViewTest do
   end
 
   test "document_by_key/3: ensure that view returns document for given key" do
-    num_retries = 5
+    num_retries = 10
     result = TestRetry.retry(num_retries,
       fn(_) ->
         View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name"

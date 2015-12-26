@@ -22,30 +22,63 @@ defmodule Couchdb.Connector.UrlHelper do
       "http://localhost:5984/_uuids?count=10"
   """
 
+  @type db_properties :: %{protocol: String.t, hostname: String.t,
+                           database: String.t, port: non_neg_integer}
+
+  @doc """
+  Produces the URL to the server given in db_props.
+  """
+  @spec database_server_url(db_properties) :: String.t
   def database_server_url db_props do
     "#{db_props[:protocol]}://#{db_props[:hostname]}:#{db_props[:port]}"
   end
 
+  @doc """
+  Produces the URL to a specific database hosted on the given server.
+  """
+  @spec database_url(db_properties) :: String.t
   def database_url db_props do
     "#{database_server_url(db_props)}/#{db_props[:database]}"
   end
 
+  @doc """
+  Produces the URL to a specific document contained in given database.
+  """
+  @spec document_url(db_properties, String.t) :: String.t
   def document_url db_props, id do
     "#{database_url(db_props)}/#{id}"
   end
 
+  @doc """
+  Produces an URL that can be used to retrieve the given number of UUIDs from
+  CouchDB.
+  """
+  @spec fetch_uuid_url(db_properties, non_neg_integer) :: String.t
   def fetch_uuid_url db_props, count \\ 1 do
     "#{database_server_url(db_props)}/_uuids?count=#{count}"
   end
 
+  @doc """
+  Produces the URL to a specific design document.
+  """
+  @spec design_url(db_properties, String.t) :: String.t
   def design_url db_props, design do
     "#{database_url(db_props)}/_design/#{design}"
   end
 
+  @doc """
+  Produces the URL to a specific view from a given design document.
+  """
+  @spec view_url(db_properties, String.t, String.t) :: String.t
   def view_url db_props, design, view do
     "#{design_url(db_props, design)}/_view/#{view}"
   end
 
+  @doc """
+  Produces the URL to query a view for a specific key, using the provided
+  staleness setting (either :ok or :update_after).
+  """
+  @spec query_path(String.t, String.t, atom) :: String.t
   def query_path view_base_url, key, stale do
     "#{view_base_url}?key=\"#{key}\"&stale=#{Atom.to_string(stale)}"
   end

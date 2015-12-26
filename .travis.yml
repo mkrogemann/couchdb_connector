@@ -1,3 +1,5 @@
+env:
+  - TRAVIS=true
 services:
   - couchdb
 language: elixir

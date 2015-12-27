@@ -1,6 +1,8 @@
 defmodule Couchdb.Connector.ViewTest do
   use ExUnit.Case
 
+  @num_retries 10
+
   alias Couchdb.Connector.View
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
@@ -28,8 +30,7 @@ defmodule Couchdb.Connector.ViewTest do
   end
 
   test "document_by_key/3: ensure that view returns document for given key" do
-    num_retries = 10
-    result = TestRetry.retry(num_retries,
+    result = TestRetry.retry(@num_retries,
       fn(_) ->
         View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name"
       end,
@@ -46,6 +47,8 @@ defmodule Couchdb.Connector.ViewTest do
         end
       end
     )
-    assert result, "document not found in view after #{num_retries} tries"
+    assert result, "document not found in view after #{@num_retries} tries"
   end
+
+  #TODO: test case for missing doc
 end

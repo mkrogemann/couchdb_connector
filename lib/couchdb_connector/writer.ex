@@ -8,16 +8,17 @@ defmodule Couchdb.Connector.Writer do
       db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_test", port: 5984}
       %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
 
-      Couchdb.Connector.storage_up(db_props)
+      Couchdb.Connector.Storage.storage_up(db_props)
       {:ok, "{\\"ok\\":true}\\n"}
 
-      Couchdb.Connector.create(db_props, "{\\"key\\": \\"value\\"}")
+      Couchdb.Connector.Writer.create(db_props, "{\\"key\\": \\"value\\"}")
       {:ok, "{\\"ok\\":true,\\"id\\":\\"7dd00...\\",\\"rev\\":\\"1-59414e7...\\"}\\n",
             [{"Server", "CouchDB/1.6.1 (Erlang OTP/18)"},
              {"Location", "http://localhost:5984/couchdb_connector_test/7dd00..."},
              {"ETag", "\\"1-59414e7...\\""}, {"Date", "Mon, 21 Dec 2015 16:13:23 GMT"},
              {"Content-Type", "text/plain; charset=utf-8"},
              {"Content-Length", "95"}, {"Cache-Control", "must-revalidate"}]}
+
   """
 
   alias Couchdb.Connector.Headers

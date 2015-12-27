@@ -8,11 +8,13 @@ defmodule Couchdb.Connector.Reader do
       db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_test", port: 5984}
       %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
 
-      Couchdb.Connector.fetch_uuid(db_props)
-      :ok, "{\\"uuids\\":[\\"1a013a4ce3...\\"]}\\n"}
-
-      Couchdb.Connector.get(db_props, "_not_there_")
+      Couchdb.Connector.Reader.get(db_props, "_not_there_")
       :error, "{\\"error\\":\\"not_found\\",\\"reason\\":\\"missing\\"}\\n"}
+
+      TODO: successful read
+
+      Couchdb.Connector.Reader.fetch_uuid(db_props)
+      :ok, "{\\"uuids\\":[\\"1a013a4ce3...\\"]}\\n"}
 
   """
 

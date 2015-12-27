@@ -6,9 +6,9 @@ defmodule Couchdb.Connector.Storage do
 
       iex>db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_test", port: 5984}
       %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
-      iex>Couchdb.Connector.storage_up(db_props)
+      iex>Couchdb.Connector.Storage.storage_up(db_props)
       {:ok, "{\\"ok\\":true}\\n"}
-      iex>Couchdb.Connector.storage_down(db_props)
+      iex>Couchdb.Connector.Storage.storage_down(db_props)
       {:ok, "{\\"ok\\":true}\\n"}
 
   """

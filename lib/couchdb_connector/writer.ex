@@ -6,19 +6,16 @@ defmodule Couchdb.Connector.Writer do
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
+  def create db_props, json do
+    { :ok, uuid_json } = Reader.fetch_uuid(db_props)
+    uuid = hd(Poison.decode!(uuid_json)["uuids"])
+    create db_props, json, uuid
+  end
+
   def create db_props, json, id do
     db_props
     |> UrlHelper.document_url(id)
     |> do_create(json, id)
-    |> Handler.handle_put(_include_headers = true)
-  end
-
-  def create_fetch_uuid db_props, json do
-    { :ok, uuid_json } = Reader.fetch_uuid(db_props)
-    uuid = hd(Poison.decode!(uuid_json)["uuids"])
-    db_props
-    |> UrlHelper.document_url(uuid)
-    |> do_create(json, uuid)
     |> Handler.handle_put(_include_headers = true)
   end
 

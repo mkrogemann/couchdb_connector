@@ -8,9 +8,9 @@ defmodule Couchdb.Connector.View do
       %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
 
       view_code = File.read!("my_view.json")
-      Couchdb.Connector.create_view db_props, "my_design", view_code
+      Couchdb.Connector.View.create_view db_props, "my_design", view_code
 
-      Couchdb.Connector.document_by_key(db_props, "design_name", "view_name", "key")
+      Couchdb.Connector.View.document_by_key(db_props, "design_name", "view_name", "key")
       {:ok, "{\\"total_rows\\":3,\\"offset\\":1,\\"rows\\":[\\r\\n{\\"id\\":\\"5c09dbf93fd...\\", ...}
 
   """

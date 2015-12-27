@@ -1,4 +1,4 @@
 defmodule Couchdb.ConnectorTest do
   use ExUnit.Case, async: false
-  doctest Couchdb.Connector
+  # doctest Couchdb.Connector
 end

@@ -10,31 +10,29 @@ defmodule Couchdb.Connector.WriterTest do
     on_exit context, fn -> TestPrep.delete_database end
   end
 
-  test "create/2: ensure that a new document gets created with couchdb generated id" do
-    {:ok, body, _headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}"
+  test "create/3: ensure that a new document gets created with given id" do
+    {:ok, body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}", "42"
     {:ok, body_map} = Poison.decode body
-    assert body_map["ok"]
-    assert String.starts_with?(body_map["rev"], "1-")
-    assert String.length(body_map["id"]) == 32
+    assert body_map["id"] == "42"
+    assert id_from_url(headers["Location"]) == "42"
   end
 
-  test "create/3: ensure that a new document gets created with given id" do
-    {:ok, body, _headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}", "42"
-    {:ok, body_map} = Poison.decode body
-    assert body_map["ok"]
-    assert body_map["id"] == "42"
+  test "create/3: ensure that given id overrides id contained in document" do
+    {:ok, response_body, headers} = Writer.create TestConfig.database_properties, "{\"_id\": \"some_id\", \"key\": \"value\"}", "42"
+    response_map = Poison.decode! response_body
+    assert response_map["id"] == "42"
+    assert id_from_url(headers["Location"]) == "42"
   end
 
   test "create_fetch_uuid/2: ensure that a new document gets create with a fetched id" do
     {:ok, body, _headers} = Writer.create_fetch_uuid TestConfig.database_properties, "{\"key\": \"value\"}"
     {:ok, body_map} = Poison.decode body
-    assert body_map["ok"]
     assert String.starts_with?(body_map["rev"], "1-")
     assert String.length(body_map["id"]) == 32
   end
 
   test "update/2: ensure that a document that contains an existing id can be updated" do
-    {:ok, _body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"original value\"}"
+    {:ok, _body, headers} = Writer.create_fetch_uuid TestConfig.database_properties, "{\"key\": \"original value\"}"
     id = id_from_url(headers["Location"])
     revision = headers["ETag"]
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
@@ -50,7 +48,7 @@ defmodule Couchdb.Connector.WriterTest do
   end
 
   test "update/3: ensure that an existing document with given id can be updated" do
-    {:ok, _body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"original value\"}"
+    {:ok, _body, headers} = Writer.create_fetch_uuid TestConfig.database_properties, "{\"key\": \"original value\"}"
     id = id_from_url(headers["Location"])
     revision = headers["ETag"]
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
@@ -59,7 +57,7 @@ defmodule Couchdb.Connector.WriterTest do
   end
 
   test "update/3: verify that a mismatch of document id and URL id raises an exception" do
-    {:ok, _body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"original value\"}"
+    {:ok, _body, headers} = Writer.create_fetch_uuid TestConfig.database_properties, "{\"key\": \"original value\"}"
     id = id_from_url(headers["Location"])
     revision = headers["ETag"]
     update = "{\"_id\": \"some_wrong_id\", \"_rev\": #{revision}, \"key\": \"new value\"}"

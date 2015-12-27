@@ -6,13 +6,6 @@ defmodule Couchdb.Connector.Writer do
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
-  def create db_props, json do
-    db_props
-    |> UrlHelper.database_url
-    |> do_create(json)
-    |> Handler.handle_put(_include_headers = true)
-  end
-
   def create db_props, json, id do
     db_props
     |> UrlHelper.document_url(id)
@@ -27,13 +20,6 @@ defmodule Couchdb.Connector.Writer do
     |> UrlHelper.document_url(uuid)
     |> do_create(json, uuid)
     |> Handler.handle_put(_include_headers = true)
-  end
-
-  defp do_create url, json do
-    couchdb_safe_json = Poison.Parser.parse!(json)
-    |> couchdb_safe
-    |> Poison.encode!
-    HTTPoison.post! url, couchdb_safe_json, [ Headers.json_header ]
   end
 
   defp do_create url, json, _id do

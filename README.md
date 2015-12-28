@@ -39,7 +39,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 ## Usage
 
-    For the subsequent steps, let's assume that we work in iex and that we use these database properties:
+For the subsequent steps, let's assume that we work in iex and that we use these database properties:
 
     iex>db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_dev", port: 5984}
 
@@ -56,11 +56,11 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 ### Write to a database
 
-    Now that the database exits, we can create documents in it.
+Now that the database exits, we can create documents in it.
 
     Couchdb.Connector.Writer.create(db_props, "{\"key\": \"value\"}")
 
-    You should see something similar to this
+You should see something similar to this
 
     {:ok,
       "{\"ok\":true,\"id\":\"6b66e9bd59c1c35f3ab51165b10889a7\",\"rev\":\"1-59414e77c768bc202142ac82c2f129de\"}\n",
@@ -72,11 +72,11 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
         {"Content-Type", "text/plain; charset=utf-8"}, {"Content-Length", "95"},
         {"Cache-Control", "must-revalidate"}]}
 
-    In the previous example, we had CouchDB assign a generated id to the document. This will do for most cases. In case you want to provide an id and you are sure that it does not yet exist in the database, you can do this:
+In the previous example, we had CouchDB assign a generated id to the document. This will do for most cases. In case you want to provide an id and you are sure that it does not yet exist in the database, you can do this:
 
     Couchdb.Connector.Writer.create(db_props, "{\"key\": \"value\"}", "unique_id")
 
-    You should then see something like
+You should then see something like
 
     {:ok,
       "{\"ok\":true,\"id\":\"unique_id\",\"rev\":\"1-59414e77c768bc202142ac82c2f129de\"}\n",
@@ -89,50 +89,51 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 ### Read from a database
 
-    Given we have a document under the id "unique_id" in the database that we created in one of the steps above, the following "GET" should return the desired document.
+Given we have a document under the id "unique_id" in the database that we created in one of the steps above, the following "GET" should return the desired document.
 
-    So let's try
+So let's try
 
     Couchdb.Connector.Reader.get(db_props, "unique_id")
 
-    You should see something akin to this:
+You should see something akin to this:
 
     {:ok,
       "{\"_id\":\"unique_id\",\"_rev\":\"1-59414e77c768bc202142ac82c2f129de\",\"key\":\"value\"}\n"}
 
-    In case you ask for a non existing document, like in this example
+In case you ask for a non existing document, like in this example
 
     Couchdb.Connector.Reader.get(db_props, "wrong_id")
 
-    You should see something this:
+You should see something this:
 
     {:error,  "{\"error\":\"not_found\",\"reason\":\"missing\"}\n"}
 
 ### Create a View
 
-    TBD
+TBD
 
 ### Query a View
 
-     TBD
+TBD
 
 ### Destroy a database
 
     Couchdb.Connector.Storage.storage_down(db_props)
 
-    You should see
+You should see
     {:ok, "{\"ok\":true}\n"}
 
-    Just in case that database never existed, you shoud see
+Just in case that database never existed, you shoud see
+
     {:error, "{\"error\":\"not_found\",\"reason\":\"missing\"}\n"}
 
 ## Next
 
-    Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
+Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
 
-    - authentication
-    - retry on (HTTPoison.Error) :closed errors
-    - enhance view query capabilities
-    - implement wrappers to take / return Maps instead of JSON strings
-    - cache UUIDs
-    - pool HTTP connections
+- authentication
+- retry on (HTTPoison.Error) :closed errors
+- enhance view query capabilities
+- implement wrappers to take / return Maps instead of JSON strings
+- cache UUIDs
+- pool HTTP connections

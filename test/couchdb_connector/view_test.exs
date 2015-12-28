@@ -25,8 +25,8 @@ defmodule Couchdb.Connector.ViewTest do
 
   test "create_view/3: ensure that view gets created" do
     {:ok, code} = File.read("test/resources/views/test_view.json")
-    {result, _} = View.create_view TestConfig.database_properties, "test_create", code
-    assert result == :ok
+    {:ok, result} = View.create_view TestConfig.database_properties, "test_design", code
+    assert String.contains?(result, "\"id\":\"_design/test_design\"")
   end
 
   test "document_by_key/3: ensure that view returns document for given key" do

@@ -39,9 +39,9 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 ## Usage
 
-For the subsequent steps, let's assume that we work in iex and that we use these database properties:
+For the subsequent steps, let's assume that we work in iex and that we define these database properties:
 
-    iex>db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_dev", port: 5984}
+    db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_dev", port: 5984}
 
 ### Create a database
 
@@ -110,11 +110,55 @@ You should see something this:
 
 ### Create a View
 
-TBD
+CouchDB [Views](http://guide.couchdb.org/editions/1/en/views.html) are defined in JavaScript and consist of mappers and (optional) reducers. Views are grouped together in CouchDB in what is known as Design Documents.
+
+Let's assume that you want to create one or more Views as part of a seeding process. In order to do so, you can encode your Views in JSON files as follows:
+
+```JSON
+{
+  "_id" : "_design/example",
+  "views" : {
+    "by_name" : {
+      "map" : "function(doc){ emit(doc.name, doc)}"
+    }
+  }
+}
+```
+
+Creating this View can then be done through the connector like this:
+
+```Elixir
+{:ok, code} = File.read("path/to/view.json")
+{:ok, _} = Couchdb.Connector.View.create_view(db_props, "example", code)
+```
+
+where "example" is the name of the design document and code now contains the JavaScript as read from file.
+
+You should see something like
+
+```Elixir
+{:ok,
+ "{\"ok\":true,\"id\":\"_design/example\",\"rev\":\"1-175ebbcc6e519413aeb640e8fc63424d\"}\n"}
+```
 
 ### Query a View
 
-TBD
+Querying a View can be done like this:
+
+```Elixir
+{:ok, result} = Couchdb.Connector.View.document_by_key(db_props, "design_name", "view_name", "key")
+```
+
+In case the document given by "key" exists, you should see something like
+```Elixir
+{:ok,
+ "{\"total_rows\":3,\"offset\":1,\"rows\":[\r\n{\"id\":\"5c09dbf93fd6226c414fad5b84004d7c\",\"key\":\"key\",..."}
+```
+
+otherwise, the response should contain an empty list of rows:
+```Elixir
+{:ok, "{\"total_rows\":0,\"offset\":0,\"rows\":[\r\n\r\n]}\n"}
+```
 
 ### Destroy a database
 
@@ -133,7 +177,6 @@ Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
 
 - authentication
 - retry on (HTTPoison.Error) :closed errors
-- enhance view query capabilities
-- implement wrappers to take / return Maps instead of JSON strings
-- cache UUIDs
+- enhance view handling and query capabilities
+- implement wrappers to take / return Maps instead of JSON strings only
 - pool HTTP connections

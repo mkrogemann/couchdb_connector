@@ -50,5 +50,25 @@ defmodule Couchdb.Connector.ViewTest do
     assert result, "document not found in view after #{@num_retries} tries"
   end
 
-  #TODO: test case for missing doc
+  test "document_by_key/3: ensure that view returns empty list of rows for missing key" do
+    key = "missing"
+    result = TestRetry.retry(@num_retries,
+      fn(_) ->
+        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", key
+      end,
+      fn(response) ->
+        case response do
+          {:ok, body} ->
+            doc = Poison.decode! body
+            rows = doc["rows"]
+            case length(rows) do
+              0 -> false
+              _ -> hd(rows)["id"] == "test_id"
+            end
+          _ -> false
+        end
+      end
+    )
+    assert !result, "unexpectedly received a document for key #{key}."
+  end
 end

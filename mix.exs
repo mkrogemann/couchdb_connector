@@ -2,19 +2,27 @@ defmodule Couchdb.Connector.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :couchdb_connector,
-     version: "0.1.0",
-     elixir: "~> 1.1",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     description: description,
-     package: package,
-     deps: deps,
-     test_coverage: [tool: Coverex.Task, coveralls: true]]
+    [
+      app: :couchdb_connector,
+      version: "0.1.0",
+      elixir: "~> 1.1",
+      build_embedded: Mix.env == :prod,
+      start_permanent: Mix.env == :prod,
+      description: description,
+      package: package,
+      deps: deps,
+      test_coverage: [
+        tool: Coverex.Task, coveralls: true
+        ]
+      ]
   end
 
   def application do
-    [applications: [:logger, :httpoison, :poison]]
+    [
+      applications:
+        [:logger, :httpoison, :poison
+      ]
+    ]
   end
 
   defp deps do

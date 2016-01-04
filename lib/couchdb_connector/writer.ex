@@ -47,21 +47,20 @@ defmodule Couchdb.Connector.Writer do
   def create db_props, json, id do
     db_props
     |> UrlHelper.document_url(id)
-    |> do_create(json, id)
+    |> do_create(json)
     |> Handler.handle_put(_include_headers = true)
   end
 
-  defp do_create url, json, _id do
-    couchdb_safe_json = Poison.Parser.parse!(json)
-    |> couchdb_safe
-    |> Poison.encode!
-    HTTPoison.put! url, couchdb_safe_json, [ Headers.json_header ]
+  defp do_create url, json do
+    safe_json = couchdb_safe(json)
+    HTTPoison.put! url, safe_json, [ Headers.json_header ]
   end
 
-  defp couchdb_safe map do
+  defp couchdb_safe json do
+    map = Poison.Parser.parse!(json)
     case Map.get(map, "_id") do
-      nil -> Map.delete(map, "_id")
-      _ -> map
+      nil -> Poison.encode!(Map.delete(map, "_id"))
+      _ -> Poison.encode!(map)
     end
   end
 
@@ -74,7 +73,8 @@ defmodule Couchdb.Connector.Writer do
     id = Map.fetch(doc_map, "_id")
     case id do
       { :ok, id } ->
-        UrlHelper.document_url(db_props, id)
+        url = UrlHelper.document_url(db_props, id)
+        url
         |> do_update(Poison.encode!(doc_map))
         |> Handler.handle_put(_include_headers = true)
       :error ->

@@ -28,7 +28,7 @@ This library has been tested against Elixir 1.1.1 and 1.2.0 with CouchDB 1.6.1.
 
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
+The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the package can be installed as follows:
 
   1. Add couchdb_connector to your list of dependencies in `mix.exs`:
 

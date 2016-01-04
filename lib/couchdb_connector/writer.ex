@@ -107,10 +107,10 @@ defmodule Couchdb.Connector.Writer do
   end
 
   defp check_id doc_map, id do
-    cond do
-      doc_map["_id"] == id ->
+    case doc_map["_id"] do
+      doc_id when doc_id == id ->
         doc_map
-      doc_map["_id"] != id ->
+      _ ->
         raise RuntimeError, message:
           "id mismatch: URL id #{id} and document _id #{doc_map["_id"]} differ"
     end

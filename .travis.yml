@@ -5,4 +5,4 @@ elixir:
   - 1.1.1
 otp_release:
   - 18.2
-script: "MIX_ENV=test mix do deps.get, deps.compile, test --cover"
+script: "MIX_ENV=test mix do deps.get, deps.compile, test --trace --cover"

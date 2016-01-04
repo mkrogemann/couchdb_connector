@@ -21,6 +21,10 @@ Basic support for view operations is provided by the View module.
 All create and update operations expect valid JSON documents. All read
 operations return JSON strings exactly as they come from CouchDB.
 
+## Supported platforms
+
+This library has been tested against Elixir 1.1.1 and 1.2.0 with CouchDB 1.6.1.
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed as:
@@ -29,7 +33,7 @@ If [available in Hex](https://hex.pm/docs/publish), the package can be installed
 
 ```Elixir
         def deps do
-          [{:couchdb_connector, "~> 0.1.0"}]
+          [{:couchdb_connector, "~> 0.2.0"}]
         end
 ```
 
@@ -202,7 +206,7 @@ You should see
 {:ok, "{\"ok\":true}\n"}
 ```
 
-In case that database never existed, you shoud see
+In case that database never existed, you should see
 
 ```Elixir
 {:error, "{\"error\":\"not_found\",\"reason\":\"missing\"}\n"}

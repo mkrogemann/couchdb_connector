@@ -75,7 +75,7 @@ defmodule Couchdb.Connector.Writer do
     case id do
       { :ok, id } ->
         UrlHelper.document_url(db_props, id)
-        |> do_update(doc_map)
+        |> do_update(Poison.encode!(doc_map))
         |> Handler.handle_put(_include_headers = true)
       :error ->
         raise RuntimeError, message:
@@ -83,36 +83,18 @@ defmodule Couchdb.Connector.Writer do
     end
   end
 
-  defp do_update url, doc_map do
-    HTTPoison.put! url, Poison.encode!(doc_map), [ Headers.json_header ]
-  end
-
   @doc """
-  Update the given document that is stored under the given id. Note that
-  a mismatch between the id parameter and the _id field contained in the
-  document will trigger a RuntimeError.
+  Update the given document that is stored under the given id.
   """
   def update db_props, json, id do
     db_props
     |> UrlHelper.document_url(id)
-    |> do_update(json, id)
+    |> do_update(json)
     |> Handler.handle_put(_include_headers = true)
   end
 
-  defp do_update url, json, id do
-    id_checked_json = Poison.Parser.parse!(json)
-    |> check_id(id)
-    |> Poison.encode!
-    HTTPoison.put!(url, id_checked_json, [ Headers.json_header ])
+  defp do_update url, json do
+    HTTPoison.put!(url, json, [ Headers.json_header ])
   end
 
-  defp check_id doc_map, id do
-    case doc_map["_id"] do
-      doc_id when doc_id == id ->
-        doc_map
-      _ ->
-        raise RuntimeError, message:
-          "id mismatch: URL id #{id} and document _id #{doc_map["_id"]} differ"
-    end
-  end
 end

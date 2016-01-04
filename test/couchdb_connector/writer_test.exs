@@ -56,16 +56,6 @@ defmodule Couchdb.Connector.WriterTest do
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
 
-  test "update/3: verify that a mismatch of document id and URL id raises an exception" do
-    {:ok, _body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"original value\"}"
-    id = id_from_url(header_value(headers, "Location"))
-    revision = header_value(headers, "ETag")
-    update = "{\"_id\": \"some_wrong_id\", \"_rev\": #{revision}, \"key\": \"new value\"}"
-    assert_raise RuntimeError, fn ->
-      Writer.update TestConfig.database_properties, update, id
-    end
-  end
-
   defp header_value headers, key do
     Enum.into(headers, %{})[key]
   end

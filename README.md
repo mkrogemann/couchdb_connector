@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/locolupo/couchdb_connector.png?label=ready&title=Ready)](https://waffle.io/locolupo/couchdb_connector)
 # CouchdbConnector
 
 [![Build Status](https://travis-ci.org/locolupo/couchdb_connector.svg)](https://travis-ci.org/locolupo/couchdb_connector)

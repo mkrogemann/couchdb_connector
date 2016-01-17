@@ -18,11 +18,8 @@ defmodule Couchdb.Connector.Mixfile do
   end
 
   def application do
-    [
-      applications:
-        [:logger, :httpoison, :poison
-      ]
-    ]
+    [applications: [:logger, :httpoison, :poison],
+     mod: {Couchdb.Connector.Supervisor, [name: :couchdb_connector_sup]}]
   end
 
   defp deps do

@@ -15,6 +15,8 @@ defmodule Couchdb.Connector.View do
 
   """
 
+  alias Couchdb.Connector.Headers
+  alias Couchdb.Connector.Options
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
@@ -24,7 +26,7 @@ defmodule Couchdb.Connector.View do
   def fetch_all db_props, design, view do
     db_props
     |> UrlHelper.view_url(design, view)
-    |> HTTPoison.get!
+    |> HTTPoison.get!(Headers.empty, Options.default)
     |> Handler.handle_get
   end
 
@@ -34,7 +36,7 @@ defmodule Couchdb.Connector.View do
   def create_view db_props, design, code do
     db_props
     |> UrlHelper.design_url(design)
-    |> HTTPoison.put!(code)
+    |> HTTPoison.put!(code, Headers.empty, Options.default)
     |> Handler.handle_put
   end
 
@@ -47,8 +49,7 @@ defmodule Couchdb.Connector.View do
     db_props
     |> UrlHelper.view_url(design, view)
     |> UrlHelper.query_path(key, stale)
-    |> HTTPoison.get!
+    |> HTTPoison.get!(Headers.empty, Options.default)
     |> Handler.handle_get
   end
-
 end

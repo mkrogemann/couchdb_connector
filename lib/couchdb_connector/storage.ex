@@ -14,6 +14,7 @@ defmodule Couchdb.Connector.Storage do
   """
 
   alias Couchdb.Connector.Headers
+  alias Couchdb.Connector.Options
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
@@ -23,7 +24,7 @@ defmodule Couchdb.Connector.Storage do
   def storage_up db_props do
     db_props
     |> UrlHelper.database_url
-    |> HTTPoison.put!("{}", [ Headers.json_header ])
+    |> HTTPoison.put!("{}", [ Headers.json_header ], Options.default)
     |> Handler.handle_put
   end
 
@@ -33,8 +34,7 @@ defmodule Couchdb.Connector.Storage do
   def storage_down db_props do
     db_props
     |> UrlHelper.database_url
-    |> HTTPoison.delete!
+    |> HTTPoison.delete!(Headers.empty, Options.default)
     |> Handler.handle_delete
   end
-
 end

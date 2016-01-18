@@ -12,4 +12,6 @@ defmodule Couchdb.Connector.Headers do
   def json_header do
     {"Content-Type", "application/json; charset=utf-8"}
   end
+
+  def empty, do: []
 end

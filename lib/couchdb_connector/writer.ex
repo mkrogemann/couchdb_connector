@@ -22,7 +22,6 @@ defmodule Couchdb.Connector.Writer do
   """
 
   alias Couchdb.Connector.Headers
-  alias Couchdb.Connector.Options
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
@@ -54,7 +53,7 @@ defmodule Couchdb.Connector.Writer do
 
   defp do_create url, json do
     safe_json = couchdb_safe(json)
-    HTTPoison.put!(url, safe_json, [ Headers.json_header ], Options.default)
+    HTTPoison.put! url, safe_json, [ Headers.json_header ]
   end
 
   defp couchdb_safe json do
@@ -95,6 +94,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   defp do_update url, json do
-    HTTPoison.put!(url, json, [ Headers.json_header ], Options.default)
+    HTTPoison.put!(url, json, [ Headers.json_header ])
   end
+
 end

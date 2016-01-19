@@ -17,8 +17,7 @@ defmodule Couchdb.Connector.Reader do
       :ok, "{\\"uuids\\":[\\"1a013a4ce3...\\"]}\\n"}
 
   """
-  alias Couchdb.Connector.Headers
-  alias Couchdb.Connector.Options
+
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
@@ -28,7 +27,7 @@ defmodule Couchdb.Connector.Reader do
   def get db_props, id do
     db_props
     |> UrlHelper.document_url(id)
-    |> HTTPoison.get!(Headers.empty, Options.default)
+    |> HTTPoison.get!
     |> Handler.handle_get
   end
 
@@ -38,7 +37,7 @@ defmodule Couchdb.Connector.Reader do
   def fetch_uuid db_props do
     db_props
     |> UrlHelper.fetch_uuid_url
-    |> HTTPoison.get!(Headers.empty, Options.default)
+    |> HTTPoison.get!
     |> Handler.handle_get
   end
 end

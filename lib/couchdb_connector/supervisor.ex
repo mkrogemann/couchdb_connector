@@ -13,9 +13,7 @@ defmodule Couchdb.Connector.Supervisor do
   end
 
   def init(:ok) do
-    children = [
-      :hackney_pool.child_spec(:couchdb_pool, [timeout: 150000, max_connections: 50])
-    ]
+    children = []
     supervise(children, strategy: :one_for_one)
   end
 end

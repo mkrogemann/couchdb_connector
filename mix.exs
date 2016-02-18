@@ -12,7 +12,7 @@ defmodule Couchdb.Connector.Mixfile do
       package: package,
       deps: deps,
       test_coverage: [
-        tool: Coverex.Task, coveralls: true
+        tool: ExCoveralls
         ]
       ]
   end
@@ -26,10 +26,10 @@ defmodule Couchdb.Connector.Mixfile do
     [
       {:httpoison, "~> 0.8.0"},
       {:poison, "~> 1.5.0"},
-      {:coverex, "1.4.7", only: [:dev, :test]},
+      {:excoveralls, "0.4.6", only: [:dev, :test]},
       {:credo, "~> 0.2", only: [:dev, :test]},
-      {:earmark, "~> 0.1", only: :dev},
-      {:ex_doc, "~> 0.11", only: :dev}
+      {:earmark, "0.2.1", only: :dev},
+      {:ex_doc, "0.11.4", only: :dev}
     ]
   end
 

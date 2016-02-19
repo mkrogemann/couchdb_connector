@@ -1,3 +1,4 @@
+sudo: require
 services:
   - couchdb
 language: elixir

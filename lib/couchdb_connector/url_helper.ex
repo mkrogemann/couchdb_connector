@@ -25,7 +25,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
 
   use Couchdb.Connector.Types
-  
+
   @doc """
   Produces the URL to the server given in db_props.
   """

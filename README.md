@@ -188,7 +188,7 @@ Querying a View can be done like this:
 In case the document given by "key" exists, you should see something like
 ```Elixir
 {:ok,
- "{\"total_rows\":3,\"offset\":1,\"rows\":[\r\n{\"id\":\"5c09dbf93fd6226c414fad5b84004d7c\",\"key\":\"key\",..."}
+ "{\"total_rows\":3,\"offset\":1,\"rows\":[\r\n{\"id\":\"5c09dbf93fd6226c...\",\"key\":\"key\",..."}
 ```
 
 otherwise, the response should contain an empty list of rows:

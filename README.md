@@ -34,17 +34,17 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
   1. Add couchdb_connector to your list of dependencies in `mix.exs`:
 
 ```Elixir
-        def deps do
-          [{:couchdb_connector, "~> 0.2.0"}]
-        end
+def deps do
+  [{:couchdb_connector, "~> 0.2.0"}]
+end
 ```
 
   2. Ensure couchdb_connector is started before your application:
 
 ```Elixir
-        def application do
-          [applications: [:couchdb_connector]]
-        end
+def application do
+  [applications: [:couchdb_connector]]
+end
 ```
 
 ## Usage

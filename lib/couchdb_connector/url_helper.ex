@@ -24,9 +24,8 @@ defmodule Couchdb.Connector.UrlHelper do
       "http://localhost:5984/_users/org.couchdb.user:jan"
   """
 
-  @type db_properties :: %{protocol: String.t, hostname: String.t,
-                           database: String.t, port: non_neg_integer}
-
+  use Couchdb.Connector.Types
+  
   @doc """
   Produces the URL to the server given in db_props.
   """

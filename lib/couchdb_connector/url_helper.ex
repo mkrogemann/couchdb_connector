@@ -1,7 +1,7 @@
 defmodule Couchdb.Connector.UrlHelper do
   @moduledoc """
   Provides URL helper functions that compose URLs based on given database
-  properties and additional parameters, such as document IDs.
+  properties and additional parameters, such as document IDs, usernames, etc.
 
   Most of the time, these functions will be used internally. There should
   rarely be a need to access these from within your application.
@@ -20,6 +20,8 @@ defmodule Couchdb.Connector.UrlHelper do
       "http://localhost:5984/_uuids?count=1"
       iex>Couchdb.Connector.UrlHelper.fetch_uuid_url(db_props, _count = 10)
       "http://localhost:5984/_uuids?count=10"
+      iex>Couchdb.Connector.UrlHelper.user_url(db_props, "jan")
+      "http://localhost:5984/_users/org.couchdb.user:jan"
   """
 
   @type db_properties :: %{protocol: String.t, hostname: String.t,
@@ -83,4 +85,11 @@ defmodule Couchdb.Connector.UrlHelper do
     "#{view_base_url}?key=\"#{key}\"&stale=#{Atom.to_string(stale)}"
   end
 
+  @doc """
+  Produces the URL to a specific user.
+  """
+  @spec user_url(db_properties, String.t) :: String.t
+  def user_url db_props, username do
+    "#{database_server_url(db_props)}/_users/org.couchdb.user:#{username}"
+  end
 end

@@ -26,12 +26,24 @@ defmodule Couchdb.Connector.AdminTest do
     assert body_map["roles"] == ["couchdb contributor"]
   end
 
+  test "user_info/2: should return an error when asked for missing user" do
+    {:error, body} = Admin.user_info(TestConfig.database_properties, "jan")
+    {:ok, body_map} = Poison.decode body
+    assert body_map["error"] == "not_found"
+  end
+
   test "destroy_user/2: ensure that a given user can be deleted" do
     add_test_user
     {:ok, body} = Admin.destroy_user(TestConfig.database_properties, "jan")
     {:ok, body_map} = Poison.decode body
     assert body_map["id"] == "org.couchdb.user:jan"
     assert String.starts_with?(body_map["rev"], "2-")
+  end
+
+  test "destroy_user/2: should return an error when given non-existing user" do
+    {:error, body} = Admin.destroy_user(TestConfig.database_properties, "jan")
+    {:ok, body_map} = Poison.decode body
+    assert body_map["error"] == "not_found"
   end
 
   defp remove_test_user do

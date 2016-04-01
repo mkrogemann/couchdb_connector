@@ -4,7 +4,7 @@ defmodule Couchdb.Connector.Mixfile do
   def project do
     [
       app: :couchdb_connector,
-      version: "0.3.0",
+      version: "0.4.0",
       elixir: "~> 1.1",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -47,6 +47,11 @@ defmodule Couchdb.Connector.Mixfile do
     The connector offers 'create', 'update' and 'read' operations through its
     Writer and Reader modules.
     Basic support for view operations is provided by the View module.
+
+    There are also management functions for users and admins.
+
+    Authentication support is given for both basic auth and cookie based
+    authentication implementations.
     """
   end
 

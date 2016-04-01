@@ -21,6 +21,8 @@ defmodule Couchdb.Connector.Writer do
 
   """
 
+  use   Couchdb.Connector.Types
+
   alias Couchdb.Connector.Headers
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.UrlHelper
@@ -32,6 +34,7 @@ defmodule Couchdb.Connector.Writer do
   Fetching the uuid from CouchDB does incur a performance penalty as
   compared to providing one and using create/3.
   """
+  @spec create(db_properties, String.t) :: String.t
   def create db_props, json do
     { :ok, uuid_json } = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])
@@ -44,6 +47,7 @@ defmodule Couchdb.Connector.Writer do
   Either provide a UUID or consider using create/2 in case uniqueness cannot
   be guaranteed.
   """
+  @spec create(db_properties, String.t, String.t) :: String.t
   def create db_props, json, id do
     db_props
     |> UrlHelper.document_url(id)
@@ -68,6 +72,7 @@ defmodule Couchdb.Connector.Writer do
   Update the given document. Note that an _id field must be contained in the
   document. A missing _id field with trigger a RuntimeError.
   """
+  @spec update(db_properties, String.t) :: String.t
   def update db_props, json do
     doc_map = Poison.Parser.parse!(json)
     id = Map.fetch(doc_map, "_id")
@@ -86,6 +91,7 @@ defmodule Couchdb.Connector.Writer do
   @doc """
   Update the given document that is stored under the given id.
   """
+  @spec update(db_properties, String.t, String.t) :: String.t
   def update db_props, json, id do
     db_props
     |> UrlHelper.document_url(id)
@@ -97,4 +103,19 @@ defmodule Couchdb.Connector.Writer do
     HTTPoison.put!(url, json, [ Headers.json_header ])
   end
 
+  @doc """
+  Delete the document with the given id in the given revision. An error will be
+  returned in case the document does not exist or the revision is wrong.
+  """
+  @spec destroy(db_properties, String.t, String.t) :: String.t
+  def destroy db_props, id, rev do
+    db_props
+    |> UrlHelper.document_url(id)
+    |> do_destroy(rev)
+    |> Handler.handle_delete
+  end
+
+  defp do_destroy url, rev do
+    HTTPoison.delete! url <> "?rev=#{rev}"
+  end
 end

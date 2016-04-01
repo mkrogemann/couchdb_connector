@@ -2,6 +2,7 @@ defmodule Couchdb.Connector.WriterTest do
   use ExUnit.Case
 
   alias Couchdb.Connector.Writer
+  alias Couchdb.Connector.Reader
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
 
@@ -61,6 +62,29 @@ defmodule Couchdb.Connector.WriterTest do
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
     {:ok, _body, headers} = Writer.update TestConfig.database_properties, update, id
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
+  end
+
+  test "destroy/3: ensure that document with given id can be deleted" do
+    {:ok, _, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}", "42"
+    revision = String.replace(header_value(headers, "ETag"), "\"", "")
+    {:ok, body} = Writer.destroy TestConfig.database_properties, "42", revision
+    {:ok, body_map} = Poison.decode body
+    assert String.starts_with?(body_map["rev"], "2-")
+    {:error, _} = Reader.get(TestConfig.database_properties, "42")
+  end
+
+  test "destroy/3: attempting to delete a non-existing document triggers an error" do
+    {:error, body} = Writer.destroy TestConfig.database_properties, "42", "any_rev"
+    {:ok, body_map} = Poison.decode body
+    assert body_map["reason"] == "missing"
+  end
+
+  test "destroy/3: attempting to delete a document with wrong revision triggers an error" do
+    {:ok, _, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}", "42"
+    revision = String.replace(String.replace(header_value(headers, "ETag"), "\"", ""), "1-", "2-")
+    {:error, body} = Writer.destroy TestConfig.database_properties, "42", revision
+    {:ok, body_map} = Poison.decode body
+    assert body_map["error"] == "conflict"
   end
 
   defp header_value headers, key do

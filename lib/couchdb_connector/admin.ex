@@ -74,6 +74,23 @@ defmodule Couchdb.Connector.Admin do
   end
 
   @doc """
+  Create a new admin with given username and password. In case of success,
+  the function will respond with an empty body. In case of failures (e.g.
+  if admin already exists), the response will be {:error, body, headers}.
+  """
+  @spec create_admin(db_properties, String.t, String.t) :: String.t
+  def create_admin db_props, username, password do
+    db_props
+    |> UrlHelper.admin_url(username)
+    |> do_create_admin(password)
+    |> Handler.handle_put(_include_headers = true)
+  end
+
+  defp do_create_admin(url, password) do
+    HTTPoison.put! url, "\"" <> password <> "\"", [ Headers.www_form_header ]
+  end
+
+  @doc """
   Returns the public information for the given user or an error in case the
   user does not exist.
   """
@@ -81,6 +98,18 @@ defmodule Couchdb.Connector.Admin do
   def user_info db_props, username do
     db_props
     |> UrlHelper.user_url(username)
+    |> HTTPoison.get!
+    |> Handler.handle_get
+  end
+
+  @doc """
+  Returns hashed information for the given admin or an error in case the admin
+  does not exist or if the given credentials are wrong.
+  """
+  @spec admin_info(db_properties, String.t, String.t) :: String.t
+  def admin_info db_props, username, password do
+    db_props
+    |> UrlHelper.admin_url(username, password)
     |> HTTPoison.get!
     |> Handler.handle_get
   end
@@ -106,7 +135,23 @@ defmodule Couchdb.Connector.Admin do
     |> Handler.handle_delete
   end
 
+  defp do_http_delete url do
+    HTTPoison.delete! url
+  end
+
   defp do_http_delete url, rev do
     HTTPoison.delete! url <> "?rev=#{rev}"
+  end
+
+  @doc """
+  Deletes the given admin from the database server or returns an error in case
+  the admin cannot be found.
+  """
+  @spec destroy_admin(db_properties, String.t, String.t) :: String.t
+  def destroy_admin db_props, username, password do
+    db_props
+    |> UrlHelper.admin_url(username, password)
+    |> do_http_delete
+    |> Handler.handle_delete
   end
 end

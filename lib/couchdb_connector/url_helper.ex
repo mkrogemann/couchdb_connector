@@ -35,6 +35,15 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
+  Produces the URL to the server given in db_props including
+  basic auth parameters
+  """
+  @spec database_server_url(db_properties, String.t, String.t) :: String.t
+  def database_server_url db_props, username, password do
+    "#{db_props[:protocol]}://#{username}:#{password}@#{db_props[:hostname]}:#{db_props[:port]}"
+  end
+
+  @doc """
   Produces the URL to a specific database hosted on the given server.
   """
   @spec database_url(db_properties) :: String.t
@@ -90,5 +99,21 @@ defmodule Couchdb.Connector.UrlHelper do
   @spec user_url(db_properties, String.t) :: String.t
   def user_url db_props, username do
     "#{database_server_url(db_props)}/_users/org.couchdb.user:#{username}"
+  end
+
+  @doc """
+  Produces the URL to a specific admin.
+  """
+  @spec admin_url(db_properties, String.t) :: String.t
+  def admin_url db_props, username do
+    "#{database_server_url(db_props)}/_config/admins/#{username}"
+  end
+
+  @doc """
+  Produces the URL to a specific admin, including basic auth params
+  """
+  @spec admin_url(db_properties, String.t, String.t) :: String.t
+  def admin_url db_props, username,password do
+    "#{database_server_url(db_props, username, password)}/_config/admins/#{username}"
   end
 end

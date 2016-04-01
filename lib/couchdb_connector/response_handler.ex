@@ -10,6 +10,10 @@ defmodule Couchdb.Connector.ResponseHandler do
   def handle_put(%{status_code: 201, body: body}),    do: {:ok,    body}
   def handle_put(%{status_code: ___, body: body}),    do: {:error, body}
 
+  # Matching on a status_code of 200 is odd, but CouchDB thinks it should
+  # return 200 for a successful PUT when it comes to creating admins.
+  def handle_put(%{status_code: 200, body: body, headers: headers},
+                 _include_headers = true),            do: {:ok,    body, headers}
   def handle_put(%{status_code: 201, body: body, headers: headers},
                  _include_headers = true),            do: {:ok,    body, headers}
   def handle_put(%{status_code: ___, body: body, headers: headers},

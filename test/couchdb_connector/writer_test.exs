@@ -1,5 +1,6 @@
 defmodule Couchdb.Connector.WriterTest do
   use ExUnit.Case
+  use Couchdb.Connector.TestSupport
 
   alias Couchdb.Connector.Writer
   alias Couchdb.Connector.Reader
@@ -85,10 +86,6 @@ defmodule Couchdb.Connector.WriterTest do
     {:error, body} = Writer.destroy TestConfig.database_properties, "42", revision
     {:ok, body_map} = Poison.decode body
     assert body_map["error"] == "conflict"
-  end
-
-  defp header_value headers, key do
-    Enum.into(headers, %{})[key]
   end
 
   defp id_from_url url do

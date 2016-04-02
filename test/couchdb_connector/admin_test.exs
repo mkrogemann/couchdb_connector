@@ -1,5 +1,6 @@
 defmodule Couchdb.Connector.AdminTest do
   use ExUnit.Case
+  use Couchdb.Connector.TestSupport
 
   alias Couchdb.Connector.Admin
   alias Couchdb.Connector.TestConfig
@@ -114,9 +115,5 @@ defmodule Couchdb.Connector.AdminTest do
 
   defp add_test_admin do
     Admin.create_admin(TestConfig.database_properties, "anna", "secret")
-  end
-
-  defp header_value headers, key do
-    Enum.into(headers, %{})[key]
   end
 end

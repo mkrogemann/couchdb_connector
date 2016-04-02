@@ -1,12 +1,12 @@
 defmodule Couchdb.Connector.ViewTest do
   use ExUnit.Case
+  use Couchdb.Connector.TestSupport
 
   @num_retries 10
 
   alias Couchdb.Connector.View
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.TestRetry
 
   setup context do
     TestPrep.ensure_database
@@ -30,7 +30,7 @@ defmodule Couchdb.Connector.ViewTest do
   end
 
   test "document_by_key/3: ensure that view returns document for given key" do
-    result = TestRetry.retry(@num_retries,
+    result = retry(@num_retries,
       fn(_) ->
         View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name"
       end,
@@ -52,7 +52,7 @@ defmodule Couchdb.Connector.ViewTest do
 
   test "document_by_key/3: ensure that view returns empty list of rows for missing key" do
     key = "missing"
-    result = TestRetry.retry(@num_retries,
+    result = retry(@num_retries,
       fn(_) ->
         View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", key
       end,

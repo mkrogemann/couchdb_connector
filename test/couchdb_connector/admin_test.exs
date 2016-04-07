@@ -9,8 +9,8 @@ defmodule Couchdb.Connector.AdminTest do
 
   setup context do
     on_exit context, fn ->
-      TestPrep.remove_test_user
-      TestPrep.remove_test_admin
+      TestPrep.delete_test_user
+      TestPrep.delete_test_admin
     end
   end
 
@@ -24,7 +24,7 @@ defmodule Couchdb.Connector.AdminTest do
   end
 
   test "user_info/2: get public information for given username" do
-    TestPrep.add_test_user
+    TestPrep.ensure_test_user
     {:ok, body} = Admin.user_info(TestConfig.database_properties, "jan")
     {:ok, body_map} = Poison.decode body
     assert body_map["_id"] == "org.couchdb.user:jan"
@@ -38,7 +38,7 @@ defmodule Couchdb.Connector.AdminTest do
   end
 
   test "destroy_user/2: ensure that a given user can be deleted" do
-    TestPrep.add_test_user
+    TestPrep.ensure_test_user
     {:ok, body} = Admin.destroy_user(TestConfig.database_properties, "jan")
     {:ok, body_map} = Poison.decode body
     assert body_map["id"] == "org.couchdb.user:jan"
@@ -61,7 +61,7 @@ defmodule Couchdb.Connector.AdminTest do
   end
 
   test "create_admin/3: ensure that same admin cannot be created twice" do
-    TestPrep.add_test_admin
+    TestPrep.ensure_test_admin
     {:error, body, _} = Admin.create_admin(
       TestConfig.database_properties, "anna", "secret")
     {:ok, body_map} = Poison.decode body
@@ -69,7 +69,7 @@ defmodule Couchdb.Connector.AdminTest do
   end
 
   test "admin_info/3: ensure that an existing admin can retrieve info about herself" do
-    TestPrep.add_test_admin
+    TestPrep.ensure_test_admin
     {:ok, body} = Admin.admin_info(TestConfig.database_properties, "anna", "secret")
     assert body != ""
   end
@@ -81,7 +81,7 @@ defmodule Couchdb.Connector.AdminTest do
   end
 
   test "destroy_admin/2: ensure that a given admin can be deleted" do
-    TestPrep.add_test_admin
+    TestPrep.ensure_test_admin
     {:ok, body} = Admin.destroy_admin(TestConfig.database_properties, "anna", "secret")
     assert body != ""
   end

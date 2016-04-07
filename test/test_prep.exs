@@ -21,12 +21,12 @@ defmodule Couchdb.Connector.TestPrep do
     {:ok, _} = HTTPoison.put "#{TestConfig.database_url}/_design/#{design_name}", code, [ Headers.json_header ]
   end
 
-  def add_test_user do
+  def ensure_test_user do
     Admin.create_user(
       TestConfig.database_properties, "jan", "relax", ["couchdb contributor"])
   end
 
-  def remove_test_user do
+  def delete_test_user do
     case Admin.user_info(TestConfig.database_properties, "jan") do
       {:ok, body} ->
         {:ok, body_map} = Poison.decode body
@@ -37,7 +37,7 @@ defmodule Couchdb.Connector.TestPrep do
     end
   end
 
-  def remove_test_admin do
+  def delete_test_admin do
     case Admin.admin_info(TestConfig.database_properties, "anna", "secret") do
       {:ok, _} ->
         HTTPoison.delete UrlHelper.admin_url(TestConfig.database_properties, "anna", "secret")
@@ -46,7 +46,7 @@ defmodule Couchdb.Connector.TestPrep do
     end
   end
 
-  def add_test_admin do
+  def ensure_test_admin do
     Admin.create_admin(TestConfig.database_properties, "anna", "secret")
   end
 end

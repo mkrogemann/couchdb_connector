@@ -25,7 +25,7 @@ defmodule Couchdb.Connector.Mixfile do
   defp deps do
     [
       {:httpoison, "~> 0.8.0"},
-      {:poison, "~> 1.5.0"},
+      {:poison, "~> 1.5 or ~> 2.0"},
       {:excoveralls, "0.4.6", only: [:dev, :test]},
       {:credo, "~> 0.2", only: [:dev, :test]},
       {:earmark, "0.2.1", only: :dev},

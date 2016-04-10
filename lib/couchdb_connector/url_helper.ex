@@ -113,7 +113,15 @@ defmodule Couchdb.Connector.UrlHelper do
   Produces the URL to a specific admin, including basic auth params
   """
   @spec admin_url(db_properties, String.t, String.t) :: String.t
-  def admin_url db_props, username,password do
+  def admin_url db_props, username, password do
     "#{database_server_url(db_props, username, password)}/_config/admins/#{username}"
+  end
+
+  @doc """
+  Produces the URL to the database server's configuration
+  """
+  @spec config_url(db_properties, String.t, String.t) :: String.t
+  def config_url db_props, username, password do
+    "#{database_server_url(db_props, username, password)}/_config"
   end
 end

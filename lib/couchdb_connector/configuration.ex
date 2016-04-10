@@ -3,6 +3,8 @@ defmodule Couchdb.Connector.Configuration do
   Provides functions to access the server's configuration.
   """
 
+  use Couchdb.Connector.Types
+
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 

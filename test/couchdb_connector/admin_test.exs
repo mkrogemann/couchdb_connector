@@ -11,6 +11,7 @@ defmodule Couchdb.Connector.AdminTest do
     on_exit context, fn ->
       TestPrep.delete_test_user
       TestPrep.delete_test_admin
+      TestPrep.delete_database
     end
   end
 
@@ -90,5 +91,13 @@ defmodule Couchdb.Connector.AdminTest do
     {:error, body} = Admin.destroy_admin(TestConfig.database_properties, "anna", "secret")
     {:ok, body_map} = Poison.decode body
     assert body_map["error"] == "unauthorized"
+  end
+
+  test "set_security/5: TODO" do
+    TestPrep.ensure_database
+    TestPrep.ensure_test_admin
+    TestPrep.ensure_test_user
+    {:ok, body} = Admin.set_security(TestConfig.database_properties, "anna", "secret", ["anna"], ["jan"])
+    assert body == "{\"ok\":true}\n"
   end
 end

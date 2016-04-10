@@ -154,4 +154,28 @@ defmodule Couchdb.Connector.Admin do
     |> do_http_delete
     |> Handler.handle_delete
   end
+
+
+  @doc """
+  Set the security object for a given database. Security object includes admins
+  and members for the database.
+  """
+  @spec set_security(db_properties, String.t, String.t, list(String.t), list(String.t)) :: String.t
+  def set_security db_props, admin_name, password, admins, members do
+    db_props
+    |> UrlHelper.security_url(admin_name, password)
+    |> do_set_security(to_json(admins, members))
+    |> Handler.handle_put
+  end
+
+  defp do_set_security url, json do
+    HTTPoison.put! url, json, [ Headers.json_header ]
+  end
+
+  defp to_json admins, members do
+    Poison.encode!(
+    %{:admins  => %{:names => admins,  :roles => ["admins"]},
+      :members => %{:names => members, :roles => ["members"]}
+    })
+  end
 end

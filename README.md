@@ -25,7 +25,7 @@ operations return JSON strings exactly as they come from CouchDB.
 
 ## Supported platforms
 
-This library has been tested against Elixir 1.1.1 and 1.2.0 with CouchDB 1.6.1.
+This library has been tested on Elixir 1.1.1 and 1.2.4 with CouchDB 1.6.1.
 
 ## Installation
 
@@ -35,7 +35,7 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
 
 ```Elixir
 def deps do
-  [{:couchdb_connector, "~> 0.2.0"}]
+  [{:couchdb_connector, "~> 0.4.0"}]
 end
 ```
 
@@ -218,7 +218,6 @@ In case that database never existed, you should see
 
 Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
 
-- authentication
 - retry on (HTTPoison.Error) :closed errors
 - enhance view handling and query capabilities
 - implement wrappers to take / return Maps instead of JSON strings only

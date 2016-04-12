@@ -11,8 +11,8 @@ defmodule Couchdb.Connector.Configuration do
   @doc """
   Returns complete server configuration.
   """
-  @spec get(db_properties, String.t, String.t) :: String.t
-  def get db_props, admin_name, password do
+  @spec server_config(db_properties, String.t, String.t) :: String.t
+  def server_config db_props, admin_name, password do
     db_props
     |> UrlHelper.config_url(admin_name, password)
     |> HTTPoison.get!

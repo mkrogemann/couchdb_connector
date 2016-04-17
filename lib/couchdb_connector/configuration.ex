@@ -16,14 +16,16 @@ defmodule Couchdb.Connector.Configuration do
   def start_link do
     connector_config = Enum.into(Application.get_all_env(:couchdb_connector), %{})
     {:ok, server_cfg_json} = server_config(connector_config,
-                                       connector_config.adminname,
-                                       connector_config.adminpwd)
-    start_link(%{connector: connector_config, server: Poison.decode!(server_cfg_json)})
+                                           connector_config.adminname,
+                                           connector_config.adminpwd)
+    start_link(%{connector: connector_config,
+                 server: Poison.decode!(server_cfg_json)})
   end
 
-  defp start_link connector_config do
-    {:ok, pid} = Agent.start_link(fn -> connector_config end)
+  defp start_link config do
+    {:ok, pid} = Agent.start_link(fn -> config end)
     Process.register(pid, :couchdb_config)
+    {:ok, pid}
   end
 
   @doc """
@@ -43,7 +45,7 @@ defmodule Couchdb.Connector.Configuration do
   @spec get() :: map()
   def get do
     :couchdb_config
-    |> Process.whereis()
+    |> Process.whereis
     |> Agent.get(fn config -> config end)
   end
 end

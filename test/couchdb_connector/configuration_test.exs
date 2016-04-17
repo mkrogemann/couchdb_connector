@@ -13,8 +13,7 @@ defmodule Couchdb.Connector.ConfigurationTest do
   end
 
   test "start_link/0: should start and register a configuration Agent process" do
-    assert Configuration.start_link
-    pid = Process.whereis :couchdb_config
+    {:ok, pid} = Configuration.start_link
     assert Process.alive? pid
   end
 
@@ -24,8 +23,8 @@ defmodule Couchdb.Connector.ConfigurationTest do
   end
 
   test "server_config/3: ensure that configuration can be read from a protected server" do
-    { :ok, json } = Configuration.server_config TestConfig.database_properties, "anna", "secret"
-    { :ok, json_map } = Poison.decode json
+    {:ok, json} = Configuration.server_config TestConfig.database_properties, "anna", "secret"
+    {:ok, json_map} = Poison.decode json
     {num, _rem} = Integer.parse json_map["couch_httpd_auth"]["timeout"]
     assert is_integer num
   end

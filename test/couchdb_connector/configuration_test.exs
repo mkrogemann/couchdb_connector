@@ -20,8 +20,7 @@ defmodule Couchdb.Connector.ConfigurationTest do
 
   test "get/0: should return the configuration Map" do
     Configuration.start_link
-    assert is_map Configuration.get
-    assert Configuration.get[:server]["couch_httpd_auth"]["timeout"] == "600"
+    assert Configuration.get[:server]["couch_httpd_auth"]["timeout"]
   end
 
   test "server_config/3: ensure that configuration can be read from a protected server" do

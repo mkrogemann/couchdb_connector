@@ -7,6 +7,7 @@ defmodule Couchdb.Connector.Types do
       @type db_properties :: %{protocol: String.t, hostname: String.t,
                                database: String.t, port: non_neg_integer}
       @type user_roles_list :: [String.t]
+      @type headers :: [{String.t, String.t}]
     end
   end
 end

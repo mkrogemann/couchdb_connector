@@ -11,6 +11,7 @@ defmodule Couchdb.Connector.Mixfile do
       description: description,
       package: package,
       deps: deps,
+      dialyzer: [plt_add_apps: [:poison, :httpoison]],
       test_coverage: [
         tool: ExCoveralls
         ]

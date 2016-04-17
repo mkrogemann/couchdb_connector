@@ -56,7 +56,7 @@ defmodule Couchdb.Connector.Admin do
   the function will respond with {:ok, body, headers}. In case of failures (e.g.
   if user already exists), the response will be {:error, body, headers}.
   """
-  @spec create_user(db_properties, String.t, String.t, user_roles_list) :: String.t
+  @spec create_user(db_properties, String.t, String.t, user_roles_list) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def create_user db_props, username, password, roles \\ [] do
     db_props
     |> UrlHelper.user_url(username)
@@ -78,7 +78,7 @@ defmodule Couchdb.Connector.Admin do
   the function will respond with an empty body. In case of failures (e.g.
   if admin already exists), the response will be {:error, body, headers}.
   """
-  @spec create_admin(db_properties, String.t, String.t) :: String.t
+  @spec create_admin(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def create_admin db_props, username, password do
     db_props
     |> UrlHelper.admin_url(username)
@@ -94,7 +94,7 @@ defmodule Couchdb.Connector.Admin do
   Returns the public information for the given user or an error in case the
   user does not exist.
   """
-  @spec user_info(db_properties, String.t) :: String.t
+  @spec user_info(db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
   def user_info db_props, username do
     db_props
     |> UrlHelper.user_url(username)
@@ -106,7 +106,7 @@ defmodule Couchdb.Connector.Admin do
   Returns hashed information for the given admin or an error in case the admin
   does not exist or if the given credentials are wrong.
   """
-  @spec admin_info(db_properties, String.t, String.t) :: String.t
+  @spec admin_info(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def admin_info db_props, username, password do
     db_props
     |> UrlHelper.admin_url(username, password)
@@ -118,7 +118,7 @@ defmodule Couchdb.Connector.Admin do
   Deletes the given user from the database server or returns an error in case
   the user cannot be found.
   """
-  @spec destroy_user(db_properties, String.t) :: String.t
+  @spec destroy_user(db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
   def destroy_user db_props, username do
     case user_info(db_props, username) do
       {:ok, user_json} ->
@@ -147,7 +147,7 @@ defmodule Couchdb.Connector.Admin do
   Deletes the given admin from the database server or returns an error in case
   the admin cannot be found.
   """
-  @spec destroy_admin(db_properties, String.t, String.t) :: String.t
+  @spec destroy_admin(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def destroy_admin db_props, username, password do
     db_props
     |> UrlHelper.admin_url(username, password)
@@ -160,7 +160,7 @@ defmodule Couchdb.Connector.Admin do
   Set the security object for a given database. Security object includes admins
   and members for the database.
   """
-  @spec set_security(db_properties, String.t, String.t, list(String.t), list(String.t)) :: String.t
+  @spec set_security(db_properties, String.t, String.t, list(String.t), list(String.t)) :: {:ok, String.t} | {:error, String.t}
   def set_security db_props, admin_name, password, admins, members do
     db_props
     |> UrlHelper.security_url(admin_name, password)

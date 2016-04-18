@@ -13,7 +13,9 @@ defmodule Couchdb.Connector.Supervisor do
   end
 
   def init(:ok) do
-    children = []
+    children = [
+      worker(Couchdb.Connector.Configuration, [])
+    ]
     supervise(children, strategy: :one_for_one)
   end
 end

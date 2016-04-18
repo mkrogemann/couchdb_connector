@@ -3,6 +3,8 @@ defmodule Couchdb.Connector.Configuration do
   Provides functions to access the server's configuration.
   """
 
+  require Logger
+
   use Couchdb.Connector.Types
 
   alias Couchdb.Connector.UrlHelper
@@ -15,16 +17,30 @@ defmodule Couchdb.Connector.Configuration do
   @spec start_link() :: true
   def start_link do
     connector_config = Enum.into(Application.get_all_env(:couchdb_connector), %{})
-    {:ok, server_cfg_json} = server_config(connector_config,
-                                           connector_config.adminname,
-                                           connector_config.adminpwd)
-    start_link(%{connector: connector_config,
-                 server: Poison.decode!(server_cfg_json)})
+    case server_config(connector_config,
+                       connector_config.adminname,
+                       connector_config.adminpwd) do
+      {:ok, server_cfg_json} ->
+        start_link(%{connector: connector_config,
+                     server: Poison.decode!(server_cfg_json)})
+      {:error, _} ->
+        Logger.info("Admin credentials failed: No access to server configuration")
+        # as long as we offer basic auth only, we can live without the server
+        # config, so let's continue for now
+        start_link(%{connector: connector_config})
+    end
   end
 
   defp start_link config do
     {:ok, pid} = Agent.start_link(fn -> config end)
-    Process.register(pid, :couchdb_config)
+    case Process.whereis(:couchdb_config) do
+      active_pid when is_pid active_pid ->
+        Process.unregister(:couchdb_config)
+        Agent.stop(active_pid)
+        Process.register(pid, :couchdb_config)
+      nil ->
+        Process.register(pid, :couchdb_config)
+    end
     {:ok, pid}
   end
 

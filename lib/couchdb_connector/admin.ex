@@ -10,17 +10,17 @@ defmodule Couchdb.Connector.Admin do
 
       Couchdb.Connector.Admin.create_user(db_props, "jan", "relax", ["couchdb contributor"])
       {:ok,
-       "{\"ok\":true,\"id\":\"org.couchdb.user:jan\",\"rev\":\"1-1d509578d1bc8cba3a6690fca5e7a9fd\"}\n",
+       "{\\"ok\\":true,\\"id\\":\\"org.couchdb.user:jan\\",\\"rev\\":\\"1-1d509578d1bc8cba3a6690fca5e7a9fd\\"}\\n",
        [{"Server", "CouchDB/1.6.1 (Erlang OTP/18)"},
         {"Location", "http://localhost:5984/_users/org.couchdb.user:jan"},
-        {"ETag", "\"1-1d509578d1bc8cba3a6690fca5e7a9fd\""},
+        {"ETag", "\\"1-1d509578d1bc8cba3a6690fca5e7a9fd\\""},
         {"Date", "Thu, 31 Mar 2016 21:50:04 GMT"},
         {"Content-Type", "text/plain; charset=utf-8"}, {"Content-Length", "83"},
         {"Cache-Control", "must-revalidate"}]}
 
       Couchdb.Connector.Admin.create_user(db_props, "jan", "relax", ["couchdb contributor"])
       {:error,
-        "{\"error\":\"conflict\",\"reason\":\"Document update conflict.\"}\n",
+        "{\\"error\\":\\"conflict\\",\\"reason\\":\\"Document update conflict.\\"}\\n",
         [{"Server", "CouchDB/1.6.1 (Erlang OTP/18)"},
          {"Date", "Thu, 31 Mar 2016 21:50:06 GMT"},
          {"Content-Type", "text/plain; charset=utf-8"}, {"Content-Length", "58"},
@@ -28,20 +28,20 @@ defmodule Couchdb.Connector.Admin do
 
       Couchdb.Connector.Admin.user_info(db_props, "jan")
       {:ok,
-        "{\"_id\":\"org.couchdb.user:jan\",\"_rev\":\"1-...\",
-          \"password_scheme\":\"pbkdf2\",\"iterations\":10,\"type\":\"user\",
-          \"roles\":[\"couchdb contributor\"],\"name\":\"jan\",
-          \"derived_key\":\"a294518...\",\"salt\":\"70869...\"}\n"}
+        "{\\"_id\\":\\"org.couchdb.user:jan\\",\\"_rev\\":\\"1-...\\",
+          \\"password_scheme\\":\\"pbkdf2\\",\\"iterations\\":10,\\"type\\":\\"user\\",
+          \\"roles\\":[\\"couchdb contributor\\"],\\"name\\":\\"jan\\",
+          \\"derived_key\\":\\"a294518...\\",\\"salt\\":\\"70869...\\"}\\n"}
 
       Couchdb.Connector.Admin.destroy_user(db_props, "jan")
       {:ok,
-        "{\"ok\":true,\"id\":\"org.couchdb.user:jan\",\"rev\":\"2-429e8839208ed64cd58eae75957cc0d4\"}\n"}
+        "{\\"ok\\":true,\\"id\\":\\"org.couchdb.user:jan\\",\\"rev\\":\\"2-429e8839208ed64cd58eae75957cc0d4\\"}\\n"}
 
       Couchdb.Connector.Admin.user_info(db_props, "jan")
-      {:error, "{\"error\":\"not_found\",\"reason\":\"deleted\"}\n"}
+      {:error, "{\\"error\\":\\"not_found\\",\\"reason\\":\\"deleted\\"}\\n"}
 
       Couchdb.Connector.Admin.destroy_user(db_props, "jan")
-      {:error, "{\"error\":\"not_found\",\"reason\":\"deleted\"}\n"}
+      {:error, "{\\"error\\":\\"not_found\\",\\"reason\\":\\"deleted\\"}\\n"}
 
   """
 

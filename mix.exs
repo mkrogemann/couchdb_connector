@@ -34,22 +34,7 @@ defmodule Couchdb.Connector.Mixfile do
 
   defp description do
     """
-    A connector for CouchDB, the Erlang-based, JSON document database.
-
-    The connector does not implement the protocols defined in Ecto.
-    Reasons: CouchDB does not support transactions as known in the world of
-    ACID compliant, relational databases.
-    The concept of migrations also does not apply to CouchDB.
-    And since CouchDB does not implement an SQL dialect, the decision was taken
-    to not follow the standards established by Ecto.
-
-    The connector offers 'create', 'update' and 'read' operations through its
-    Writer and Reader modules.
-    Basic support for view operations is provided by the View module.
-
-    There are also management functions for users and admins.
-
-    Basic access authentication (basic auth) is supported.
+    A connector for CouchDB with support for views and authentication.
     """
   end
 

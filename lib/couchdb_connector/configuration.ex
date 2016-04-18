@@ -14,7 +14,7 @@ defmodule Couchdb.Connector.Configuration do
   Reads the connector configuration as well as the server configuration at
   startup and stores the combined configuration as a Map in a linked Agent.
   """
-  @spec start_link() :: true
+  @spec start_link() :: {:ok, pid()}
   def start_link do
     connector_config = Enum.into(Application.get_all_env(:couchdb_connector), %{})
     case server_config(connector_config,

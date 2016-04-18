@@ -12,10 +12,7 @@ defmodule Couchdb.Connector.Mixfile do
       package: package,
       deps: deps,
       dialyzer: [plt_add_apps: [:poison, :httpoison]],
-      test_coverage: [
-        tool: ExCoveralls
-        ]
-      ]
+      test_coverage: [tool: ExCoveralls]]
   end
 
   def application do
@@ -52,8 +49,7 @@ defmodule Couchdb.Connector.Mixfile do
 
     There are also management functions for users and admins.
 
-    Authentication support is given for both basic auth and cookie based
-    authentication implementations.
+    Basic access authentication (basic auth) is supported.
     """
   end
 

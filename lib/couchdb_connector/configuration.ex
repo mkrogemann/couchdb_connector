@@ -24,7 +24,7 @@ defmodule Couchdb.Connector.Configuration do
         start_link(%{connector: connector_config,
                      server: Poison.decode!(server_cfg_json)})
       {:error, _} ->
-        Logger.info("Admin credentials failed: No access to server configuration")
+        _ = Logger.info("Admin credentials failed: No access to server configuration")
         # as long as we offer basic auth only, we can live without the server
         # config, so let's continue for now
         start_link(%{connector: connector_config})

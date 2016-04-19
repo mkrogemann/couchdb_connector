@@ -93,7 +93,7 @@ defmodule Couchdb.Connector.AdminTest do
     assert body_map["error"] == "unauthorized"
   end
 
-  test "set_security/5: TODO" do
+  test "set_security/5: ensure that the security object can be set for the given database" do
     TestPrep.ensure_database
     TestPrep.ensure_test_admin
     TestPrep.ensure_test_user

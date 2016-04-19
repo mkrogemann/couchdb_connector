@@ -5,26 +5,11 @@ defmodule Couchdb.Connector.UrlHelper do
 
   Most of the time, these functions will be used internally. There should
   rarely be a need to access these from within your application.
-
-  ## Examples
-
-      iex>db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_test", port: 5984}
-      %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
-      iex>Couchdb.Connector.UrlHelper.database_url(db_props)
-      "http://localhost:5984/couchdb_connector_test"
-      iex>Couchdb.Connector.UrlHelper.document_url(db_props, "5c09dbf93fd6226c414fad5b84004d7c")
-      "http://localhost:5984/couchdb_connector_test/5c09dbf93fd6226c414fad5b84004d7c"
-      iex>Couchdb.Connector.UrlHelper.view_url(db_props, "test_design", "test_view")
-      "http://localhost:5984/couchdb_connector_test/_design/test_design/_view/test_view"
-      iex>Couchdb.Connector.UrlHelper.fetch_uuid_url(db_props)
-      "http://localhost:5984/_uuids?count=1"
-      iex>Couchdb.Connector.UrlHelper.fetch_uuid_url(db_props, _count = 10)
-      "http://localhost:5984/_uuids?count=10"
-      iex>Couchdb.Connector.UrlHelper.user_url(db_props, "jan")
-      "http://localhost:5984/_users/org.couchdb.user:jan"
   """
 
   use Couchdb.Connector.Types
+
+  import Couchdb.Connector.Auth
 
   @doc """
   Produces the URL to the server given in db_props.
@@ -65,7 +50,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec document_url(db_properties, String.t) :: String.t
   def document_url db_props, id do
-    "#{database_url(db_props)}/#{id}"
+    (with_user_auth db_props) <> "/#{db_props[:database]}/#{id}"
   end
 
   @doc """
@@ -74,7 +59,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec fetch_uuid_url(db_properties, non_neg_integer) :: String.t
   def fetch_uuid_url db_props, count \\ 1 do
-    "#{database_server_url(db_props)}/_uuids?count=#{count}"
+    (with_user_auth db_props) <> "/_uuids?count=#{count}"
   end
 
   @doc """
@@ -82,7 +67,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec design_url(db_properties, String.t) :: String.t
   def design_url db_props, design do
-    "#{database_url(db_props)}/_design/#{design}"
+    (with_user_auth db_props) <> "/#{db_props[:database]}/_design/#{design}"
   end
 
   @doc """

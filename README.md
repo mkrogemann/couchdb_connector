@@ -23,6 +23,10 @@ Basic support for view operations is provided by the View module.
 All create and update operations expect valid JSON documents. All read
 operations return JSON strings exactly as they come from CouchDB.
 
+The connector also offers functions to manage users and admins.
+
+Basic access authentication (basic auth) is now also supported.
+
 ## Supported platforms
 
 This library has been tested on Elixir 1.1.1 and 1.2.4 with CouchDB 1.6.1.
@@ -35,7 +39,7 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
 
 ```Elixir
 def deps do
-  [{:couchdb_connector, "~> 0.4.0"}]
+  [{:couchdb_connector, "~> 0.3.0"}]
 end
 ```
 
@@ -218,7 +222,7 @@ In case that database never existed, you should see
 
 Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
 
-- retry on (HTTPoison.Error) :closed errors
 - enhance view handling and query capabilities
 - implement wrappers to take / return Maps instead of JSON strings only
-- pool HTTP connections
+- cookie auth, oauth auth
+- attachment support

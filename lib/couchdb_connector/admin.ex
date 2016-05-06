@@ -72,14 +72,15 @@ defmodule Couchdb.Connector.Admin do
     |> Handler.handle_put(_include_headers = true)
   end
 
-  defp do_create_user url, json do
+  defp do_create_user(url, json) do
     HTTPoison.put! url, json, [ Headers.json_header ]
   end
 
   defp user_to_json(user_auth, roles) do
     Poison.encode! %{"name" => elem(user_auth, 0),
                      "password" => elem(user_auth, 1),
-                     "roles" => roles, "type" => "user"}
+                     "roles" => roles,
+                     "type" => "user"}
   end
 
   @doc """
@@ -137,18 +138,18 @@ defmodule Couchdb.Connector.Admin do
     end
   end
 
-  defp do_destroy_user db_props, admin_auth, username, rev do
+  defp do_destroy_user(db_props, admin_auth, username, rev) do
     db_props
     |> UrlHelper.user_url(admin_auth, username)
     |> do_http_delete(rev)
     |> Handler.handle_delete
   end
 
-  defp do_http_delete url do
+  defp do_http_delete(url) do
     HTTPoison.delete! url
   end
 
-  defp do_http_delete url, rev do
+  defp do_http_delete(url, rev) do
     HTTPoison.delete! url <> "?rev=#{rev}"
   end
 
@@ -157,13 +158,12 @@ defmodule Couchdb.Connector.Admin do
   the admin cannot be found.
   """
   @spec destroy_admin(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
-  def destroy_admin db_props, username, password do
+  def destroy_admin(db_props, username, password) do
     db_props
     |> UrlHelper.admin_url(username, password)
     |> do_http_delete
     |> Handler.handle_delete
   end
-
 
   @doc """
   Set the security object for a given database. Security object includes admins

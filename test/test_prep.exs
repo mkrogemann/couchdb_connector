@@ -33,7 +33,7 @@ defmodule Couchdb.Connector.TestPrep do
         HTTPoison.delete UrlHelper.user_url(TestConfig.database_properties, {"anna", "secret"}, "jan")
           <> "?rev=#{body_map["_rev"]}"
           # TODO: do not return nil but an error
-      {:error, s} ->
+      {:error, _} ->
         nil
     end
   end
@@ -42,7 +42,7 @@ defmodule Couchdb.Connector.TestPrep do
     case Admin.admin_info(TestConfig.database_properties, "anna", "secret") do
       {:ok, _} ->
         HTTPoison.delete(UrlHelper.admin_url(TestConfig.database_properties, "anna", "secret"))
-      {:error, s} ->
+      {:error, _} ->
         # TODO: do not return nil but an error
         nil
     end

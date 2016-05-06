@@ -12,7 +12,7 @@ defmodule Couchdb.Connector.UrlHelper do
   import Couchdb.Connector.Auth
 
   @doc """
-  Produces the URL to the server given in db_props.
+  Produces the URL to the server given in db_props, using no authentication.
   """
   @spec database_server_url(db_properties) :: String.t
   def database_server_url db_props do
@@ -23,6 +23,16 @@ defmodule Couchdb.Connector.UrlHelper do
   Produces the URL to the server given in db_props including
   basic auth parameters.
   """
+  @spec database_server_url(db_properties, basic_auth) :: String.t
+  def database_server_url(db_props, user_auth) do
+    database_server_url(db_props, elem(user_auth, 0), elem(user_auth, 1))
+  end
+
+  @doc """
+  Produces the URL to the server given in db_props including
+  basic auth parameters.
+  """
+  # TODO auth
   @spec database_server_url(db_properties, String.t, String.t) :: String.t
   def database_server_url db_props, username, password do
     "#{db_props[:protocol]}://#{username}:#{password}@#{db_props[:hostname]}:#{db_props[:port]}"
@@ -40,6 +50,7 @@ defmodule Couchdb.Connector.UrlHelper do
   Produces the URL to a specific database hosted on the given server including
   basic auth parameters.
   """
+  # TODO auth
   @spec database_url(db_properties, String.t, String.t) :: String.t
   def database_url db_props, username, password do
     "#{database_server_url(db_props, username, password)}/#{db_props[:database]}"
@@ -51,6 +62,15 @@ defmodule Couchdb.Connector.UrlHelper do
   @spec document_url(db_properties, String.t) :: String.t
   def document_url db_props, id do
     (with_user_auth db_props) <> "/#{db_props[:database]}/#{id}"
+  end
+
+  @doc """
+  Produces the URL to a specific document contained in given database, making
+  use of basic authentication.
+  """
+  @spec document_url(db_properties, basic_auth, String.t) :: String.t
+  def document_url(db_props, user_auth, id) do
+    "#{database_url(db_props, elem(user_auth, 0), elem(user_auth, 1))}/#{id}"
   end
 
   @doc """
@@ -93,6 +113,15 @@ defmodule Couchdb.Connector.UrlHelper do
   @spec user_url(db_properties, String.t) :: String.t
   def user_url db_props, username do
     "#{database_server_url(db_props)}/_users/org.couchdb.user:#{username}"
+  end
+
+  @doc """
+  Produces the URL to a specific user, applying the given admin credentials.
+  Use this to create a new user, given you know some admin credentials.
+  """
+  @spec user_url(db_properties, basic_auth, String.t) :: String.t
+  def user_url(db_props, admin_auth, username) do
+    "#{database_server_url(db_props, elem(admin_auth, 0), elem(admin_auth, 1))}/_users/org.couchdb.user:#{username}"
   end
 
   @doc """

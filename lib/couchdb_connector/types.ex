@@ -9,7 +9,7 @@ defmodule Couchdb.Connector.Types do
     quote do
       @type db_properties :: %{protocol: String.t, hostname: String.t,
                                database: String.t, port: non_neg_integer}
-      @type user_roles_list :: [String.t]
+      @type user_roles :: [String.t]
       @type headers :: [{String.t, String.t}] # List of header names and values
       @type basic_auth :: {String.t, String.t} # username, password
     end

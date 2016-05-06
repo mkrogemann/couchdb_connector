@@ -51,16 +51,24 @@ defmodule Couchdb.Connector.Admin do
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
+  # @spec create_user(db_properties, String.t, String.t, user_roles_list) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  # def create_user db_props, username, password, roles do
+  #   db_props
+  #   |> UrlHelper.user_url(username)
+  #   |> do_create_user(to_json(username, password, roles))
+  #   |> Handler.handle_put(_include_headers = true)
+  # end
+
   @doc """
   Create a new user with given username, password and roles. In case of success,
   the function will respond with {:ok, body, headers}. In case of failures (e.g.
   if user already exists), the response will be {:error, body, headers}.
   """
-  @spec create_user(db_properties, String.t, String.t, user_roles_list) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def create_user db_props, username, password, roles \\ [] do
+  @spec create_user(db_properties, basic_auth, basic_auth, user_roles) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def create_user(db_props, admin_auth, user_auth, roles) do
     db_props
-    |> UrlHelper.user_url(username)
-    |> do_create_user(to_json(username, password, roles))
+    |> UrlHelper.user_url(admin_auth, elem(user_auth, 0))
+    |> do_create_user(user_to_json(user_auth, roles))
     |> Handler.handle_put(_include_headers = true)
   end
 
@@ -68,8 +76,9 @@ defmodule Couchdb.Connector.Admin do
     HTTPoison.put! url, json, [ Headers.json_header ]
   end
 
-  defp to_json username, password, roles do
-    Poison.encode! %{"name" => username, "password" => password,
+  defp user_to_json(user_auth, roles) do
+    Poison.encode! %{"name" => elem(user_auth, 0),
+                     "password" => elem(user_auth, 1),
                      "roles" => roles, "type" => "user"}
   end
 
@@ -94,10 +103,10 @@ defmodule Couchdb.Connector.Admin do
   Returns the public information for the given user or an error in case the
   user does not exist.
   """
-  @spec user_info(db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
-  def user_info db_props, username do
+  @spec user_info(db_properties, basic_auth, String.t) :: {:ok, String.t} | {:error, String.t}
+  def user_info(db_props, admin_auth, username) do
     db_props
-    |> UrlHelper.user_url(username)
+    |> UrlHelper.user_url(admin_auth, username)
     |> HTTPoison.get!
     |> Handler.handle_get
   end
@@ -116,21 +125,21 @@ defmodule Couchdb.Connector.Admin do
 
   @doc """
   Deletes the given user from the database server or returns an error in case
-  the user cannot be found.
+  the user cannot be found. Requires admin basic auth credentials.
   """
-  @spec destroy_user(db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
-  def destroy_user db_props, username do
-    case user_info(db_props, username) do
+  @spec destroy_user(db_properties, basic_auth, String.t) :: {:ok, String.t} | {:error, String.t}
+  def destroy_user(db_props, admin_auth, username) do
+    case user_info(db_props, admin_auth, username) do
       {:ok, user_json} ->
         user = Poison.decode! user_json
-        do_destroy_user(db_props, username, user["_rev"])
+        do_destroy_user(db_props, admin_auth, username, user["_rev"])
       error -> error
     end
   end
 
-  defp do_destroy_user db_props, username, rev do
+  defp do_destroy_user db_props, admin_auth, username, rev do
     db_props
-    |> UrlHelper.user_url(username)
+    |> UrlHelper.user_url(admin_auth, username)
     |> do_http_delete(rev)
     |> Handler.handle_delete
   end
@@ -160,19 +169,20 @@ defmodule Couchdb.Connector.Admin do
   Set the security object for a given database. Security object includes admins
   and members for the database.
   """
-  @spec set_security(db_properties, String.t, String.t, list(String.t), list(String.t)) :: {:ok, String.t} | {:error, String.t}
-  def set_security db_props, admin_name, password, admins, members do
+  # TODO: add user roles
+  @spec set_security(db_properties, basic_auth, list(String.t), list(String.t)) :: {:ok, String.t} | {:error, String.t}
+  def set_security(db_props, admin_auth, admins, members) do
     db_props
-    |> UrlHelper.security_url(admin_name, password)
-    |> do_set_security(to_json(admins, members))
+    |> UrlHelper.security_url(elem(admin_auth, 0), elem(admin_auth, 1))
+    |> do_set_security(security_to_json(admins, members))
     |> Handler.handle_put
   end
 
-  defp do_set_security url, json do
+  defp do_set_security(url, json) do
     HTTPoison.put! url, json, [ Headers.json_header ]
   end
 
-  defp to_json admins, members do
+  defp security_to_json(admins, members) do
     Poison.encode!(
     %{:admins  => %{:names => admins,  :roles => ["admins"]},
       :members => %{:names => members, :roles => ["members"]}

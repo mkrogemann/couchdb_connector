@@ -9,8 +9,6 @@ defmodule Couchdb.Connector.UrlHelper do
 
   use Couchdb.Connector.Types
 
-  import Couchdb.Connector.Auth
-
   @doc """
   Produces the URL to the server given in db_props, using no authentication.
   """
@@ -61,7 +59,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec document_url(db_properties, String.t) :: String.t
   def document_url db_props, id do
-    (with_user_auth db_props) <> "/#{db_props[:database]}/#{id}"
+    "#{database_server_url(db_props)}/#{db_props[:database]}/#{id}"
   end
 
   @doc """
@@ -79,7 +77,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec fetch_uuid_url(db_properties, non_neg_integer) :: String.t
   def fetch_uuid_url db_props, count \\ 1 do
-    (with_user_auth db_props) <> "/_uuids?count=#{count}"
+    "#{database_server_url(db_props)}/_uuids?count=#{count}"
   end
 
   @doc """
@@ -87,7 +85,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec design_url(db_properties, String.t) :: String.t
   def design_url db_props, design do
-    (with_user_auth db_props) <> "/#{db_props[:database]}/_design/#{design}"
+    "#{database_server_url(db_props)}/#{db_props[:database]}/_design/#{design}"
   end
 
   @doc """

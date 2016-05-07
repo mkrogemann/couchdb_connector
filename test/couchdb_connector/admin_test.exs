@@ -2,6 +2,11 @@ defmodule Couchdb.Connector.AdminTest do
   use ExUnit.Case
   use Couchdb.Connector.TestSupport
 
+  @retries 100
+  # Unfortunately, I see a need for retries in this suite of tests.
+  # It looks like CouchDB sometimes takes a few microseconds before
+  # the user database gets committed / reports the expected results.
+
   alias Couchdb.Connector.Admin
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
@@ -17,12 +22,25 @@ defmodule Couchdb.Connector.AdminTest do
 
   test "create_user/4: ensure that a new user gets created with given parameters" do
     TestPrep.ensure_test_admin
-    {:ok, body, headers} = Admin.create_user(
-      TestConfig.database_properties, {"anna", "secret"}, {"jan", "relax"}, ["couchdb contributor"])
-    {:ok, body_map} = Poison.decode body
-    assert body_map["id"] == "org.couchdb.user:jan"
-    assert header_value(headers, "Location") ==
-      UrlHelper.user_url(TestConfig.database_properties, "jan")
+
+    result = retry(@retries,
+      fn(_) ->
+        Admin.create_user(
+          TestConfig.database_properties, {"anna", "secret"}, {"jan", "relax"}, ["couchdb contributor"])
+      end,
+      fn(response) ->
+        case response do
+          {:ok, body, _headers} ->
+            {:ok, body_map} = Poison.decode body
+            case body_map["id"] do
+              "org.couchdb.user:jan" -> true
+              _ -> false
+            end
+          _ -> false
+        end
+      end
+    )
+    assert result, "user reported to still not exist after #{@retries} tries"
   end
 
   test "user_info/3: get public information for given username" do
@@ -36,9 +54,23 @@ defmodule Couchdb.Connector.AdminTest do
 
   test "user_info/3: should return an error when asked for missing user" do
     TestPrep.ensure_test_admin
-    {:error, body} = Admin.user_info(TestConfig.database_properties, {"anna", "secret"}, "jan")
-    {:ok, body_map} = Poison.decode body
-    assert body_map["error"] == "not_found"
+    result = retry(@retries,
+      fn(_) ->
+        Admin.user_info(TestConfig.database_properties, {"anna", "secret"}, "jan")
+      end,
+      fn(response) ->
+        case response do
+          {:error, body} ->
+            {:ok, body_map} = Poison.decode body
+            case body_map["error"] do
+              "not_found" -> true
+              _ -> false
+            end
+          _ -> false
+        end
+      end
+    )
+    assert result, "user still reported to exist after #{@retries} tries"
   end
 
   test "destroy_user/3: ensure that a given user can be deleted" do

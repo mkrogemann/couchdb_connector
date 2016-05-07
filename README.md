@@ -29,7 +29,8 @@ Basic access authentication (basic auth) is now also supported.
 
 ## Supported platforms
 
-This library has been tested on Elixir 1.1.1 and 1.2.4 with CouchDB 1.6.1.
+This library has been tested successfully with Elixir release versions 1.0.5,
+1.1.1 and 1.2.5, using CouchDB version 1.6.1.
 
 ## Installation
 

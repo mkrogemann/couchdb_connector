@@ -42,7 +42,6 @@ defmodule Couchdb.Connector.Writer do
     db_props
     |> UrlHelper.document_url(auth, id)
     |> do_create(json)
-    |> Handler.handle_put(_include_headers = true)
   end
 
   @doc """
@@ -57,7 +56,6 @@ defmodule Couchdb.Connector.Writer do
     db_props
     |> UrlHelper.document_url(id)
     |> do_create(json)
-    |> Handler.handle_put(_include_headers = true)
   end
 
   @doc """
@@ -75,8 +73,8 @@ defmodule Couchdb.Connector.Writer do
 
   defp do_create url, json do
     safe_json = couchdb_safe(json)
-    HTTPoison.put! url, safe_json, [ Headers.json_header ]
-
+    HTTPoison.put!(url, safe_json, [Headers.json_header])
+    |> Handler.handle_put(_include_headers = true)
   end
 
   defp couchdb_safe json do

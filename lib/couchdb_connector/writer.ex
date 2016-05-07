@@ -58,7 +58,25 @@ defmodule Couchdb.Connector.Writer do
     |> do_create(json)
   end
 
+  @doc """
+  Create a new document with given json and a CouchDB generated id, using basic
+  authentication.
+  Fetching the uuid from CouchDB does of course incur a performance penalty as
+  compared to providing one.
+  """
+  @spec create_generate(db_properties, basic_auth, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def create_generate(db_props, auth, json) do
+    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
+    uuid = hd(Poison.decode!(uuid_json)["uuids"])
+    create(db_props, auth, json, uuid)
+  end
 
+  @doc """
+  Create a new document with given json and a CouchDB generated id, using no
+  authentication.
+  Fetching the uuid from CouchDB does of course incur a performance penalty as
+  compared to providing one.
+  """
   @spec create_generate(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def create_generate(db_props, json) do
     {:ok, uuid_json} = Reader.fetch_uuid(db_props)
@@ -67,10 +85,8 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Create a new document with given json and a CouchDB generated id, using no
-  authentication.
-  Fetching the uuid from CouchDB does of course incur a performance penalty as
-  compared to providing one.
+  This function has been deprecated in version 0.3.0 and will be removed in a
+  future release.
   """
   @spec create(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def create(db_props, json) do

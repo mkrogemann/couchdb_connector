@@ -105,6 +105,15 @@ defmodule Couchdb.Connector.WriterTest do
     assert id_from_url(header_value(headers, "Location")) == "42"
   end
 
+  test "create_generate/3: ensure that a new document gets create with a fetched id" do
+    TestPrep.secure_database
+    {:ok, body, _headers} =
+      Writer.create_generate TestConfig.database_properties, {"jan", "relax"}, "{\"key\": \"value\"}"
+    {:ok, body_map} = Poison.decode body
+    assert String.starts_with?(body_map["rev"], "1-")
+    assert String.length(body_map["id"]) == 32
+  end
+
   test "destroy/4: ensure that document with given id can be deleted" do
     TestPrep.secure_database
     {:ok, _, headers} =

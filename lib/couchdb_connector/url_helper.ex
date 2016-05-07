@@ -23,17 +23,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec database_server_url(db_properties, basic_auth) :: String.t
   def database_server_url(db_props, user_auth) do
-    database_server_url(db_props, elem(user_auth, 0), elem(user_auth, 1))
-  end
-
-  @doc """
-  Produces the URL to the server given in db_props including
-  basic auth parameters.
-  """
-  # TODO auth
-  @spec database_server_url(db_properties, String.t, String.t) :: String.t
-  def database_server_url db_props, username, password do
-    "#{db_props[:protocol]}://#{username}:#{password}@#{db_props[:hostname]}:#{db_props[:port]}"
+    "#{db_props[:protocol]}://#{elem(user_auth, 0)}:#{elem(user_auth, 1)}@#{db_props[:hostname]}:#{db_props[:port]}"
   end
 
   @doc """
@@ -51,7 +41,7 @@ defmodule Couchdb.Connector.UrlHelper do
   # TODO auth
   @spec database_url(db_properties, String.t, String.t) :: String.t
   def database_url db_props, username, password do
-    "#{database_server_url(db_props, username, password)}/#{db_props[:database]}"
+    "#{database_server_url(db_props, {username, password})}/#{db_props[:database]}"
   end
 
   @doc """
@@ -119,7 +109,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec user_url(db_properties, basic_auth, String.t) :: String.t
   def user_url(db_props, admin_auth, username) do
-    "#{database_server_url(db_props, elem(admin_auth, 0), elem(admin_auth, 1))}/_users/org.couchdb.user:#{username}"
+    "#{database_server_url(db_props, admin_auth)}/_users/org.couchdb.user:#{username}"
   end
 
   @doc """
@@ -135,7 +125,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec admin_url(db_properties, String.t, String.t) :: String.t
   def admin_url db_props, admin_name, password do
-    "#{database_server_url(db_props, admin_name, password)}/_config/admins/#{admin_name}"
+    "#{database_server_url(db_props, {admin_name, password})}/_config/admins/#{admin_name}"
   end
 
   @doc """
@@ -143,7 +133,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec config_url(db_properties, String.t, String.t) :: String.t
   def config_url db_props, admin_name, password do
-    "#{database_server_url(db_props, admin_name, password)}/_config"
+    "#{database_server_url(db_props, {admin_name, password})}/_config"
   end
 
   @doc """

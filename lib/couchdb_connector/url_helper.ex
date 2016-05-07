@@ -62,7 +62,7 @@ defmodule Couchdb.Connector.UrlHelper do
 
   @doc """
   Produces an URL that can be used to retrieve the given number of UUIDs from
-  CouchDB.
+  CouchDB. Authentication is not required.
   """
   @spec fetch_uuid_url(db_properties, non_neg_integer) :: String.t
   def fetch_uuid_url db_props, count \\ 1 do
@@ -70,7 +70,7 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to a specific design document.
+  Produces the URL to a specific design document, using no authentication.
   """
   @spec design_url(db_properties, String.t) :: String.t
   def design_url db_props, design do
@@ -78,7 +78,8 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to a specific view from a given design document.
+  Produces the URL to a specific view from a given design document, using no
+  authentication.
   """
   @spec view_url(db_properties, String.t, String.t) :: String.t
   def view_url db_props, design, view do
@@ -95,7 +96,7 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to a specific user.
+  Produces the URL to a specific user, providing no authentication.
   """
   @spec user_url(db_properties, String.t) :: String.t
   def user_url db_props, username do
@@ -104,7 +105,7 @@ defmodule Couchdb.Connector.UrlHelper do
 
   @doc """
   Produces the URL to a specific user, applying the given admin credentials.
-  Use this to create a new user, given you know some admin credentials.
+  Use this to create a new user, given the callers knows some admin credentials.
   """
   @spec user_url(db_properties, basic_auth, String.t) :: String.t
   def user_url(db_props, admin_auth, username) do
@@ -112,7 +113,7 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to a specific admin.
+  Produces the URL to a specific admin, using no authentication
   """
   @spec admin_url(db_properties, String.t) :: String.t
   def admin_url db_props, username do
@@ -128,7 +129,8 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to the database's security object.
+  Produces the URL to the database's security object. Requires admin
+  credentials.
   """
   @spec security_url(db_properties, basic_auth) :: String.t
   def security_url db_props, admin_auth do

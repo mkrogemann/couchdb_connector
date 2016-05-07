@@ -165,7 +165,7 @@ defmodule Couchdb.Connector.Admin do
   @spec set_security(db_properties, basic_auth, list(String.t), list(String.t)) :: {:ok, String.t} | {:error, String.t}
   def set_security(db_props, admin_auth, admins, members) do
     db_props
-    |> UrlHelper.security_url(elem(admin_auth, 0), elem(admin_auth, 1))
+    |> UrlHelper.security_url(admin_auth)
     |> do_set_security(security_to_json(admins, members))
     |> Handler.handle_put
   end

@@ -10,7 +10,6 @@ defmodule Couchdb.Connector.AdminTest do
   alias Couchdb.Connector.Admin
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.UrlHelper
 
   setup context do
     on_exit context, fn ->

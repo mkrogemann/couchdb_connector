@@ -22,8 +22,8 @@ defmodule Couchdb.Connector.UrlHelper do
   basic auth parameters.
   """
   @spec database_server_url(db_properties, basic_auth) :: String.t
-  def database_server_url(db_props, user_auth) do
-    "#{db_props[:protocol]}://#{elem(user_auth, 0)}:#{elem(user_auth, 1)}@#{db_props[:hostname]}:#{db_props[:port]}"
+  def database_server_url(db_props, auth) do
+    "#{db_props[:protocol]}://#{elem(auth, 0)}:#{elem(auth, 1)}@#{db_props[:hostname]}:#{db_props[:port]}"
   end
 
   @doc """
@@ -38,10 +38,9 @@ defmodule Couchdb.Connector.UrlHelper do
   Produces the URL to a specific database hosted on the given server including
   basic auth parameters.
   """
-  # TODO auth
-  @spec database_url(db_properties, String.t, String.t) :: String.t
-  def database_url db_props, username, password do
-    "#{database_server_url(db_props, {username, password})}/#{db_props[:database]}"
+  @spec database_url(db_properties, basic_auth) :: String.t
+  def database_url(db_props, auth) do
+    "#{database_server_url(db_props, auth)}/#{db_props[:database]}"
   end
 
   @doc """
@@ -57,8 +56,8 @@ defmodule Couchdb.Connector.UrlHelper do
   use of basic authentication.
   """
   @spec document_url(db_properties, basic_auth, String.t) :: String.t
-  def document_url(db_props, user_auth, id) do
-    "#{database_url(db_props, elem(user_auth, 0), elem(user_auth, 1))}/#{id}"
+  def document_url(db_props, auth, id) do
+    "#{database_url(db_props, auth)}/#{id}"
   end
 
   @doc """
@@ -129,18 +128,10 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to the database server's configuration.
-  """
-  @spec config_url(db_properties, String.t, String.t) :: String.t
-  def config_url db_props, admin_name, password do
-    "#{database_server_url(db_props, {admin_name, password})}/_config"
-  end
-
-  @doc """
   Produces the URL to the database's security object.
   """
-  @spec security_url(db_properties, String.t, String.t) :: String.t
-  def security_url db_props, admin_name, password do
-    "#{database_url(db_props, admin_name, password)}/_security"
+  @spec security_url(db_properties, basic_auth) :: String.t
+  def security_url db_props, admin_auth do
+    "#{database_url(db_props, admin_auth)}/_security"
   end
 end

@@ -120,10 +120,9 @@ defmodule Couchdb.Connector.Writer do
     id = Map.fetch(doc_map, "_id")
     case id do
       {:ok, id} ->
-        url = UrlHelper.document_url(db_props, id)
-        url
+        db_props
+        |> UrlHelper.document_url(id)
         |> do_update(Poison.encode!(doc_map))
-        |> Handler.handle_put(_include_headers = true)
       :error ->
         raise RuntimeError, message:
           "the document to be updated must contain an \"_id\" field"
@@ -139,7 +138,6 @@ defmodule Couchdb.Connector.Writer do
     db_props
     |> UrlHelper.document_url(auth, id)
     |> do_update(json)
-    |> Handler.handle_put(_include_headers = true)
   end
 
   @doc """
@@ -151,11 +149,11 @@ defmodule Couchdb.Connector.Writer do
     db_props
     |> UrlHelper.document_url(id)
     |> do_update(json)
-    |> Handler.handle_put(_include_headers = true)
   end
 
   defp do_update(url, json) do
     HTTPoison.put!(url, json, [Headers.json_header])
+    |> Handler.handle_put(_include_headers = true)
   end
 
   @doc """

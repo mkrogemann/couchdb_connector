@@ -38,18 +38,14 @@ defmodule Couchdb.Connector.ReaderTest do
   # Tests for secured database, using basic authentication
 
   test "get/3: ensure that document exists using basic authentication" do
-    TestPrep.ensure_test_admin
-    TestPrep.ensure_test_user
-    TestPrep.ensure_test_security
+    TestPrep.secure_database
     { :ok, json } = Reader.get(TestConfig.database_properties, {"jan", "relax"}, "foo")
     { :ok, json_map } = Poison.decode json
     assert json_map["test_key"] == "test_value"
   end
 
   test "fetch_uuid/1: get a single uuid from a secured database server" do
-    TestPrep.ensure_test_admin
-    TestPrep.ensure_test_user
-    TestPrep.ensure_test_security
+    TestPrep.secure_database
     { :ok, json } = Reader.fetch_uuid(TestConfig.database_properties)
     uuid = hd(Poison.decode!(json)["uuids"])
     assert String.length(uuid) == 32

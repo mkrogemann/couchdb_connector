@@ -58,5 +58,5 @@ defmodule Couchdb.Connector.TestPrep do
     ensure_test_admin
     ensure_test_user
     ensure_test_security
-  end  
+  end
 end

@@ -78,12 +78,29 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
+  Produces the URL to a specific design document, using basic authentication.
+  """
+  @spec design_url(db_properties, basic_auth, String.t) :: String.t
+  def design_url db_props, auth, design do
+    "#{database_server_url(db_props, auth)}/#{db_props[:database]}/_design/#{design}"
+  end
+
+  @doc """
   Produces the URL to a specific view from a given design document, using no
   authentication.
   """
   @spec view_url(db_properties, String.t, String.t) :: String.t
   def view_url db_props, design, view do
     "#{design_url(db_props, design)}/_view/#{view}"
+  end
+
+  @doc """
+  Produces the URL to a specific view from a given design document, making use
+  of basic authentication.
+  """
+  @spec view_url(db_properties, basic_auth, String.t, String.t) :: String.t
+  def view_url db_props, auth, design, view do
+    "#{design_url(db_props, auth, design)}/_view/#{view}"
   end
 
   @doc """

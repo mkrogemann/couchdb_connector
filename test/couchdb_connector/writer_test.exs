@@ -9,8 +9,14 @@ defmodule Couchdb.Connector.WriterTest do
 
   setup context do
     TestPrep.ensure_database
-    on_exit context, fn -> TestPrep.delete_database end
+    on_exit context, fn ->
+      TestPrep.delete_test_user
+      TestPrep.delete_test_admin
+      TestPrep.delete_database
+    end
   end
+
+  # Test cases for unsecured database
 
   test "create/3: ensure that a new document gets created with given id" do
     {:ok, body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}", "42"
@@ -87,6 +93,22 @@ defmodule Couchdb.Connector.WriterTest do
     {:ok, body_map} = Poison.decode body
     assert body_map["error"] == "conflict"
   end
+
+  # Tests for secured database, using basic authentication
+
+  test "create/4: ensure that a new document gets created with given id" do
+    TestPrep.ensure_test_admin
+    TestPrep.ensure_test_user
+    TestPrep.ensure_test_security
+    {:ok, body, headers} = Writer.create(
+      TestConfig.database_properties,
+      {"jan", "relax"}, "{\"key\": \"value\"}", "42"
+    )
+    {:ok, body_map} = Poison.decode body
+    assert body_map["id"] == "42"
+    assert id_from_url(header_value(headers, "Location")) == "42"
+  end
+
 
   defp id_from_url url do
     hd(Enum.reverse(String.split(url, "/", trim: true)))

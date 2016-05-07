@@ -28,6 +28,38 @@ defmodule Couchdb.Connector.Writer do
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
+
+  @doc """
+  Create a new document with given json and given id, using the provided basic
+  authentication parameters.
+  Clients must make sure that the id has not been used for an existing document
+  in CouchDB.
+  Either provide a UUID or consider using create_tralala/3 in case uniqueness cannot
+  be guaranteed.
+  """
+  @spec create(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def create(db_props, auth, json, id) do
+    db_props
+    |> UrlHelper.document_url(auth, id)
+    |> do_create(json)
+    |> Handler.handle_put(_include_headers = true)
+  end
+
+  @doc """
+  Create a new document with given json and given id, using no authentication.
+  Clients must make sure that the id has not been used for an existing document
+  in CouchDB.
+  Either provide a UUID or consider using create/2 in case uniqueness cannot
+  be guaranteed.
+  """
+  @spec create(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def create db_props, json, id do
+    db_props
+    |> UrlHelper.document_url(id)
+    |> do_create(json)
+    |> Handler.handle_put(_include_headers = true)
+  end
+
   @doc """
   Create a new document with given json and a CouchDB generated id.
   This function maps to a HTTP PUT.
@@ -41,23 +73,10 @@ defmodule Couchdb.Connector.Writer do
     create db_props, json, uuid
   end
 
-  @doc """
-  Create a new document with given json and given id. Clients must make sure
-  that the id has not been used for an existing document in CouchDB.
-  Either provide a UUID or consider using create/2 in case uniqueness cannot
-  be guaranteed.
-  """
-  @spec create(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def create db_props, json, id do
-    db_props
-    |> UrlHelper.document_url(id)
-    |> do_create(json)
-    |> Handler.handle_put(_include_headers = true)
-  end
-
   defp do_create url, json do
     safe_json = couchdb_safe(json)
     HTTPoison.put! url, safe_json, [ Headers.json_header ]
+
   end
 
   defp couchdb_safe json do

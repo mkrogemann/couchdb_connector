@@ -114,6 +114,18 @@ defmodule Couchdb.Connector.WriterTest do
     assert String.length(body_map["id"]) == 32
   end
 
+  test "update/3: ensure that a document that contains an existing id can be updated" do
+    TestPrep.secure_database
+    {:ok, _body, headers} =
+      Writer.create_generate TestConfig.database_properties, {"jan", "relax"}, "{\"key\": \"original value\"}"
+    id = id_from_url(header_value(headers, "Location"))
+    revision = header_value(headers, "ETag")
+    update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
+    {:ok, _body, headers} =
+      Writer.update TestConfig.database_properties, {"jan", "relax"}, update
+    assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
+  end
+
   test "update/4: ensure that an existing document with given id can be updated" do
     TestPrep.secure_database
     {:ok, _body, headers} =

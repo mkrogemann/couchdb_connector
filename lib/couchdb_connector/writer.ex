@@ -96,8 +96,8 @@ defmodule Couchdb.Connector.Writer do
 
   defp do_create(url, json) do
     safe_json = couchdb_safe(json)
-    HTTPoison.put!(url, safe_json, [Headers.json_header])
-    |> Handler.handle_put(_include_headers = true)
+    response = HTTPoison.put!(url, safe_json, [Headers.json_header])
+    Handler.handle_put(response, _include_headers = true)
   end
 
   # TODO: documentation and naming
@@ -110,14 +110,43 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
+  Update the given document, using basic authentication.
+  Note that an _id field must be contained in the document.
+  A missing _id field will trigger a RuntimeError.
+  """
+  @spec update(db_properties, basic_auth, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def update(db_props, auth, json) when is_tuple(auth) do
+    {doc_map, id} = parse_and_extract_id(json)
+    case id do
+      {:ok, id} ->
+        db_props
+        |> UrlHelper.document_url(auth, id)
+        |> do_update(Poison.encode!(doc_map))
+      :error ->
+        raise RuntimeError, message:
+          "the document to be updated must contain an \"_id\" field"
+    end
+  end
+
+  @doc """
+  Update the given document that is stored under the given id, using no
+  authentication.
+  """
+  @spec update(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def update(db_props, json, id) do
+    db_props
+    |> UrlHelper.document_url(id)
+    |> do_update(json)
+  end
+
+  @doc """
   Update the given document, using no authentication.
   Note that an _id field must be contained in the document.
   A missing _id field will trigger a RuntimeError.
   """
   @spec update(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def update(db_props, json) do
-    doc_map = Poison.Parser.parse!(json)
-    id = Map.fetch(doc_map, "_id")
+    {doc_map, id} = parse_and_extract_id(json)
     case id do
       {:ok, id} ->
         db_props
@@ -140,20 +169,15 @@ defmodule Couchdb.Connector.Writer do
     |> do_update(json)
   end
 
-  @doc """
-  Update the given document that is stored under the given id, using no
-  authentication.
-  """
-  @spec update(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def update(db_props, json, id) do
-    db_props
-    |> UrlHelper.document_url(id)
-    |> do_update(json)
+  defp do_update(url, json) do
+    url
+    |> HTTPoison.put!(json, [Headers.json_header])
+    |> Handler.handle_put(_include_headers = true)
   end
 
-  defp do_update(url, json) do
-    HTTPoison.put!(url, json, [Headers.json_header])
-    |> Handler.handle_put(_include_headers = true)
+  defp parse_and_extract_id(json) do
+    doc_map = Poison.Parser.parse!(json)
+    {doc_map, Map.fetch(doc_map, "_id")}
   end
 
   @doc """
@@ -183,7 +207,6 @@ defmodule Couchdb.Connector.Writer do
   end
 
   defp do_destroy(url, rev) do
-    HTTPoison.delete!(url <> "?rev=#{rev}")
-    |> Handler.handle_delete
+    Handler.handle_delete(HTTPoison.delete!(url <> "?rev=#{rev}"))
   end
 end

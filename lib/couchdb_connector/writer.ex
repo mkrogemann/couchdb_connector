@@ -52,7 +52,7 @@ defmodule Couchdb.Connector.Writer do
   be guaranteed.
   """
   @spec create(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def create db_props, json, id do
+  def create(db_props, json, id) do
     db_props
     |> UrlHelper.document_url(id)
     |> do_create(json)
@@ -65,19 +65,20 @@ defmodule Couchdb.Connector.Writer do
   compared to providing one and using create/3.
   """
   @spec create(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def create db_props, json do
+  def create(db_props, json) do
     { :ok, uuid_json } = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])
-    create db_props, json, uuid
+    create(db_props, json, uuid)
   end
 
-  defp do_create url, json do
+  defp do_create(url, json) do
     safe_json = couchdb_safe(json)
     HTTPoison.put!(url, safe_json, [Headers.json_header])
     |> Handler.handle_put(_include_headers = true)
   end
 
-  defp couchdb_safe json do
+  # TODO: documentation and naming
+  defp couchdb_safe(json) do
     map = Poison.Parser.parse!(json)
     case Map.get(map, "_id") do
       nil -> Poison.encode!(Map.delete(map, "_id"))
@@ -90,11 +91,11 @@ defmodule Couchdb.Connector.Writer do
   document. A missing _id field with trigger a RuntimeError.
   """
   @spec update(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def update db_props, json do
+  def update(db_props, json) do
     doc_map = Poison.Parser.parse!(json)
     id = Map.fetch(doc_map, "_id")
     case id do
-      { :ok, id } ->
+      {:ok, id} ->
         url = UrlHelper.document_url(db_props, id)
         url
         |> do_update(Poison.encode!(doc_map))
@@ -109,15 +110,15 @@ defmodule Couchdb.Connector.Writer do
   Update the given document that is stored under the given id.
   """
   @spec update(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def update db_props, json, id do
+  def update(db_props, json, id) do
     db_props
     |> UrlHelper.document_url(id)
     |> do_update(json)
     |> Handler.handle_put(_include_headers = true)
   end
 
-  defp do_update url, json do
-    HTTPoison.put!(url, json, [ Headers.json_header ])
+  defp do_update(url, json) do
+    HTTPoison.put!(url, json, [Headers.json_header])
   end
 
   @doc """
@@ -125,14 +126,14 @@ defmodule Couchdb.Connector.Writer do
   returned in case the document does not exist or the revision is wrong.
   """
   @spec destroy(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
-  def destroy db_props, id, rev do
+  def destroy(db_props, id, rev) do
     db_props
     |> UrlHelper.document_url(id)
     |> do_destroy(rev)
     |> Handler.handle_delete
   end
 
-  defp do_destroy url, rev do
-    HTTPoison.delete! url <> "?rev=#{rev}"
+  defp do_destroy(url, rev) do
+    HTTPoison.delete!(url <> "?rev=#{rev}")
   end
 end

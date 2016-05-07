@@ -109,6 +109,23 @@ defmodule Couchdb.Connector.WriterTest do
     assert id_from_url(header_value(headers, "Location")) == "42"
   end
 
+  test "destroy/4: ensure that document with given id can be deleted" do
+    TestPrep.ensure_test_admin
+    TestPrep.ensure_test_user
+    TestPrep.ensure_test_security
+    {:ok, _, headers} = Writer.create(
+      TestConfig.database_properties,
+      {"jan", "relax"}, "{\"key\": \"value\"}", "42"
+    )
+    revision = String.replace(header_value(headers, "ETag"), "\"", "")
+    {:ok, body} = Writer.destroy(
+      TestConfig.database_properties,
+      {"jan", "relax"}, "42", revision
+    )
+    {:ok, body_map} = Poison.decode body
+    assert String.starts_with?(body_map["rev"], "2-")
+    {:error, _} = Reader.get(TestConfig.database_properties, "42")
+  end
 
   defp id_from_url url do
     hd(Enum.reverse(String.split(url, "/", trim: true)))

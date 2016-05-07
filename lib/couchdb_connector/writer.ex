@@ -122,18 +122,33 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Delete the document with the given id in the given revision. An error will be
-  returned in case the document does not exist or the revision is wrong.
+  Delete the document with the given id in the given revision, using basic
+  authentication.
+  An error will be returned in case the document does not exist or the
+  revision is wrong.
+  """
+  @spec destroy(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
+  def destroy(db_props, auth, id, rev) do
+    db_props
+    |> UrlHelper.document_url(auth, id)
+    |> do_destroy(rev)
+  end
+
+  @doc """
+  Delete the document with the given id in the given revision, using no
+  authentication.
+  An error will be returned in case the document does not exist or the
+  revision is wrong.
   """
   @spec destroy(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def destroy(db_props, id, rev) do
     db_props
     |> UrlHelper.document_url(id)
     |> do_destroy(rev)
-    |> Handler.handle_delete
   end
 
   defp do_destroy(url, rev) do
     HTTPoison.delete!(url <> "?rev=#{rev}")
+    |> Handler.handle_delete
   end
 end

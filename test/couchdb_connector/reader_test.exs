@@ -9,8 +9,8 @@ defmodule Couchdb.Connector.ReaderTest do
     TestPrep.ensure_database
     TestPrep.ensure_document "{\"test_key\": \"test_value\"}", "foo"
     on_exit context, fn ->
-      TestPrep.delete_test_admin
       TestPrep.delete_test_user
+      TestPrep.delete_test_admin
       TestPrep.delete_database
     end
   end

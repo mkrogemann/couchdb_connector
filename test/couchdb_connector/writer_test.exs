@@ -39,15 +39,15 @@ defmodule Couchdb.Connector.WriterTest do
     assert id_from_url(header_value(headers, "Location")) == "42"
   end
 
-  test "create/2: ensure that a new document gets create with a fetched id" do
-    {:ok, body, _headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}"
+  test "create_generate/2: ensure that a new document gets create with a fetched id" do
+    {:ok, body, _headers} = Writer.create_generate TestConfig.database_properties, "{\"key\": \"value\"}"
     {:ok, body_map} = Poison.decode body
     assert String.starts_with?(body_map["rev"], "1-")
     assert String.length(body_map["id"]) == 32
   end
 
   test "update/2: ensure that a document that contains an existing id can be updated" do
-    {:ok, _body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"original value\"}"
+    {:ok, _body, headers} = Writer.create_generate TestConfig.database_properties, "{\"key\": \"original value\"}"
     id = id_from_url(header_value(headers, "Location"))
     revision = header_value(headers, "ETag")
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
@@ -63,7 +63,7 @@ defmodule Couchdb.Connector.WriterTest do
   end
 
   test "update/3: ensure that an existing document with given id can be updated" do
-    {:ok, _body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"original value\"}"
+    {:ok, _body, headers} = Writer.create_generate TestConfig.database_properties, "{\"key\": \"original value\"}"
     id = id_from_url(header_value(headers, "Location"))
     revision = header_value(headers, "ETag")
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"

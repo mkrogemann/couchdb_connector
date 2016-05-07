@@ -34,7 +34,7 @@ defmodule Couchdb.Connector.Writer do
   authentication parameters.
   Clients must make sure that the id has not been used for an existing document
   in CouchDB.
-  Either provide a UUID or consider using create_tralala/3 in case uniqueness cannot
+  Either provide a UUID or consider using create_generate in case uniqueness cannot
   be guaranteed.
   """
   @spec create(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
@@ -48,7 +48,7 @@ defmodule Couchdb.Connector.Writer do
   Create a new document with given json and given id, using no authentication.
   Clients must make sure that the id has not been used for an existing document
   in CouchDB.
-  Either provide a UUID or consider using create/2 in case uniqueness cannot
+  Either provide a UUID or consider using create_generate in case uniqueness cannot
   be guaranteed.
   """
   @spec create(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
@@ -58,17 +58,24 @@ defmodule Couchdb.Connector.Writer do
     |> do_create(json)
   end
 
+
+  @spec create_generate(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def create_generate(db_props, json) do
+    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
+    uuid = hd(Poison.decode!(uuid_json)["uuids"])
+    create(db_props, json, uuid)
+  end
+
   @doc """
-  Create a new document with given json and a CouchDB generated id.
-  This function maps to a HTTP PUT.
-  Fetching the uuid from CouchDB does incur a performance penalty as
-  compared to providing one and using create/3.
+  Create a new document with given json and a CouchDB generated id, using no
+  authentication.
+  Fetching the uuid from CouchDB does of course incur a performance penalty as
+  compared to providing one.
   """
   @spec create(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def create(db_props, json) do
-    { :ok, uuid_json } = Reader.fetch_uuid(db_props)
-    uuid = hd(Poison.decode!(uuid_json)["uuids"])
-    create(db_props, json, uuid)
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Write.create/2 is deprecated, please use create_generate/2 instead\n"
+    create_generate(db_props, json)
   end
 
   defp do_create(url, json) do

@@ -53,4 +53,10 @@ defmodule Couchdb.Connector.TestPrep do
   def ensure_test_security do
     Admin.set_security(TestConfig.database_properties, {"anna", "secret"}, ["anna"], ["jan"])
   end
+
+  def secure_database do
+    ensure_test_admin
+    ensure_test_user
+    ensure_test_security
+  end  
 end

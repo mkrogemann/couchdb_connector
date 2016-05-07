@@ -49,7 +49,7 @@ defmodule Couchdb.Connector.TestPrep do
   end
 
   def ensure_test_admin do
-    Admin.create_admin(TestConfig.database_properties, "anna", "secret")
+    Admin.create_admin(TestConfig.database_properties, {"anna", "secret"})
   end
 
   def ensure_test_security do

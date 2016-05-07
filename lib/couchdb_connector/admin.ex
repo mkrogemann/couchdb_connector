@@ -80,11 +80,11 @@ defmodule Couchdb.Connector.Admin do
   the function will respond with an empty body. In case of failures (e.g.
   if admin already exists), the response will be {:error, body, headers}.
   """
-  @spec create_admin(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def create_admin db_props, username, password do
+  @spec create_admin(db_properties, basic_auth) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def create_admin(db_props, admin_auth) do
     db_props
-    |> UrlHelper.admin_url(username)
-    |> do_create_admin(password)
+    |> UrlHelper.admin_url(elem(admin_auth, 0))
+    |> do_create_admin(elem(admin_auth, 1))
     |> Handler.handle_put(_include_headers = true)
   end
 

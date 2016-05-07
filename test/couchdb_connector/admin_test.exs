@@ -89,19 +89,19 @@ defmodule Couchdb.Connector.AdminTest do
     assert body_map["error"] == "not_found"
   end
 
-  test "create_admin/3: ensure that a new admin gets created with given parameters" do
+  test "create_admin/2: ensure that a new admin gets created with given parameters" do
     {:ok, body, headers} = Admin.create_admin(
-      TestConfig.database_properties, "anna", "secret")
+      TestConfig.database_properties, {"anna", "secret"})
     # CouchDB has a peculiar way to respond to successful 'add admin' requests
     # I think it's wrong in doing what it does, but what can you do?
     assert body == "\"\"\n"
     assert header_value(headers, "Content-Length") == "3"
   end
 
-  test "create_admin/3: ensure that same admin cannot be created twice" do
+  test "create_admin/2: ensure that same admin cannot be created twice" do
     TestPrep.ensure_test_admin
     {:error, body, _} = Admin.create_admin(
-      TestConfig.database_properties, "anna", "secret")
+      TestConfig.database_properties, {"anna", "secret"})
     {:ok, body_map} = Poison.decode body
     assert body_map["error"] == "unauthorized"
   end

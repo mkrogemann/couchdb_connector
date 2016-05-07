@@ -110,8 +110,9 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Update the given document. Note that an _id field must be contained in the
-  document. A missing _id field with trigger a RuntimeError.
+  Update the given document, using no authentication.
+  Note that an _id field must be contained in the document.
+  A missing _id field will trigger a RuntimeError.
   """
   @spec update(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def update(db_props, json) do
@@ -130,7 +131,20 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Update the given document that is stored under the given id.
+  Update the given document that is stored under the given id, using basic
+  authentication.
+  """
+  @spec update(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  def update(db_props, auth, json, id) do
+    db_props
+    |> UrlHelper.document_url(auth, id)
+    |> do_update(json)
+    |> Handler.handle_put(_include_headers = true)
+  end
+
+  @doc """
+  Update the given document that is stored under the given id, using no
+  authentication.
   """
   @spec update(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def update(db_props, json, id) do

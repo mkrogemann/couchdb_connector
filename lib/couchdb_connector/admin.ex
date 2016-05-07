@@ -51,14 +51,6 @@ defmodule Couchdb.Connector.Admin do
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
-  # @spec create_user(db_properties, String.t, String.t, user_roles_list) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  # def create_user db_props, username, password, roles do
-  #   db_props
-  #   |> UrlHelper.user_url(username)
-  #   |> do_create_user(to_json(username, password, roles))
-  #   |> Handler.handle_put(_include_headers = true)
-  # end
-
   @doc """
   Create a new user with given username, password and roles. In case of success,
   the function will respond with {:ok, body, headers}. In case of failures (e.g.

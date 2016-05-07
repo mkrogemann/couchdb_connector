@@ -29,7 +29,7 @@ defmodule Couchdb.Connector.ViewTest do
     assert String.contains?(result, "\"id\":\"_design/test_design\"")
   end
 
-  test "document_by_key/3: ensure that view returns document for given key" do
+  test "document_by_key/5: ensure that view returns document for given key" do
     result = retry(@retries,
       fn(_) ->
         View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name"
@@ -50,7 +50,7 @@ defmodule Couchdb.Connector.ViewTest do
     assert result, "document not found in view after #{@retries} tries"
   end
 
-  test "document_by_key/3: ensure that view returns empty list of rows for missing key" do
+  test "document_by_key/5: ensure that view returns empty list of rows for missing key" do
     key = "missing"
     result = retry(@retries,
       fn(_) ->

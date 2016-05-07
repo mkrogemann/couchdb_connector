@@ -32,9 +32,8 @@ defmodule Couchdb.Connector.TestPrep do
         {:ok, body_map} = Poison.decode body
         HTTPoison.delete UrlHelper.user_url(TestConfig.database_properties, {"anna", "secret"}, "jan")
           <> "?rev=#{body_map["_rev"]}"
-          # TODO: do not return nil but an error
-      {:error, _} ->
-        nil
+      {:error, body} ->
+        {:error, body}
     end
   end
 
@@ -42,9 +41,8 @@ defmodule Couchdb.Connector.TestPrep do
     case Admin.admin_info(TestConfig.database_properties, "anna", "secret") do
       {:ok, _} ->
         HTTPoison.delete(UrlHelper.admin_url(TestConfig.database_properties, "anna", "secret"))
-      {:error, _} ->
-        # TODO: do not return nil but an error
-        nil
+      {:error, body} ->
+        {:error, body}
     end
   end
 

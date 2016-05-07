@@ -33,8 +33,7 @@ defmodule Couchdb.Connector.Reader do
   def get(db_props, id) do
     db_props
     |> UrlHelper.document_url(id)
-    |> HTTPoison.get!
-    |> Handler.handle_get
+    |> do_get
   end
 
   @doc """
@@ -45,8 +44,7 @@ defmodule Couchdb.Connector.Reader do
   def get(db_props, basic_auth, id) do
     db_props
     |> UrlHelper.document_url(basic_auth, id)
-    |> HTTPoison.get!
-    |> Handler.handle_get
+    |> do_get
   end
 
   @doc """
@@ -56,6 +54,11 @@ defmodule Couchdb.Connector.Reader do
   def fetch_uuid(db_props) do
     db_props
     |> UrlHelper.fetch_uuid_url
+    |> do_get
+  end
+
+  defp do_get(url) do
+    url
     |> HTTPoison.get!
     |> Handler.handle_get
   end

@@ -100,7 +100,9 @@ defmodule Couchdb.Connector.Writer do
     Handler.handle_put(response, _include_headers = true)
   end
 
-  # TODO: documentation and naming
+  # In the case that clients present both an id value and the json document
+  # to be stored for the given id, we MUST make sure that the document does
+  # not contain a nil _id field at the top level
   defp couchdb_safe(json) do
     map = Poison.Parser.parse!(json)
     case Map.get(map, "_id") do

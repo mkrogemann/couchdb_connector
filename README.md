@@ -16,16 +16,19 @@ The concept of migrations also does not apply to CouchDB.
 And since CouchDB does not implement an SQL dialect, the decision was taken
 to not follow the standards established by Ecto.
 
-The connector offers 'create', 'update' and 'read' operations through its
+The connector offers create, update and read operations through its
 Writer and Reader modules.
 Basic support for view operations is provided by the View module.
 
 All create and update operations expect valid JSON documents. All read
 operations return JSON strings exactly as they come from CouchDB.
 
-The connector also offers functions to manage users and admins.
+The connector also offers functions to manage users and admins. These functions
+have been implemented to support testing of authentication and most users will
+probably manage users through different tools.
 
-Basic access authentication (basic auth) is now also supported.
+Basic access authentication (basic auth) is currently the only supported
+authentication scheme.
 
 ## Supported platforms
 

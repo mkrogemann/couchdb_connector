@@ -15,6 +15,8 @@ defmodule Couchdb.Connector.View do
 
   """
 
+  use Couchdb.Connector.Types
+
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
@@ -22,6 +24,7 @@ defmodule Couchdb.Connector.View do
   Returns everything found for the given view in the given design document,
   using no authentication.
   """
+  @spec fetch_all(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def fetch_all(db_props, design, view) do
     db_props
     |> UrlHelper.view_url(design, view)
@@ -33,6 +36,7 @@ defmodule Couchdb.Connector.View do
   Returns everything found for the given view in the given design document,
   using basic authentication.
   """
+  @spec fetch_all(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def fetch_all(db_props, auth, design, view) do
     db_props
     |> UrlHelper.view_url(auth, design, view)
@@ -44,6 +48,7 @@ defmodule Couchdb.Connector.View do
   Create a view with the given JavaScript code in the given design document.
   Admin credentials are required for this operation.
   """
+  @spec create_view(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def create_view(db_props, admin_auth, design, code) do
     db_props
     |> UrlHelper.design_url(admin_auth, design)
@@ -54,6 +59,7 @@ defmodule Couchdb.Connector.View do
   @doc """
   Create a view with the given JavaScript code in the given design document.
   """
+  @spec create_view(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def create_view(db_props, design, code) do
     db_props
     |> UrlHelper.design_url(design)
@@ -69,6 +75,8 @@ defmodule Couchdb.Connector.View do
   Staleness is set to 'update_after' which will perform worse than 'ok' but
   deliver more up-to-date results.
   """
+  @spec document_by_key(db_properties, basic_auth, String.t, String.t, String.t, :update_after)
+    :: {:ok, String.t} | {:error, String.t}
   def document_by_key(db_props, auth, design, view, key, :update_after),
     do: authenticated_document_by_key(db_props, auth, design, view, key, :update_after)
 
@@ -80,6 +88,8 @@ defmodule Couchdb.Connector.View do
   Staleness is set to 'ok' which will perform better than 'update_after' but
   potentially deliver stale results.
   """
+  @spec document_by_key(db_properties, basic_auth, String.t, String.t, String.t, :ok)
+    :: {:ok, String.t} | {:error, String.t}
   def document_by_key(db_props, auth, design, view, key, :ok),
     do: authenticated_document_by_key(db_props, auth, design, view, key, :ok)
 
@@ -96,6 +106,8 @@ defmodule Couchdb.Connector.View do
   key exists.
   Staleness is set to 'update_after'.
   """
+  @spec document_by_key(db_properties, String.t, String.t, String.t)
+    :: {:ok, String.t} | {:error, String.t}
   def document_by_key(db_props, design, view, key),
     do: document_by_key(db_props, design, view, key, :update_after)
 
@@ -105,6 +117,8 @@ defmodule Couchdb.Connector.View do
   key exists.
   Staleness is set to 'update_after'.
   """
+  @spec document_by_key(db_properties, String.t, String.t, String.t, :update_after)
+    :: {:ok, String.t} | {:error, String.t}
   def document_by_key(db_props, design, view, key, :update_after),
     do: unauthenticated_document_by_key(db_props, design, view, key, :update_after)
 
@@ -114,6 +128,8 @@ defmodule Couchdb.Connector.View do
   key exists.
   Staleness is set to 'ok'.
   """
+  @spec document_by_key(db_properties, String.t, String.t, String.t, :ok)
+    :: {:ok, String.t} | {:error, String.t}
   def document_by_key(db_props, design, view, key, :ok),
     do: unauthenticated_document_by_key(db_props, design, view, key, :ok)
 
@@ -125,6 +141,8 @@ defmodule Couchdb.Connector.View do
   Staleness is set to 'update_after' which will perform worse than 'ok' but
   deliver more up-to-date results.
   """
+  @spec document_by_key(db_properties, basic_auth, String.t, String.t, String.t)
+    :: {:ok, String.t} | {:error, String.t}
   def document_by_key(db_props, auth, design, view, key) when is_tuple(auth),
     do: document_by_key(db_props, auth, design, view, key, :update_after)
 

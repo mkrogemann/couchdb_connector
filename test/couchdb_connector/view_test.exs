@@ -32,7 +32,7 @@ defmodule Couchdb.Connector.ViewTest do
   test "document_by_key/5: ensure that view returns document for given key" do
     result = retry(@retries,
       fn(_) ->
-        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name"
+        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name", :update_after
       end,
       fn(response) ->
         case response do
@@ -54,7 +54,7 @@ defmodule Couchdb.Connector.ViewTest do
     key = "missing"
     result = retry(@retries,
       fn(_) ->
-        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", key
+        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", key, :update_after
       end,
       fn(response) ->
         case response do

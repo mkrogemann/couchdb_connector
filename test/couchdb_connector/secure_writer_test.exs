@@ -48,6 +48,13 @@ defmodule Couchdb.Connector.SecureWriterTest do
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
 
+  test "update/3: verify that a document without id raises an exception" do
+    update = "{\"_rev\": \"some_revision\", \"key\": \"new value\"}"
+    assert_raise RuntimeError, fn ->
+      Writer.update(TestConfig.database_properties, {"jan", "relax"}, update)
+    end
+  end
+
   test "update/4: ensure that an existing document with given id can be updated" do
     TestPrep.secure_database
     {:ok, _body, headers} =

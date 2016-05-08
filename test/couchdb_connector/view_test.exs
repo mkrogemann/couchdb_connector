@@ -71,4 +71,8 @@ defmodule Couchdb.Connector.ViewTest do
     )
     assert !result, "unexpectedly received a document for key #{key}."
   end
+
+  test "document_by_key/4: ensure that function exists. document may or may not be found" do
+    View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "some_key", :ok
+  end
 end

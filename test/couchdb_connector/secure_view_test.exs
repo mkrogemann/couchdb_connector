@@ -41,7 +41,7 @@ defmodule Couchdb.Connector.SecureViewTest do
       fn(_) ->
         View.document_by_key(
           TestConfig.database_properties, {"jan", "relax"}, "test_view", "test_fetch", "test_name", :update_after
-        )    
+        )
       end,
       fn(response) ->
         case response do
@@ -57,5 +57,9 @@ defmodule Couchdb.Connector.SecureViewTest do
       end
     )
     assert result, "document not found in view after #{@retries} tries"
+  end
+
+  test "document_by_key/5: ensure that function exists. document may or may not be found" do
+    View.document_by_key TestConfig.database_properties, {"jan", "relax"}, "test_view", "test_fetch", "some_key", :ok
   end
 end

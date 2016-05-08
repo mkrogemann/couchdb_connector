@@ -26,6 +26,7 @@ defmodule Couchdb.Connector.Mixfile do
       {:poison, "~> 1.5 or ~> 2.0"},
       {:excoveralls, "0.4.6", only: [:dev, :test]},
       {:credo, "~> 0.2", only: [:dev, :test]},
+      {:mock, "~> 0.1.3", only: [:dev, :test]},
       {:earmark, "0.2.1", only: :dev},
       {:ex_doc, "0.11.4", only: :dev},
       {:dialyxir, "~> 0.3", only: [:dev]}

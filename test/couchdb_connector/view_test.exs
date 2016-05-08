@@ -73,6 +73,10 @@ defmodule Couchdb.Connector.ViewTest do
   end
 
   test "document_by_key/4: ensure that function exists. document may or may not be found" do
+    View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "some_key"
+  end
+
+  test "document_by_key/5: ensure that function exists. document may or may not be found" do
     View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "some_key", :ok
   end
 end

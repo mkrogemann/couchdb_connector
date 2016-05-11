@@ -157,4 +157,15 @@ defmodule Couchdb.Connector.View do
     |> HTTPoison.get!
     |> Handler.handle_get
   end
+
+  @doc """
+  Find and return one document with given key in given view. Will return a
+  JSON document with an empty list of documents if no document with given
+  key exists.
+  Staleness is set to 'update_after'.
+  """
+  def document_by_key db_props, design, view, key, stale \\ :update_after do
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/5 is deprecated, please use document_by_key/2 instead\n"
+    document_by_key(db_props, %{design: design, view: view, key: key})
+  end
 end

@@ -4,6 +4,7 @@ defmodule Couchdb.Connector.SecureReaderTest do
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
+  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -19,7 +20,7 @@ defmodule Couchdb.Connector.SecureReaderTest do
 
   test "get/3: ensure that document exists using basic authentication" do
     TestPrep.secure_database
-    { :ok, json } = Reader.get(TestConfig.database_properties, {"jan", "relax"}, "foo")
+    { :ok, json } = Reader.get(TestConfig.database_properties, TestSupport.test_user, "foo")
     { :ok, json_map } = Poison.decode json
     assert json_map["test_key"] == "test_value"
   end

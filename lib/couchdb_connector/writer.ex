@@ -117,7 +117,7 @@ defmodule Couchdb.Connector.Writer do
   A missing _id field will trigger a RuntimeError.
   """
   @spec update(db_properties, basic_auth, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
-  def update(db_props, auth, json) when is_tuple(auth) do
+  def update(db_props, auth, json) when is_map(auth) do
     {doc_map, id} = parse_and_extract_id(json)
     case id do
       {:ok, id} ->

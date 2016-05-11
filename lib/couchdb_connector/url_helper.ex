@@ -23,7 +23,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec database_server_url(db_properties, basic_auth) :: String.t
   def database_server_url(db_props, auth) do
-    "#{db_props[:protocol]}://#{elem(auth, 0)}:#{elem(auth, 1)}@#{db_props[:hostname]}:#{db_props[:port]}"
+    "#{db_props[:protocol]}://#{auth[:user]}:#{auth[:password]}@#{db_props[:hostname]}:#{db_props[:port]}"
   end
 
   @doc """
@@ -142,7 +142,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec admin_url(db_properties, String.t, String.t) :: String.t
   def admin_url db_props, admin_name, password do
-    "#{database_server_url(db_props, {admin_name, password})}/_config/admins/#{admin_name}"
+    "#{database_server_url(db_props, %{user: admin_name, password: password})}/_config/admins/#{admin_name}"
   end
 
   @doc """

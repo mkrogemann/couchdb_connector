@@ -59,7 +59,7 @@ defmodule Couchdb.Connector.Admin do
   @spec create_user(db_properties, basic_auth, basic_auth, user_roles) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def create_user(db_props, admin_auth, user_auth, roles) do
     db_props
-    |> UrlHelper.user_url(admin_auth, elem(user_auth, 0))
+    |> UrlHelper.user_url(admin_auth, user_auth[:user])
     |> do_create_user(user_to_json(user_auth, roles))
     |> Handler.handle_put(_include_headers = true)
   end
@@ -69,8 +69,8 @@ defmodule Couchdb.Connector.Admin do
   end
 
   defp user_to_json(user_auth, roles) do
-    Poison.encode! %{"name" => elem(user_auth, 0),
-                     "password" => elem(user_auth, 1),
+    Poison.encode! %{"name" => user_auth[:user],
+                     "password" => user_auth[:password],
                      "roles" => roles,
                      "type" => "user"}
   end
@@ -83,8 +83,8 @@ defmodule Couchdb.Connector.Admin do
   @spec create_admin(db_properties, basic_auth) :: {:ok, String.t, headers} | {:error, String.t, headers}
   def create_admin(db_props, admin_auth) do
     db_props
-    |> UrlHelper.admin_url(elem(admin_auth, 0))
-    |> do_create_admin(elem(admin_auth, 1))
+    |> UrlHelper.admin_url(admin_auth[:user])
+    |> do_create_admin(admin_auth[:password])
     |> Handler.handle_put(_include_headers = true)
   end
 
@@ -108,10 +108,10 @@ defmodule Couchdb.Connector.Admin do
   Returns hashed information for the given admin or an error in case the admin
   does not exist or if the given credentials are wrong.
   """
-  @spec admin_info(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
-  def admin_info db_props, username, password do
+  @spec admin_info(db_properties, basic_auth) :: {:ok, String.t} | {:error, String.t}
+  def admin_info db_props, admin_auth do
     db_props
-    |> UrlHelper.admin_url(username, password)
+    |> UrlHelper.admin_url(admin_auth[:user], admin_auth[:password])
     |> HTTPoison.get!
     |> Handler.handle_get
   end

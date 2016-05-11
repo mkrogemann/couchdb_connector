@@ -21,16 +21,25 @@ defmodule Couchdb.Connector.TestPrep do
     {:ok, _} = HTTPoison.put "#{TestConfig.database_url}/_design/#{design_name}", code, [ Headers.json_header ]
   end
 
+  # TODO: duplicate functions
+  defp test_admin do
+    %{user: "anna", password: "secret"}
+  end
+
+  defp test_user do
+    %{user: "jan", password: "relax"}
+  end
+
   def ensure_test_user do
     Admin.create_user(
-      TestConfig.database_properties, {"anna", "secret"}, {"jan", "relax"}, ["members"])
+      TestConfig.database_properties, test_admin, test_user, ["members"])
   end
 
   def delete_test_user do
-    case Admin.user_info(TestConfig.database_properties, {"anna", "secret"}, "jan") do
+    case Admin.user_info(TestConfig.database_properties, test_admin, "jan") do
       {:ok, body} ->
         {:ok, body_map} = Poison.decode body
-        HTTPoison.delete UrlHelper.user_url(TestConfig.database_properties, {"anna", "secret"}, "jan")
+        HTTPoison.delete UrlHelper.user_url(TestConfig.database_properties, test_admin, "jan")
           <> "?rev=#{body_map["_rev"]}"
       {:error, body} ->
         {:error, body}
@@ -38,7 +47,7 @@ defmodule Couchdb.Connector.TestPrep do
   end
 
   def delete_test_admin do
-    case Admin.admin_info(TestConfig.database_properties, "anna", "secret") do
+    case Admin.admin_info(TestConfig.database_properties, test_admin) do
       {:ok, _} ->
         HTTPoison.delete(UrlHelper.admin_url(TestConfig.database_properties, "anna", "secret"))
       {:error, body} ->
@@ -47,11 +56,11 @@ defmodule Couchdb.Connector.TestPrep do
   end
 
   def ensure_test_admin do
-    Admin.create_admin(TestConfig.database_properties, {"anna", "secret"})
+    Admin.create_admin(TestConfig.database_properties, test_admin)
   end
 
   def ensure_test_security do
-    Admin.set_security(TestConfig.database_properties, {"anna", "secret"}, ["anna"], ["jan"])
+    Admin.set_security(TestConfig.database_properties, test_admin, ["anna"], ["jan"])
   end
 
   def secure_database do

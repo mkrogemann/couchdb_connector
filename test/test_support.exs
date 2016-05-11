@@ -17,7 +17,15 @@ defmodule Couchdb.Connector.TestSupport do
               _ -> retry(num_attempts - 1, test_fn, match_fn, test_arg)
             end
         end
-      end      
+      end
     end
+  end
+
+  def test_user() do
+    %{user: "jan", password: "relax"}
+  end
+
+  def test_admin() do
+    %{user: "anna", password: "secret"}
   end
 end

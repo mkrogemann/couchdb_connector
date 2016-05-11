@@ -7,6 +7,7 @@ defmodule Couchdb.Connector.SecureViewTest do
   alias Couchdb.Connector.View
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
+  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -22,7 +23,7 @@ defmodule Couchdb.Connector.SecureViewTest do
 
   test "fetch_all/4: ensure that view works as expected" do
     {:ok, json} =
-      View.fetch_all TestConfig.database_properties, {"jan", "relax"}, "test_view", "test_fetch"
+      View.fetch_all TestConfig.database_properties, TestSupport.test_user, "test_view", "test_fetch"
     {:ok, result_map} = Poison.decode json
     assert result_map["total_rows"] == 1
     [first|_] = result_map["rows"]
@@ -32,7 +33,7 @@ defmodule Couchdb.Connector.SecureViewTest do
   test "create_view/4: ensure that view gets created" do
     {:ok, code} = File.read("test/resources/views/test_view.json")
     {:ok, result} =
-      View.create_view TestConfig.database_properties, {"anna", "secret"}, "test_design", code
+      View.create_view TestConfig.database_properties, TestSupport.test_admin, "test_design", code
     assert String.contains?(result, "\"id\":\"_design/test_design\"")
   end
 
@@ -40,7 +41,7 @@ defmodule Couchdb.Connector.SecureViewTest do
     result = retry(@retries,
       fn(_) ->
         View.document_by_key(
-          TestConfig.database_properties, {"jan", "relax"}, "test_view", "test_fetch", "test_name", :update_after
+          TestConfig.database_properties, TestSupport.test_user, "test_view", "test_fetch", "test_name", :update_after
         )
       end,
       fn(response) ->
@@ -60,10 +61,10 @@ defmodule Couchdb.Connector.SecureViewTest do
   end
 
   test "document_by_key/5: ensure that function exists. document may or may not be found" do
-    View.document_by_key TestConfig.database_properties, {"jan", "relax"}, "test_view", "test_fetch", "some_key"
+    View.document_by_key TestConfig.database_properties, TestSupport.test_user, "test_view", "test_fetch", "some_key"
   end
 
   test "document_by_key/6: ensure that function exists. document may or may not be found" do
-    View.document_by_key TestConfig.database_properties, {"jan", "relax"}, "test_view", "test_fetch", "some_key", :ok
+    View.document_by_key TestConfig.database_properties, TestSupport.test_user, "test_view", "test_fetch", "some_key", :ok
   end
 end

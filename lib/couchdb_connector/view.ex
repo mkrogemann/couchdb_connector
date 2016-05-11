@@ -143,7 +143,7 @@ defmodule Couchdb.Connector.View do
   """
   @spec document_by_key(db_properties, basic_auth, String.t, String.t, String.t)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, auth, design, view, key) when is_tuple(auth),
+  def document_by_key(db_props, auth, design, view, key) when is_map(auth),
     do: document_by_key(db_props, auth, design, view, key, :update_after)
 
   defp unauthenticated_document_by_key(db_props, design, view, key, stale) do

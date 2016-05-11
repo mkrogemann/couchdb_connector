@@ -7,6 +7,7 @@ defmodule Couchdb.Connector.ViewTest do
   alias Couchdb.Connector.View
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
+  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -29,10 +30,10 @@ defmodule Couchdb.Connector.ViewTest do
     assert String.contains?(result, "\"id\":\"_design/test_design\"")
   end
 
-  test "document_by_key/5: ensure that view returns document for given key" do
+  test "document_by_key/3: ensure that view returns document for given key" do
     result = retry(@retries,
       fn(_) ->
-        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name", :update_after
+        View.document_by_key TestConfig.database_properties, TestSupport.test_view_key, :update_after
       end,
       fn(response) ->
         case response do
@@ -50,11 +51,11 @@ defmodule Couchdb.Connector.ViewTest do
     assert result, "document not found in view after #{@retries} tries"
   end
 
-  test "document_by_key/5: ensure that view returns empty list of rows for missing key" do
+  test "document_by_key/3: ensure that view returns empty list of rows for missing key" do
     key = "missing"
     result = retry(@retries,
       fn(_) ->
-        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", key, :update_after
+        View.document_by_key TestConfig.database_properties, TestSupport.test_view_key(key), :update_after
       end,
       fn(response) ->
         case response do
@@ -72,11 +73,11 @@ defmodule Couchdb.Connector.ViewTest do
     assert !result, "unexpectedly received a document for key #{key}."
   end
 
-  test "document_by_key/4: ensure that function exists. document may or may not be found" do
-    View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "some_key"
+  test "document_by_key/2: ensure that function exists. document may or may not be found" do
+    View.document_by_key TestConfig.database_properties, TestSupport.test_view_key
   end
 
-  test "document_by_key/5: ensure that function exists. document may or may not be found" do
-    View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "some_key", :ok
+  test "document_by_key/3: ensure that function exists. document may or may not be found" do
+    View.document_by_key TestConfig.database_properties, TestSupport.test_view_key, :ok
   end
 end

@@ -11,7 +11,8 @@ defmodule Couchdb.Connector.Types do
                                database: String.t, port: non_neg_integer}
       @type user_roles :: [String.t]
       @type headers :: [{String.t, String.t}] # List of header names and values
-      @type basic_auth :: %{user: String.t, password: String.t} # username, password
+      @type basic_auth :: %{user: String.t, password: String.t}
+      @type view_key :: %{design: String.t, view: String.t, key: String.t}
     end
   end
 end

@@ -75,10 +75,10 @@ defmodule Couchdb.Connector.View do
   Staleness is set to 'update_after' which will perform worse than 'ok' but
   deliver more up-to-date results.
   """
-  @spec document_by_key(db_properties, basic_auth, String.t, String.t, String.t, :update_after)
+  @spec document_by_key(db_properties, basic_auth, view_key, :update_after)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, auth, design, view, key, :update_after),
-    do: authenticated_document_by_key(db_props, auth, design, view, key, :update_after)
+  def document_by_key(db_props, auth, view_key, :update_after),
+    do: authenticated_document_by_key(db_props, auth, view_key, :update_after)
 
   @doc """
   Find and return one document with given key in given view, using basic
@@ -88,15 +88,15 @@ defmodule Couchdb.Connector.View do
   Staleness is set to 'ok' which will perform better than 'update_after' but
   potentially deliver stale results.
   """
-  @spec document_by_key(db_properties, basic_auth, String.t, String.t, String.t, :ok)
+  @spec document_by_key(db_properties, basic_auth, view_key, :ok)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, auth, design, view, key, :ok),
-    do: authenticated_document_by_key(db_props, auth, design, view, key, :ok)
+  def document_by_key(db_props, auth, view_key, :ok),
+    do: authenticated_document_by_key(db_props, auth, view_key, :ok)
 
-  defp authenticated_document_by_key(db_props, auth, design, view, key, stale) do
+  defp authenticated_document_by_key(db_props, auth, view_key, stale) do
     db_props
-    |> UrlHelper.view_url(auth, design, view)
-    |> UrlHelper.query_path(key, stale)
+    |> UrlHelper.view_url(auth, view_key[:design], view_key[:view])
+    |> UrlHelper.query_path(view_key[:key], stale)
     |> do_document_by_key
   end
 
@@ -106,10 +106,9 @@ defmodule Couchdb.Connector.View do
   key exists.
   Staleness is set to 'update_after'.
   """
-  @spec document_by_key(db_properties, String.t, String.t, String.t)
-    :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, design, view, key),
-    do: document_by_key(db_props, design, view, key, :update_after)
+  @spec document_by_key(db_properties, view_key) :: {:ok, String.t} | {:error, String.t}
+  def document_by_key(db_props, view_key),
+    do: document_by_key(db_props, view_key, :update_after)
 
   @doc """
   Find and return one document with given key in given view. Will return a
@@ -117,10 +116,10 @@ defmodule Couchdb.Connector.View do
   key exists.
   Staleness is set to 'update_after'.
   """
-  @spec document_by_key(db_properties, String.t, String.t, String.t, :update_after)
+  @spec document_by_key(db_properties, view_key, :update_after)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, design, view, key, :update_after),
-    do: unauthenticated_document_by_key(db_props, design, view, key, :update_after)
+  def document_by_key(db_props, view_key, :update_after),
+    do: unauthenticated_document_by_key(db_props, view_key, :update_after)
 
   @doc """
   Find and return one document with given key in given view. Will return a
@@ -128,10 +127,10 @@ defmodule Couchdb.Connector.View do
   key exists.
   Staleness is set to 'ok'.
   """
-  @spec document_by_key(db_properties, String.t, String.t, String.t, :ok)
+  @spec document_by_key(db_properties, view_key, :ok)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, design, view, key, :ok),
-    do: unauthenticated_document_by_key(db_props, design, view, key, :ok)
+  def document_by_key(db_props, view_key, :ok),
+    do: unauthenticated_document_by_key(db_props, view_key, :ok)
 
   @doc """
   Find and return one document with given key in given view, using basic
@@ -141,15 +140,15 @@ defmodule Couchdb.Connector.View do
   Staleness is set to 'update_after' which will perform worse than 'ok' but
   deliver more up-to-date results.
   """
-  @spec document_by_key(db_properties, basic_auth, String.t, String.t, String.t)
+  @spec document_by_key(db_properties, basic_auth, view_key)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, auth, design, view, key) when is_map(auth),
-    do: document_by_key(db_props, auth, design, view, key, :update_after)
+  def document_by_key(db_props, auth, view_key) when is_map(auth),
+    do: document_by_key(db_props, auth, view_key, :update_after)
 
-  defp unauthenticated_document_by_key(db_props, design, view, key, stale) do
+  defp unauthenticated_document_by_key(db_props, view_key, stale) do
     db_props
-    |> UrlHelper.view_url(design, view)
-    |> UrlHelper.query_path(key, stale)
+    |> UrlHelper.view_url(view_key[:design], view_key[:view])
+    |> UrlHelper.query_path(view_key[:key], stale)
     |> do_document_by_key
   end
 

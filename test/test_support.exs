@@ -28,4 +28,12 @@ defmodule Couchdb.Connector.TestSupport do
   def test_admin() do
     %{user: "anna", password: "secret"}
   end
+
+  def test_view_key do
+    test_view_key("test_name")
+  end
+
+  def test_view_key(key) do
+    %{design: "test_view", view: "test_fetch", key: key}
+  end
 end

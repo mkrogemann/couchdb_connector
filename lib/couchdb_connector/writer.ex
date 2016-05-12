@@ -21,42 +21,93 @@ defmodule Couchdb.Connector.Writer do
 
   """
 
+  alias Couchdb.Connector.Types
   alias Couchdb.Connector.Headers
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
+
   @doc """
-  Create a new document with given json and a CouchDB generated id.
-  This function maps to a HTTP PUT.
-  Fetching the uuid from CouchDB does incur a performance penalty as
-  compared to providing one and using create/3.
+  Create a new document with given json and given id, using the provided basic
+  authentication parameters.
+  Clients must make sure that the id has not been used for an existing document
+  in CouchDB.
+  Either provide a UUID or consider using create_generate in case uniqueness cannot
+  be guaranteed.
   """
-  def create db_props, json do
-    { :ok, uuid_json } = Reader.fetch_uuid(db_props)
-    uuid = hd(Poison.decode!(uuid_json)["uuids"])
-    create db_props, json, uuid
+  @spec create(Types.db_properties, Types.basic_auth, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def create(db_props, auth, json, id) do
+    db_props
+    |> UrlHelper.document_url(auth, id)
+    |> do_create(json)
   end
 
   @doc """
-  Create a new document with given json and given id. Clients must make sure
-  that the id has not been used for an existing document in CouchDB.
-  Either provide a UUID or consider using create/2 in case uniqueness cannot
+  Create a new document with given json and given id, using no authentication.
+  Clients must make sure that the id has not been used for an existing document
+  in CouchDB.
+  Either provide a UUID or consider using create_generate in case uniqueness cannot
   be guaranteed.
   """
-  def create db_props, json, id do
+  @spec create(Types.db_properties, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def create(db_props, json, id) do
     db_props
     |> UrlHelper.document_url(id)
     |> do_create(json)
-    |> Handler.handle_put(_include_headers = true)
   end
 
-  defp do_create url, json do
+  @doc """
+  Create a new document with given json and a CouchDB generated id, using basic
+  authentication.
+  Fetching the uuid from CouchDB does of course incur a performance penalty as
+  compared to providing one.
+  """
+  @spec create_generate(Types.db_properties, Types.basic_auth, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def create_generate(db_props, auth, json) do
+    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
+    uuid = hd(Poison.decode!(uuid_json)["uuids"])
+    create(db_props, auth, json, uuid)
+  end
+
+  @doc """
+  Create a new document with given json and a CouchDB generated id, using no
+  authentication.
+  Fetching the uuid from CouchDB does of course incur a performance penalty as
+  compared to providing one.
+  """
+  @spec create_generate(Types.db_properties, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def create_generate(db_props, json) do
+    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
+    uuid = hd(Poison.decode!(uuid_json)["uuids"])
+    create(db_props, json, uuid)
+  end
+
+  @doc """
+  This function has been deprecated in version 0.3.0 and will be removed in a
+  future release.
+  """
+  @spec create(Types.db_properties, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def create(db_props, json) do
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Write.create/2 is deprecated, please use create_generate/2 instead\n"
+    create_generate(db_props, json)
+  end
+
+  defp do_create(url, json) do
     safe_json = couchdb_safe(json)
-    HTTPoison.put! url, safe_json, [ Headers.json_header ]
+    response = HTTPoison.put!(url, safe_json, [Headers.json_header])
+    Handler.handle_put(response, :include_headers)
   end
 
-  defp couchdb_safe json do
+  # In the case that clients present both an id value and the json document
+  # to be stored for the given id, we MUST make sure that the document does
+  # not contain a nil _id field at the top level
+  defp couchdb_safe(json) do
     map = Poison.Parser.parse!(json)
     case Map.get(map, "_id") do
       nil -> Poison.encode!(Map.delete(map, "_id"))
@@ -65,18 +116,19 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Update the given document. Note that an _id field must be contained in the
-  document. A missing _id field with trigger a RuntimeError.
+  Update the given document, using basic authentication.
+  Note that an _id field must be contained in the document.
+  A missing _id field will trigger a RuntimeError.
   """
-  def update db_props, json do
-    doc_map = Poison.Parser.parse!(json)
-    id = Map.fetch(doc_map, "_id")
+  @spec update(Types.db_properties, Types.basic_auth, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def update(db_props, auth, json) when is_map(auth) do
+    {doc_map, id} = parse_and_extract_id(json)
     case id do
-      { :ok, id } ->
-        url = UrlHelper.document_url(db_props, id)
-        url
+      {:ok, id} ->
+        db_props
+        |> UrlHelper.document_url(auth, id)
         |> do_update(Poison.encode!(doc_map))
-        |> Handler.handle_put(_include_headers = true)
       :error ->
         raise RuntimeError, message:
           "the document to be updated must contain an \"_id\" field"
@@ -84,17 +136,89 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Update the given document that is stored under the given id.
+  Update the given document that is stored under the given id, using no
+  authentication.
   """
-  def update db_props, json, id do
+  @spec update(Types.db_properties, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def update(db_props, json, id) do
     db_props
     |> UrlHelper.document_url(id)
     |> do_update(json)
-    |> Handler.handle_put(_include_headers = true)
   end
 
-  defp do_update url, json do
-    HTTPoison.put!(url, json, [ Headers.json_header ])
+  @doc """
+  Update the given document, using no authentication.
+  Note that an _id field must be contained in the document.
+  A missing _id field will trigger a RuntimeError.
+  """
+  @spec update(Types.db_properties, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def update(db_props, json) do
+    {doc_map, id} = parse_and_extract_id(json)
+    case id do
+      {:ok, id} ->
+        db_props
+        |> UrlHelper.document_url(id)
+        |> do_update(Poison.encode!(doc_map))
+      :error ->
+        raise RuntimeError, message:
+          "the document to be updated must contain an \"_id\" field"
+    end
   end
 
+  @doc """
+  Update the given document that is stored under the given id, using basic
+  authentication.
+  """
+  @spec update(Types.db_properties, Types.basic_auth, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def update(db_props, auth, json, id) do
+    db_props
+    |> UrlHelper.document_url(auth, id)
+    |> do_update(json)
+  end
+
+  defp do_update(url, json) do
+    url
+    |> HTTPoison.put!(json, [Headers.json_header])
+    |> Handler.handle_put(:include_headers)
+  end
+
+  defp parse_and_extract_id(json) do
+    doc_map = Poison.Parser.parse!(json)
+    {doc_map, Map.fetch(doc_map, "_id")}
+  end
+
+  @doc """
+  Delete the document with the given id in the given revision, using basic
+  authentication.
+  An error will be returned in case the document does not exist or the
+  revision is wrong.
+  """
+  @spec destroy(Types.db_properties, Types.basic_auth, String.t, String.t)
+    :: {:ok, String.t} | {:error, String.t}
+  def destroy(db_props, auth, id, rev) do
+    db_props
+    |> UrlHelper.document_url(auth, id)
+    |> do_destroy(rev)
+  end
+
+  @doc """
+  Delete the document with the given id in the given revision, using no
+  authentication.
+  An error will be returned in case the document does not exist or the
+  revision is wrong.
+  """
+  @spec destroy(Types.db_properties, String.t, String.t)
+    :: {:ok, String.t} | {:error, String.t}
+  def destroy(db_props, id, rev) do
+    db_props
+    |> UrlHelper.document_url(id)
+    |> do_destroy(rev)
+  end
+
+  defp do_destroy(url, rev) do
+    Handler.handle_delete(HTTPoison.delete!(url <> "?rev=#{rev}"))
+  end
 end

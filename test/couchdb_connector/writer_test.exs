@@ -1,14 +1,20 @@
 defmodule Couchdb.Connector.WriterTest do
   use ExUnit.Case
+  use Couchdb.Connector.TestSupport
 
   alias Couchdb.Connector.Writer
+  alias Couchdb.Connector.Reader
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
 
   setup context do
     TestPrep.ensure_database
-    on_exit context, fn -> TestPrep.delete_database end
+    on_exit context, fn ->
+      TestPrep.delete_database
+    end
   end
+
+  # Test cases for unsecured database
 
   test "create/3: ensure that a new document gets created with given id" do
     {:ok, body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}", "42"
@@ -31,7 +37,14 @@ defmodule Couchdb.Connector.WriterTest do
     assert id_from_url(header_value(headers, "Location")) == "42"
   end
 
-  test "create/2: ensure that a new document gets create with a fetched id" do
+  test "create_generate/2: ensure that a new document gets create with a fetched id" do
+    {:ok, body, _headers} = Writer.create_generate TestConfig.database_properties, "{\"key\": \"value\"}"
+    {:ok, body_map} = Poison.decode body
+    assert String.starts_with?(body_map["rev"], "1-")
+    assert String.length(body_map["id"]) == 32
+  end
+
+  test "create/2: ensure that a new document gets create with a fetched id for deprecated API" do
     {:ok, body, _headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}"
     {:ok, body_map} = Poison.decode body
     assert String.starts_with?(body_map["rev"], "1-")
@@ -39,7 +52,7 @@ defmodule Couchdb.Connector.WriterTest do
   end
 
   test "update/2: ensure that a document that contains an existing id can be updated" do
-    {:ok, _body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"original value\"}"
+    {:ok, _body, headers} = Writer.create_generate TestConfig.database_properties, "{\"key\": \"original value\"}"
     id = id_from_url(header_value(headers, "Location"))
     revision = header_value(headers, "ETag")
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
@@ -55,7 +68,7 @@ defmodule Couchdb.Connector.WriterTest do
   end
 
   test "update/3: ensure that an existing document with given id can be updated" do
-    {:ok, _body, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"original value\"}"
+    {:ok, _body, headers} = Writer.create_generate TestConfig.database_properties, "{\"key\": \"original value\"}"
     id = id_from_url(header_value(headers, "Location"))
     revision = header_value(headers, "ETag")
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
@@ -63,8 +76,27 @@ defmodule Couchdb.Connector.WriterTest do
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
 
-  defp header_value headers, key do
-    Enum.into(headers, %{})[key]
+  test "destroy/3: ensure that document with given id can be deleted" do
+    {:ok, _, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}", "42"
+    revision = String.replace(header_value(headers, "ETag"), "\"", "")
+    {:ok, body} = Writer.destroy TestConfig.database_properties, "42", revision
+    {:ok, body_map} = Poison.decode body
+    assert String.starts_with?(body_map["rev"], "2-")
+    {:error, _} = Reader.get(TestConfig.database_properties, "42")
+  end
+
+  test "destroy/3: attempting to delete a non-existing document triggers an error" do
+    {:error, body} = Writer.destroy TestConfig.database_properties, "42", "any_rev"
+    {:ok, body_map} = Poison.decode body
+    assert body_map["reason"] == "missing"
+  end
+
+  test "destroy/3: attempting to delete a document with wrong revision triggers an error" do
+    {:ok, _, headers} = Writer.create TestConfig.database_properties, "{\"key\": \"value\"}", "42"
+    revision = String.replace(String.replace(header_value(headers, "ETag"), "\"", ""), "1-", "2-")
+    {:error, body} = Writer.destroy TestConfig.database_properties, "42", revision
+    {:ok, body_map} = Poison.decode body
+    assert body_map["error"] == "conflict"
   end
 
   defp id_from_url url do

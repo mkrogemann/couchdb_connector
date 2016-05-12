@@ -1,12 +1,13 @@
 defmodule Couchdb.Connector.ViewTest do
   use ExUnit.Case
+  use Couchdb.Connector.TestSupport
 
-  @num_retries 10
+  @retries 10
 
   alias Couchdb.Connector.View
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.TestRetry
+  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -30,7 +31,58 @@ defmodule Couchdb.Connector.ViewTest do
   end
 
   test "document_by_key/3: ensure that view returns document for given key" do
-    result = TestRetry.retry(@num_retries,
+    result = retry(@retries,
+      fn(_) ->
+        View.document_by_key TestConfig.database_properties, TestSupport.test_view_key, :update_after
+      end,
+      fn(response) ->
+        case response do
+          {:ok, body} ->
+            doc = Poison.decode! body
+            rows = doc["rows"]
+            case length(rows) do
+              0 -> false
+              _ -> hd(rows)["id"] == "test_id"
+            end
+          _ -> false
+        end
+      end
+    )
+    assert result, "document not found in view after #{@retries} tries"
+  end
+
+  test "document_by_key/3: ensure that view returns empty list of rows for missing key" do
+    key = "missing"
+    result = retry(@retries,
+      fn(_) ->
+        View.document_by_key TestConfig.database_properties, TestSupport.test_view_key(key), :update_after
+      end,
+      fn(response) ->
+        case response do
+          {:ok, body} ->
+            doc = Poison.decode! body
+            rows = doc["rows"]
+            case length(rows) do
+              0 -> false
+              _ -> hd(rows)["id"] == "test_id"
+            end
+          _ -> false
+        end
+      end
+    )
+    assert !result, "unexpectedly received a document for key #{key}."
+  end
+
+  test "document_by_key/2: ensure that function exists. document may or may not be found" do
+    View.document_by_key TestConfig.database_properties, TestSupport.test_view_key
+  end
+
+  test "document_by_key/3: ensure that function exists. document may or may not be found" do
+    View.document_by_key TestConfig.database_properties, TestSupport.test_view_key, :ok
+  end
+
+  test "document_by_key/5: ensure that view returns document for given key" do
+    result = retry(@retries,
       fn(_) ->
         View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name"
       end,
@@ -47,28 +99,6 @@ defmodule Couchdb.Connector.ViewTest do
         end
       end
     )
-    assert result, "document not found in view after #{@num_retries} tries"
-  end
-
-  test "document_by_key/3: ensure that view returns empty list of rows for missing key" do
-    key = "missing"
-    result = TestRetry.retry(@num_retries,
-      fn(_) ->
-        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", key
-      end,
-      fn(response) ->
-        case response do
-          {:ok, body} ->
-            doc = Poison.decode! body
-            rows = doc["rows"]
-            case length(rows) do
-              0 -> false
-              _ -> hd(rows)["id"] == "test_id"
-            end
-          _ -> false
-        end
-      end
-    )
-    assert !result, "unexpectedly received a document for key #{key}."
+    assert result, "document not found in view after #{@retries} tries"
   end
 end

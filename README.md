@@ -16,16 +16,24 @@ The concept of migrations also does not apply to CouchDB.
 And since CouchDB does not implement an SQL dialect, the decision was taken
 to not follow the standards established by Ecto.
 
-The connector offers 'create', 'update' and 'read' operations through its
+The connector offers create, update and read operations through its
 Writer and Reader modules.
 Basic support for view operations is provided by the View module.
 
 All create and update operations expect valid JSON documents. All read
 operations return JSON strings exactly as they come from CouchDB.
 
+The connector also offers functions to manage users and admins. These functions
+have been implemented to support testing of authentication and most users will
+probably manage users through different tools.
+
+Basic access authentication (basic auth) is currently the only supported
+authentication scheme.
+
 ## Supported platforms
 
-This library has been tested against Elixir 1.1.1 and 1.2.0 with CouchDB 1.6.1.
+This library has been tested successfully with Elixir release versions 1.0.5,
+1.1.1 and 1.2.5, using CouchDB version 1.6.1.
 
 ## Installation
 
@@ -34,17 +42,17 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
   1. Add couchdb_connector to your list of dependencies in `mix.exs`:
 
 ```Elixir
-        def deps do
-          [{:couchdb_connector, "~> 0.2.0"}]
-        end
+def deps do
+  [{:couchdb_connector, "~> 0.3.0"}]
+end
 ```
 
   2. Ensure couchdb_connector is started before your application:
 
 ```Elixir
-        def application do
-          [applications: [:couchdb_connector]]
-        end
+def application do
+  [applications: [:couchdb_connector]]
+end
 ```
 
 ## Usage
@@ -188,7 +196,7 @@ Querying a View can be done like this:
 In case the document given by "key" exists, you should see something like
 ```Elixir
 {:ok,
- "{\"total_rows\":3,\"offset\":1,\"rows\":[\r\n{\"id\":\"5c09dbf93fd6226c414fad5b84004d7c\",\"key\":\"key\",..."}
+ "{\"total_rows\":3,\"offset\":1,\"rows\":[\r\n{\"id\":\"5c09dbf93fd6226c...\",\"key\":\"key\",..."}
 ```
 
 otherwise, the response should contain an empty list of rows:
@@ -218,8 +226,7 @@ In case that database never existed, you should see
 
 Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
 
-- authentication
-- retry on (HTTPoison.Error) :closed errors
 - enhance view handling and query capabilities
 - implement wrappers to take / return Maps instead of JSON strings only
-- pool HTTP connections
+- cookie auth, oauth auth
+- attachment support

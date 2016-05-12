@@ -9,34 +9,55 @@ defmodule Couchdb.Connector.Reader do
       %{database: "couchdb_connector_test", hostname: "localhost", port: 5984, protocol: "http"}
 
       Couchdb.Connector.Reader.get(db_props, "_not_there_")
-      :error, "{\\"error\\":\\"not_found\\",\\"reason\\":\\"missing\\"}\\n"}
+      {:error, "{\\"error\\":\\"not_found\\",\\"reason\\":\\"missing\\"}\\n"}
 
-      TODO: successful read
+      Couchdb.Connector.Reader.get(db_props, "ca922a07263524e2feb5fe398303ecf8")
+      {:ok,
+        "{\\"_id\\":\\"ca922a07263524e2feb5fe398303ecf8\\",\\"_rev\\":\\"1-59414...\\",\\"key\\":\\"value\\"}\\n"}
 
       Couchdb.Connector.Reader.fetch_uuid(db_props)
-      :ok, "{\\"uuids\\":[\\"1a013a4ce3...\\"]}\\n"}
+      {:ok, "{\\"uuids\\":[\\"1a013a4ce3...\\"]}\\n"}
 
   """
 
+  alias Couchdb.Connector.Types
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
   @doc """
-  Retrieve the document given by database properties and id.
+  Retrieve the document given by database properties and id, using no
+  authentication.
   """
-  def get db_props, id do
+  @spec get(Types.db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
+  def get(db_props, id) do
     db_props
     |> UrlHelper.document_url(id)
-    |> HTTPoison.get!
-    |> Handler.handle_get
+    |> do_get
+  end
+
+  @doc """
+  Retrieve the document given by database properties and id, using the given
+  basic auth credentials for authentication.
+  """
+  @spec get(Types.db_properties, Types.basic_auth, String.t) :: {:ok, String.t} | {:error, String.t}
+  def get(db_props, basic_auth, id) do
+    db_props
+    |> UrlHelper.document_url(basic_auth, id)
+    |> do_get
   end
 
   @doc """
   Fetch a single uuid from CouchDB for use in a a subsequent create operation.
   """
-  def fetch_uuid db_props do
+  @spec fetch_uuid(Types.db_properties) :: {:ok, String.t} | {:error, String.t}
+  def fetch_uuid(db_props) do
     db_props
     |> UrlHelper.fetch_uuid_url
+    |> do_get
+  end
+
+  defp do_get(url) do
+    url
     |> HTTPoison.get!
     |> Handler.handle_get
   end

@@ -3,7 +3,9 @@ services:
   - couchdb
 language: elixir
 elixir:
-  - 1.2.2
+  - 1.0.5
+  - 1.1.1
+  - 1.2.5
 otp_release:
   - 18.2.1
 env:

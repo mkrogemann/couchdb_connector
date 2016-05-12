@@ -61,7 +61,7 @@ defmodule Couchdb.Connector.Admin do
     db_props
     |> UrlHelper.user_url(admin_auth, user_auth[:user])
     |> do_create_user(user_to_json(user_auth, roles))
-    |> Handler.handle_put(_include_headers = true)
+    |> Handler.handle_put(:include_headers)
   end
 
   defp do_create_user(url, json) do
@@ -85,7 +85,7 @@ defmodule Couchdb.Connector.Admin do
     db_props
     |> UrlHelper.admin_url(admin_auth[:user])
     |> do_create_admin(admin_auth[:password])
-    |> Handler.handle_put(_include_headers = true)
+    |> Handler.handle_put(:include_headers)
   end
 
   defp do_create_admin(url, password) do

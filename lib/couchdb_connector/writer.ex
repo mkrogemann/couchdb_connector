@@ -97,7 +97,7 @@ defmodule Couchdb.Connector.Writer do
   defp do_create(url, json) do
     safe_json = couchdb_safe(json)
     response = HTTPoison.put!(url, safe_json, [Headers.json_header])
-    Handler.handle_put(response, _include_headers = true)
+    Handler.handle_put(response, :include_headers)
   end
 
   # In the case that clients present both an id value and the json document
@@ -174,7 +174,7 @@ defmodule Couchdb.Connector.Writer do
   defp do_update(url, json) do
     url
     |> HTTPoison.put!(json, [Headers.json_header])
-    |> Handler.handle_put(_include_headers = true)
+    |> Handler.handle_put(:include_headers)
   end
 
   defp parse_and_extract_id(json) do

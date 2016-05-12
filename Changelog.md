@@ -1,4 +1,4 @@
-Version 0.3.0 - released 2016-05-12
+Version 0.3.0 - released 2016-05-13
 -------------
 
 - Allow document removal

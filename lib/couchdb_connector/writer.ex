@@ -21,8 +21,7 @@ defmodule Couchdb.Connector.Writer do
 
   """
 
-  use   Couchdb.Connector.Types
-
+  alias Couchdb.Connector.Types
   alias Couchdb.Connector.Headers
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.UrlHelper
@@ -37,7 +36,8 @@ defmodule Couchdb.Connector.Writer do
   Either provide a UUID or consider using create_generate in case uniqueness cannot
   be guaranteed.
   """
-  @spec create(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec create(Types.db_properties, Types.basic_auth, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def create(db_props, auth, json, id) do
     db_props
     |> UrlHelper.document_url(auth, id)
@@ -51,7 +51,8 @@ defmodule Couchdb.Connector.Writer do
   Either provide a UUID or consider using create_generate in case uniqueness cannot
   be guaranteed.
   """
-  @spec create(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec create(Types.db_properties, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def create(db_props, json, id) do
     db_props
     |> UrlHelper.document_url(id)
@@ -64,7 +65,8 @@ defmodule Couchdb.Connector.Writer do
   Fetching the uuid from CouchDB does of course incur a performance penalty as
   compared to providing one.
   """
-  @spec create_generate(db_properties, basic_auth, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec create_generate(Types.db_properties, Types.basic_auth, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def create_generate(db_props, auth, json) do
     {:ok, uuid_json} = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])
@@ -77,7 +79,8 @@ defmodule Couchdb.Connector.Writer do
   Fetching the uuid from CouchDB does of course incur a performance penalty as
   compared to providing one.
   """
-  @spec create_generate(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec create_generate(Types.db_properties, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def create_generate(db_props, json) do
     {:ok, uuid_json} = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])
@@ -88,7 +91,8 @@ defmodule Couchdb.Connector.Writer do
   This function has been deprecated in version 0.3.0 and will be removed in a
   future release.
   """
-  @spec create(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec create(Types.db_properties, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def create(db_props, json) do
     IO.write :stderr, "\nwarning: Couchdb.Connector.Write.create/2 is deprecated, please use create_generate/2 instead\n"
     create_generate(db_props, json)
@@ -116,7 +120,8 @@ defmodule Couchdb.Connector.Writer do
   Note that an _id field must be contained in the document.
   A missing _id field will trigger a RuntimeError.
   """
-  @spec update(db_properties, basic_auth, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec update(Types.db_properties, Types.basic_auth, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update(db_props, auth, json) when is_map(auth) do
     {doc_map, id} = parse_and_extract_id(json)
     case id do
@@ -134,7 +139,8 @@ defmodule Couchdb.Connector.Writer do
   Update the given document that is stored under the given id, using no
   authentication.
   """
-  @spec update(db_properties, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec update(Types.db_properties, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update(db_props, json, id) do
     db_props
     |> UrlHelper.document_url(id)
@@ -146,7 +152,8 @@ defmodule Couchdb.Connector.Writer do
   Note that an _id field must be contained in the document.
   A missing _id field will trigger a RuntimeError.
   """
-  @spec update(db_properties, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec update(Types.db_properties, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update(db_props, json) do
     {doc_map, id} = parse_and_extract_id(json)
     case id do
@@ -164,7 +171,8 @@ defmodule Couchdb.Connector.Writer do
   Update the given document that is stored under the given id, using basic
   authentication.
   """
-  @spec update(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t, headers} | {:error, String.t, headers}
+  @spec update(Types.db_properties, Types.basic_auth, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update(db_props, auth, json, id) do
     db_props
     |> UrlHelper.document_url(auth, id)
@@ -188,7 +196,8 @@ defmodule Couchdb.Connector.Writer do
   An error will be returned in case the document does not exist or the
   revision is wrong.
   """
-  @spec destroy(db_properties, basic_auth, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
+  @spec destroy(Types.db_properties, Types.basic_auth, String.t, String.t)
+    :: {:ok, String.t} | {:error, String.t}
   def destroy(db_props, auth, id, rev) do
     db_props
     |> UrlHelper.document_url(auth, id)
@@ -201,7 +210,8 @@ defmodule Couchdb.Connector.Writer do
   An error will be returned in case the document does not exist or the
   revision is wrong.
   """
-  @spec destroy(db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
+  @spec destroy(Types.db_properties, String.t, String.t)
+    :: {:ok, String.t} | {:error, String.t}
   def destroy(db_props, id, rev) do
     db_props
     |> UrlHelper.document_url(id)

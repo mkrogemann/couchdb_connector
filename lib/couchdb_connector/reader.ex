@@ -20,8 +20,7 @@ defmodule Couchdb.Connector.Reader do
 
   """
 
-  use Couchdb.Connector.Types
-
+  alias Couchdb.Connector.Types
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
@@ -29,7 +28,7 @@ defmodule Couchdb.Connector.Reader do
   Retrieve the document given by database properties and id, using no
   authentication.
   """
-  @spec get(db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
+  @spec get(Types.db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
   def get(db_props, id) do
     db_props
     |> UrlHelper.document_url(id)
@@ -40,7 +39,7 @@ defmodule Couchdb.Connector.Reader do
   Retrieve the document given by database properties and id, using the given
   basic auth credentials for authentication.
   """
-  @spec get(db_properties, basic_auth, String.t) :: {:ok, String.t} | {:error, String.t}
+  @spec get(Types.db_properties, Types.basic_auth, String.t) :: {:ok, String.t} | {:error, String.t}
   def get(db_props, basic_auth, id) do
     db_props
     |> UrlHelper.document_url(basic_auth, id)
@@ -50,7 +49,7 @@ defmodule Couchdb.Connector.Reader do
   @doc """
   Fetch a single uuid from CouchDB for use in a a subsequent create operation.
   """
-  @spec fetch_uuid(db_properties) :: {:ok, String.t} | {:error, String.t}
+  @spec fetch_uuid(Types.db_properties) :: {:ok, String.t} | {:error, String.t}
   def fetch_uuid(db_props) do
     db_props
     |> UrlHelper.fetch_uuid_url

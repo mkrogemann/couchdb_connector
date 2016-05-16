@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/locolupo/couchdb_connector/badge.svg?branch=master&service=github)](https://coveralls.io/github/locolupo/couchdb_connector?branch=master)
 [![Hex.pm](https://img.shields.io/hexpm/v/couchdb_connector.svg?style=flat-square)](https://hex.pm/packages/couchdb_connector)
 [![Stories in Ready](https://badge.waffle.io/locolupo/couchdb_connector.png?label=ready&title=Ready)](https://waffle.io/locolupo/couchdb_connector)
+[![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/couchdb_connector/)
 
 ## Description
 

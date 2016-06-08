@@ -5,7 +5,7 @@ language: elixir
 elixir:
   - 1.0.5
   - 1.1.1
-  - 1.2.5
+  - 1.2.6
 otp_release:
   - 18.2.1
 env:

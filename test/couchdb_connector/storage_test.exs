@@ -16,8 +16,7 @@ defmodule Couchdb.Connector.StorageTest do
     assert db_exists
   end
 
-  test "storage_up/1: verify second attempt at creating a database
-        returns :error" do
+  test "storage_up/1: verify second attempt at creating a database returns :error" do
     { :ok, _body } = Storage.storage_up TestConfig.database_properties
 
     { :error, body } = Storage.storage_up TestConfig.database_properties
@@ -33,8 +32,7 @@ defmodule Couchdb.Connector.StorageTest do
     assert !db_exists
   end
 
-  test "storage_up/1: verify second attempt at destroying a database
-        returns :error" do
+  test "storage_up/1: verify second attempt at destroying a database returns :error" do
     { :ok, _body } = Storage.storage_up TestConfig.database_properties
     { :ok, _body } = Storage.storage_down TestConfig.database_properties
 

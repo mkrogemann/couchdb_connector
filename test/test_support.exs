@@ -34,6 +34,8 @@ defmodule Couchdb.Connector.TestSupport do
             response = fun.()
             case response do
               {:error, %HTTPoison.Error{reason: _}} ->
+                IO.puts("Couchdb HTTP connection error - #{num_attempts - 1} attempts left")
+                :timer.sleep(10)
                 retry_on_error(fun, num_attempts - 1)
               success ->
                 success

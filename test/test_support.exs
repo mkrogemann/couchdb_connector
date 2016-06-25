@@ -20,6 +20,26 @@ defmodule Couchdb.Connector.TestSupport do
             end
         end
       end
+
+      # Couchdb sometimes surprises us with errors like this one:
+      # {:error, %HTTPoison.Error{id: nil, reason: :closed}}
+      # These closed connections happen a lot on Travis which makes triggers
+      # lots of false alerts.
+      # TODO: would like to match more precisely so that we only retry in case
+      # of 'closed' errors.
+      def retry_on_error(fun, num_attempts \\ 3) do
+        case num_attempts do
+          1 -> fun.()
+          _ ->
+            response = fun.()
+            case response do
+              {:error, %HTTPoison.Error{reason: _}} ->
+                retry_on_error(fun, num_attempts - 1)
+              success ->
+                success
+            end
+        end
+      end
     end
   end
 

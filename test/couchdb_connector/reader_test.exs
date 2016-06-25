@@ -1,5 +1,6 @@
 defmodule Couchdb.Connector.ReaderTest do
   use ExUnit.Case
+  use Couchdb.Connector.TestSupport
 
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.TestConfig
@@ -16,19 +17,22 @@ defmodule Couchdb.Connector.ReaderTest do
   # Test cases for unsecured database
 
   test "get/2: ensure that document exists" do
-    { :ok, json } = Reader.get TestConfig.database_properties, "foo"
-    { :ok, json_map } = Poison.decode json
+    {:ok, json} = retry_on_error(
+      fn() -> Reader.get(TestConfig.database_properties, "foo") end)
+    {:ok, json_map} = Poison.decode json
     assert json_map["test_key"] == "test_value"
   end
 
   test "get/2: ensure an error is returned for missing document" do
-    { :error, json } = Reader.get TestConfig.database_properties, "unicorn"
-    { :ok, json_map } = Poison.decode json
+    {:error, json} = retry_on_error(
+      fn() -> Reader.get(TestConfig.database_properties, "unicorn") end)
+    {:ok, json_map} = Poison.decode json
     assert json_map["reason"] == "missing"
   end
 
   test "fetch_uuid/1: get a single uuid from database server" do
-    { :ok, json } = Reader.fetch_uuid(TestConfig.database_properties)
+    {:ok, json} = retry_on_error(
+      fn() -> Reader.fetch_uuid(TestConfig.database_properties) end)
     uuid = hd(Poison.decode!(json)["uuids"])
     assert String.length(uuid) == 32
   end

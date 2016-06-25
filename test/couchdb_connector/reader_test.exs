@@ -1,6 +1,6 @@
 defmodule Couchdb.Connector.ReaderTest do
   use ExUnit.Case
-  use Couchdb.Connector.TestSupport
+  use Couchdb.Connector.TestSupport.Macros
 
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.TestConfig

@@ -1,6 +1,6 @@
 defmodule Couchdb.Connector.WriterTest do
   use ExUnit.Case
-  use Couchdb.Connector.TestSupport
+  use Couchdb.Connector.TestSupport.Macros
 
   alias Couchdb.Connector.Writer
   alias Couchdb.Connector.Reader

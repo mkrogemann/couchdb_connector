@@ -1,6 +1,6 @@
 defmodule Couchdb.Connector.SecureViewTest do
   use ExUnit.Case
-  use Couchdb.Connector.TestSupport
+  use Couchdb.Connector.TestSupport.Macros
 
   @retries 10
 

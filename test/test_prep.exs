@@ -1,4 +1,5 @@
 defmodule Couchdb.Connector.TestPrep do
+  alias Couchdb.Connector.TestSupport
 
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.Headers
@@ -6,19 +7,27 @@ defmodule Couchdb.Connector.TestPrep do
   alias Couchdb.Connector.UrlHelper
 
   def ensure_database do
-    {:ok, _} = HTTPoison.put "#{TestConfig.database_url}", "{}", [ Headers.json_header ]
+    {:ok, _} = TestSupport.retry_on_error(fn() ->
+      HTTPoison.put "#{TestConfig.database_url}", "{}", [Headers.json_header]
+    end)
   end
 
   def delete_database do
-    {:ok, _} = HTTPoison.delete "#{TestConfig.database_url}"
+    {:ok, _} = TestSupport.retry_on_error(fn() ->
+      HTTPoison.delete("#{TestConfig.database_url}")
+    end)
   end
 
   def ensure_document(doc, id) do
-    {:ok, _} = HTTPoison.put "#{TestConfig.database_url}/#{id}", doc, [ Headers.json_header ]
+    {:ok, _} = TestSupport.retry_on_error(fn() ->
+      HTTPoison.put "#{TestConfig.database_url}/#{id}", doc, [Headers.json_header]
+    end)
   end
 
   def ensure_view(design_name, code) do
-    {:ok, _} = HTTPoison.put "#{TestConfig.database_url}/_design/#{design_name}", code, [ Headers.json_header ]
+    {:ok, _} = TestSupport.retry_on_error(fn() ->
+      HTTPoison.put "#{TestConfig.database_url}/_design/#{design_name}", code, [Headers.json_header]
+    end)
   end
 
   # TODO: duplicate functions
@@ -31,8 +40,9 @@ defmodule Couchdb.Connector.TestPrep do
   end
 
   def ensure_test_user do
-    Admin.create_user(
-      TestConfig.database_properties, test_admin, test_user, ["members"])
+    TestSupport.retry_on_error(fn() ->
+      Admin.create_user(TestConfig.database_properties, test_admin, test_user, ["members"])
+    end)
   end
 
   def delete_test_user do
@@ -56,11 +66,15 @@ defmodule Couchdb.Connector.TestPrep do
   end
 
   def ensure_test_admin do
-    Admin.create_admin(TestConfig.database_properties, test_admin)
+    TestSupport.retry_on_error(fn() ->
+      Admin.create_admin(TestConfig.database_properties, test_admin)
+    end)
   end
 
   def ensure_test_security do
-    Admin.set_security(TestConfig.database_properties, test_admin, ["anna"], ["jan"])
+    TestSupport.retry_on_error(fn() ->
+      Admin.set_security(TestConfig.database_properties, test_admin, ["anna"], ["jan"])
+    end)
   end
 
   def secure_database do

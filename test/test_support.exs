@@ -1,4 +1,4 @@
-defmodule Couchdb.Connector.TestSupport do
+defmodule Couchdb.Connector.TestSupport.Macros do
 
   defmacro __using__(_opts) do
     quote do
@@ -21,29 +21,18 @@ defmodule Couchdb.Connector.TestSupport do
         end
       end
 
-      # Couchdb sometimes surprises us with errors like this one:
-      # {:error, %HTTPoison.Error{id: nil, reason: :closed}}
-      # These closed connections happen a lot on Travis which makes triggers
-      # lots of false alerts.
-      # TODO: would like to match more precisely so that we only retry in case
-      # of 'closed' errors.
       def retry_on_error(fun, num_attempts \\ 3) do
-        case num_attempts do
-          1 -> fun.()
-          _ ->
-            response = fun.()
-            case response do
-              {:error, %HTTPoison.Error{reason: _}} ->
-                IO.puts("Couchdb HTTP connection error - #{num_attempts - 1} attempts left")
-                :timer.sleep(10)
-                retry_on_error(fun, num_attempts - 1)
-              success ->
-                success
-            end
-        end
+        Couchdb.Connector.TestSupport.retry_on_error(fun, num_attempts)
       end
+
     end
+
   end
+end
+
+
+defmodule Couchdb.Connector.TestSupport do
+  require Logger
 
   def test_user() do
     %{user: "jan", password: "relax"}
@@ -59,5 +48,27 @@ defmodule Couchdb.Connector.TestSupport do
 
   def test_view_key(key) do
     %{design: "test_view", view: "test_fetch", key: key}
+  end
+
+  # Couchdb sometimes surprises us with errors like this one:
+  # {:error, %HTTPoison.Error{id: nil, reason: :closed}}
+  # These closed connections happen a lot on Travis which makes triggers
+  # lots of false alerts.
+  # TODO: would like to match more precisely so that we only retry in case
+  # of 'closed' errors.
+  def retry_on_error(fun, num_attempts \\ 3) do
+    case num_attempts do
+      1 -> fun.()
+      _ ->
+        response = fun.()
+        case response do
+          {:error, %HTTPoison.Error{reason: _}} ->
+            Logger.warn("Couchdb HTTP connection error - #{num_attempts - 1} attempts left")
+            :timer.sleep(10)
+            retry_on_error(fun, num_attempts - 1)
+          success ->
+            success
+        end
+    end
   end
 end

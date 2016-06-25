@@ -1,6 +1,6 @@
 defmodule Couchdb.Connector.AdminTest do
   use ExUnit.Case
-  use Couchdb.Connector.TestSupport
+  use Couchdb.Connector.TestSupport.Macros
 
   alias Couchdb.Connector.Admin
   alias Couchdb.Connector.TestConfig

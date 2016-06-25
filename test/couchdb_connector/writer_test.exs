@@ -75,7 +75,6 @@ defmodule Couchdb.Connector.WriterTest do
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
 
-  # TODO: integrate with retry_on_error
   test "update/2: verify that a document without id raises an exception" do
     update = "{\"_rev\": \"some_revision\", \"key\": \"new value\"}"
     assert_raise RuntimeError, fn ->

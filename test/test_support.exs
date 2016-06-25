@@ -14,7 +14,9 @@ defmodule Couchdb.Connector.TestSupport do
             response = test_fn.(test_arg)
             case match_fn.(response) do
               true -> true
-              _ -> retry(num_attempts - 1, test_fn, match_fn, test_arg)
+              _ ->
+                Process.sleep(5) # TODO: convert this into a parameter
+                retry(num_attempts - 1, test_fn, match_fn, test_arg)
             end
         end
       end

@@ -56,7 +56,7 @@ defmodule Couchdb.Connector.TestSupport do
   # lots of false alerts.
   # TODO: would like to match more precisely so that we only retry in case
   # of 'closed' errors.
-  def retry_on_error(fun, num_attempts \\ 3) do
+  def retry_on_error(fun, num_attempts \\ 5) do
     case num_attempts do
       1 -> fun.()
       _ ->
@@ -64,7 +64,7 @@ defmodule Couchdb.Connector.TestSupport do
         case response do
           {:error, %HTTPoison.Error{reason: _}} ->
             Logger.warn("Couchdb HTTP connection error - #{num_attempts - 1} attempts left")
-            :timer.sleep(10)
+            :timer.sleep(20)
             retry_on_error(fun, num_attempts - 1)
           success ->
             success

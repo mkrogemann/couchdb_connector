@@ -23,7 +23,7 @@ defmodule Couchdb.Connector.Storage do
   def storage_up db_props do
     db_props
     |> UrlHelper.database_url
-    |> HTTPoison.put!("{}", [ Headers.json_header ])
+    |> HTTPoison.put!("{}", [Headers.json_header])
     |> Handler.handle_put
   end
 

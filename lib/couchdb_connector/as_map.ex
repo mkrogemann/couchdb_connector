@@ -1,12 +1,12 @@
 defprotocol AsMap do
   @moduledoc """
+  This protocol provides the as_map function that translates a BitString
+  returned from CouchDB into a Map.
   """
   def as_map(json)
 end
 
 defimpl AsMap, for: BitString do
-
-  Poison.decode("")
   def as_map(json) do
     case Poison.decode(json) do
       {:ok, decoded} -> decoded
@@ -16,8 +16,13 @@ defimpl AsMap, for: BitString do
         Document returned by CouchDB is invalid
         json: #{json}
         """
-      {:error, reason} ->
-        raise RuntimeError, message: "Document returned by CouchDB is not parseable\nreason: #{elem(reason, 0)}\nchar: #{elem(reason, 1)}\njson: #{json}"
+      {:error, {:invalid, token}} ->
+        raise RuntimeError, message:
+        """
+        Document returned by CouchDB is invalid
+        token: #{token}
+        json: #{json}
+        """
     end
   end
 end

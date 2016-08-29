@@ -1,4 +1,4 @@
-defprotocol AsMap do
+defprotocol Couchdb.Connector.AsMap do
   @moduledoc """
   This protocol provides the as_map function that translates a BitString
   returned from CouchDB into a Map.
@@ -6,7 +6,7 @@ defprotocol AsMap do
   def as_map(json)
 end
 
-defimpl AsMap, for: BitString do
+defimpl Couchdb.Connector.AsMap, for: BitString do
   def as_map(json) do
     case Poison.decode(json) do
       {:ok, decoded} -> decoded

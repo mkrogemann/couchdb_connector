@@ -3,7 +3,6 @@
 [![Build Status](https://travis-ci.org/locolupo/couchdb_connector.svg)](https://travis-ci.org/locolupo/couchdb_connector)
 [![Coverage Status](https://coveralls.io/repos/locolupo/couchdb_connector/badge.svg?branch=master&service=github)](https://coveralls.io/github/locolupo/couchdb_connector?branch=master)
 [![Hex.pm](https://img.shields.io/hexpm/v/couchdb_connector.svg?style=flat-square)](https://hex.pm/packages/couchdb_connector)
-[![Stories in Ready](https://badge.waffle.io/locolupo/couchdb_connector.png?label=ready&title=Ready)](https://waffle.io/locolupo/couchdb_connector)
 [![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/couchdb_connector/)
 
 ## Description
@@ -34,7 +33,7 @@ authentication scheme.
 ## Supported platforms
 
 This library has been tested successfully with Elixir release versions 1.0.5,
-1.1.1, 1.2.6 and 1.3.0, using CouchDB version 1.6.1.
+1.1.1, 1.2.6 and 1.3.2, using Erlang OTP 18.2.1 and CouchDB version 1.6.1.
 
 ## Installation
 
@@ -61,7 +60,7 @@ end
 For the subsequent steps, let's assume that we work in iex and that we define these database properties:
 
 ```Elixir
-db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_dev", port: 5984}
+db_props = %{protocol: "http", hostname: "localhost", database: "couchdb_connector_dev", port: 5984}
 ```
 
 ### Create a database

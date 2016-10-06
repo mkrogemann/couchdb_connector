@@ -4,6 +4,7 @@
 [![Coverage Status](https://coveralls.io/repos/locolupo/couchdb_connector/badge.svg?branch=master&service=github)](https://coveralls.io/github/locolupo/couchdb_connector?branch=master)
 [![Hex.pm](https://img.shields.io/hexpm/v/couchdb_connector.svg?style=flat-square)](https://hex.pm/packages/couchdb_connector)
 [![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/couchdb_connector/)
+[![Deps Status](https://beta.hexfaktor.org/badge/prod/github/locolupo/couchdb_connector.svg)](https://beta.hexfaktor.org/github/locolupo/couchdb_connector)
 
 ## Description
 

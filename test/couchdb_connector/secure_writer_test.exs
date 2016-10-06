@@ -96,8 +96,4 @@ defmodule Couchdb.Connector.SecureWriterTest do
     assert String.starts_with?(body_map["rev"], "2-")
     {:error, _} = Reader.get(TestConfig.database_properties, "42")
   end
-
-  defp id_from_url url do
-    hd(Enum.reverse(String.split(url, "/", trim: true)))
-  end
 end

@@ -25,6 +25,9 @@ defmodule Couchdb.Connector.TestSupport.Macros do
         Couchdb.Connector.TestSupport.retry_on_error(fun, num_attempts)
       end
 
+      def id_from_url url do
+        hd(Enum.reverse(String.split(url, "/", trim: true)))
+      end
     end
 
   end

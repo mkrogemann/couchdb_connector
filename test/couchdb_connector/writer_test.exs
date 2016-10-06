@@ -122,8 +122,4 @@ defmodule Couchdb.Connector.WriterTest do
     {:ok, body_map} = Poison.decode body
     assert body_map["error"] == "conflict"
   end
-
-  defp id_from_url url do
-    hd(Enum.reverse(String.split(url, "/", trim: true)))
-  end
 end

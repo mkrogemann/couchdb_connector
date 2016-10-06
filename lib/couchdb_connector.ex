@@ -1,6 +1,5 @@
 defmodule Couchdb.Connector do
   @moduledoc """
-  TODO: moduledoc
   Your primary interface for writing to and reading from CouchDB.
   The exchange format here are Maps. If you want to go more low
   level and deal with JSON strings instead, please consider using
@@ -35,7 +34,9 @@ defmodule Couchdb.Connector do
   end
 
   @doc """
-  TODO: doc
+  Fetch a single uuid from CouchDB for use in a a subsequent create operation.
+  Clients can retrieve the returned List of UUIDs by getting the value for key
+  "uuids". The List contains only one element (UUID).
   """
   @spec fetch_uuid(Types.db_properties) :: {:ok, map} | {:error, String.t}
   def fetch_uuid(db_props) do
@@ -55,9 +56,7 @@ defmodule Couchdb.Connector do
     :: {:ok, map, Types.headers} | {:error, String.t, Types.headers}
   def create(db_props, doc_map, id) do
     case Writer.create(db_props, as_json(doc_map), id) do
-      # TODO: print out what we get here. is it interesting? maybe do a map with payload and headers/
       {:ok, json, headers} -> {:ok, %{:payload => as_map(json), :headers => as_map(headers)}}
-      # TODO: is String.t an alias for binary??
       {:error, json, headers} -> {:error, as_map(json), headers}
     end
   end

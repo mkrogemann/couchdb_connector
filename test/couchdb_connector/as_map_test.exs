@@ -31,4 +31,14 @@ defmodule Couchdb.Connector.AsMapTest do
     assert decoded["_rev"] == "1-0f97561a543ed2e9c98a24dea818ec10"
     assert decoded["test_key"] == "test_value"
   end
+
+  test "as_map/1 with a List of String Tuples should return decoded Map" do
+    list_of_tuples = [
+      {"Server", "CouchDB/1.6.1 (Erlang OTP/19)"},
+      {"Location", "http://127.0.0.1:5984/couchdb_connector_test/42"}
+    ]
+    decoded = as_map(list_of_tuples)
+
+    assert decoded["Server"] == "CouchDB/1.6.1 (Erlang OTP/19)"
+  end
 end

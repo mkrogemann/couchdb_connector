@@ -49,6 +49,6 @@ end
 # in a List of Tuples of Strings
 defimpl Couchdb.Connector.AsMap, for: List do
   def as_map(tuples) do
-    Enum.into(%{}, tuples)
+    Enum.into(tuples, %{})
   end
 end

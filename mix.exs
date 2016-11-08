@@ -22,7 +22,7 @@ defmodule Couchdb.Connector.Mixfile do
 
   defp deps do
     [
-      {:httpoison, "~> 0.8"},
+      {:httpoison, "~> 0.9"},
       {:poison, "~> 1.5 or ~> 2.0"},
       {:excoveralls, "~> 0.5", only: [:dev, :test]},
       {:credo, "~> 0.3", only: [:dev, :test]},

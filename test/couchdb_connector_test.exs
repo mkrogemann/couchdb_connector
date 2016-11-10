@@ -50,7 +50,15 @@ defmodule Couchdb.ConnectorTest do
   end
 
   # create with generated uuid
-
+  test "create_generate/2: ensure that a new document gets created with a fetched id" do
+    {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
+    {:ok, %{:headers => headers, :payload => payload}} = retry_on_error(
+      fn() ->
+        Connector.create_generate(TestConfig.database_properties, doc_map)
+      end)
+    assert String.length(payload["id"]) == 32
+    assert String.starts_with?(payload["rev"], "1-")
+  end
 
   # tests for secured database
   test "fetch_uuid/1: get a single uuid from a secured database server" do

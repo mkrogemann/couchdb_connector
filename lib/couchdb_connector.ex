@@ -53,13 +53,25 @@ defmodule Couchdb.Connector do
   Either provide a UUID or consider using create_generate in case uniqueness cannot
   be guaranteed.
   """
-  @spec create(Types.db_properties, map, String.t)
-    :: {:ok, map, Types.headers} | {:error, String.t, Types.headers}
+  @spec create(Types.db_properties, map, String.t) :: {:ok, map} | {:error, String.t, Types.headers}
   def create(db_props, doc_map, id) do
     case Writer.create(db_props, as_json(doc_map), id) do
       {:ok, json, headers} -> {:ok, %{:payload => as_map(json), :headers => as_map(headers)}}
       {:error, json, headers} -> {:error, as_map(json), headers}
     end
+  end
+
+  @doc """
+  Create a new document from given map with a CouchDB generated id, using no
+  authentication.
+  Fetching the uuid from CouchDB does of course incur a performance penalty as
+  compared to providing one.
+  """
+  @spec create_generate(Types.db_properties, map) :: {:ok, map} | {:error, String.t, Types.headers}
+  def create_generate(db_props, doc_map) do
+    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
+    uuid = hd(Poison.decode!(uuid_json)["uuids"])
+    create(db_props, doc_map, uuid)
   end
 
   @doc """

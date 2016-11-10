@@ -44,7 +44,7 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
 
 ```Elixir
 def deps do
-  [{:couchdb_connector, "~> 0.3.0"}]
+  [{:couchdb_connector, "~> 0.4.0"}]
 end
 ```
 

@@ -1,3 +1,12 @@
+Version 0.4.0 - released 2016-11-13
+-------------
+
+- Provide connector functions that yield and consume documents as Maps
+- Support Elixir versions 1.2 and 1.3
+- Allow wider range of httpoison versions
+- Update development dependencies
+- Add and improve documentation
+
 Version 0.3.0 - released 2016-05-13
 -------------
 

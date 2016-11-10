@@ -4,7 +4,7 @@ defmodule Couchdb.Connector.Mixfile do
   def project do
     [
       app: :couchdb_connector,
-      version: "0.4.0-dev",
+      version: "0.4.0",
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,

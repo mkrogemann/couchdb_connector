@@ -124,9 +124,9 @@ You should then see something like
     {"Cache-Control", "must-revalidate"}]}
 ```
 
-### Write to a database — input given as Map
+### Write to a database — Input given as Map
 
-Starting with version 0.4, you can now also pass in the document as a Map instead of using the JSON String representation. To do so, make use of the top-level API given Couchdb.Connector:
+Starting with version 0.4, you can now also pass in the document as a Map instead of using the JSON String representation. To do so, make use of the top-level API given in the module Couchdb.Connector:
 
 ```Elixir
 Couchdb.Connector.create(TestConfig.database_properties, %{"key" => "value"}, "42")
@@ -177,9 +177,9 @@ You should see something this:
 {:error,  "{\"error\":\"not_found\",\"reason\":\"missing\"}\n"}
 ```
 
-### Read from a database — response wrapped in a Map
+### Read from a database — Response wrapped in a Map
 
-Also starting with version 0.4, you can now also retrieve a CouchDB document given as a Map instead of the JSON String representation. To do so, make use of the top-level API given Couchdb.Connector:
+Also starting with version 0.4, you can now retrieve a CouchDB document given as a Map instead of the JSON String representation. To do so, make use of the top-level API given in the module Couchdb.Connector:
 
 ```Elixir
 Couchdb.Connector.get(TestConfig.database_properties, "42")

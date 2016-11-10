@@ -8,6 +8,7 @@ defmodule Couchdb.Connector do
 
   import Couchdb.Connector.AsMap
   import Couchdb.Connector.AsJson
+  alias Couchdb.Connector.Types
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.Writer
 

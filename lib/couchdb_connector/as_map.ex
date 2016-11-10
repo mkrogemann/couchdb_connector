@@ -11,9 +11,10 @@ defprotocol Couchdb.Connector.AsMap do
   def as_map(json)
 end
 
-# TODO: document purpose
+# Documents are returned as either a tuple containing an :ok and
+# the actual document (String) or alternatively an :error together
+# with a reason.
 defimpl Couchdb.Connector.AsMap, for: Tuple do
-  # @spec as_map(tuple) :: map | tuple
   def as_map(tuple) do
     case tuple do
       {:ok, document} -> {:ok, Couchdb.Connector.AsMap.as_map(document)}
@@ -22,9 +23,8 @@ defimpl Couchdb.Connector.AsMap, for: Tuple do
   end
 end
 
-# TODO: document purpose
+# The actual document will be given as a BitString.
 defimpl Couchdb.Connector.AsMap, for: BitString do
-  # @spec as_map(BitString) :: map
   def as_map(json) do
     case Poison.decode(json) do
       {:ok, decoded} -> decoded

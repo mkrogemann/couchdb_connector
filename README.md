@@ -33,8 +33,8 @@ authentication scheme.
 
 ## Supported platforms
 
-This library has been tested successfully with Elixir release versions 1.0.5,
-1.1.1, 1.2.6 and 1.3.2, using Erlang OTP 18.2.1 and CouchDB version 1.6.1.
+The current release of the connector has been tested successfully with Elixir release versions
+1.2.6 and 1.3.2, using Erlang OTP 18.2.1 and CouchDB version 1.6.1.
 
 ## Installation
 

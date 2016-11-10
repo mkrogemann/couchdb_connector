@@ -124,6 +124,30 @@ You should then see something like
     {"Cache-Control", "must-revalidate"}]}
 ```
 
+### Write to a database — input given as Map
+
+Starting with version 0.4, you can now also pass in the document as a Map instead of using the JSON String representation. To do so, make use of the top-level API given Couchdb.Connector:
+
+```Elixir
+Couchdb.Connector.create(TestConfig.database_properties, %{"key" => "value"}, "42")
+```
+
+The response should look similar to this:
+
+```Elixir
+{:ok,
+ %{headers: %{"Cache-Control" => "must-revalidate", "Content-Length" => "65",
+     "Content-Type" => "text/plain; charset=utf-8",
+     "Date" => "Thu, 10 Nov 2016 22:22:18 GMT",
+     "ETag" => "\"1-59414e77c768bc202142ac82c2f129de\"",
+     "Location" => "http://127.0.0.1:5984/couchdb_connector_dev/42",
+     "Server" => "CouchDB/1.6.1 (Erlang OTP/19)"},
+   payload: %{"id" => "42", "ok" => true,
+     "rev" => "1-59414e77c768bc202142ac82c2f129de"}}}
+```
+
+In other words, the connector wraps headers and payload in nested Maps — Cool!
+
 ### Read from a database
 
 Given we have a document under the id "unique_id" in the database that we created in one of the steps above, the following "GET" should return the desired document.
@@ -151,6 +175,28 @@ You should see something this:
 
 ```Elixir
 {:error,  "{\"error\":\"not_found\",\"reason\":\"missing\"}\n"}
+```
+
+### Read from a database — response wrapped in a Map
+
+Also starting with version 0.4, you can now also retrieve a CouchDB document given as a Map instead of the JSON String representation. To do so, make use of the top-level API given Couchdb.Connector:
+
+```Elixir
+Couchdb.Connector.get(TestConfig.database_properties, "42")
+```
+
+The response should look similar to this:
+
+```Elixir
+{:ok,
+ %{"_id" => "42", "_rev" => "1-59414e77c768bc202142ac82c2f129de",
+   "key" => "value"}}
+```
+
+The error case (document does not exist) still looks like this (the error message is still a String, not a Map):
+
+```Elixir
+{:error, "{\"error\":\"not_found\",\"reason\":\"missing\"}\n"}
 ```
 
 ### Create a View
@@ -228,6 +274,5 @@ In case that database never existed, you should see
 Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
 
 - enhance view handling and query capabilities
-- implement wrappers to take / return Maps instead of JSON strings only
 - cookie auth, oauth auth
 - attachment support

@@ -1,4 +1,4 @@
-Version 0.4.0 - released 2016-11-13
+Version 0.4.0 - released 2016-11-11
 -------------
 
 - Provide connector functions that yield and consume documents as Maps

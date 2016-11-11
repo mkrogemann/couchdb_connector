@@ -53,9 +53,10 @@ defmodule Couchdb.Connector do
   Either provide a UUID or consider using create_generate in case uniqueness cannot
   be guaranteed.
   """
-  @spec create(Types.db_properties, map, String.t) :: {:ok, map} | {:error, String.t, Types.headers}
+  @spec create(Types.db_properties, map, String.t) :: {:ok, map} | {:error, map}
   def create(db_props, doc_map, id) do
-    Writer.create(db_props, as_json(doc_map), id) |> handle_create_response
+    response = Writer.create(db_props, as_json(doc_map), id)
+    response |> handle_create_response
   end
 
   defp handle_create_response({status, json, headers}) do
@@ -68,7 +69,7 @@ defmodule Couchdb.Connector do
   Fetching the uuid from CouchDB does of course incur a performance penalty as
   compared to providing one.
   """
-  @spec create_generate(Types.db_properties, map) :: {:ok, map} | {:error, String.t, Types.headers}
+  @spec create_generate(Types.db_properties, map) :: {:ok, map} | {:error, map}
   def create_generate(db_props, doc_map) do
     {:ok, uuid_json} = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])
@@ -83,10 +84,10 @@ defmodule Couchdb.Connector do
   Either provide a UUID or consider using create_generate in case uniqueness cannot
   be guaranteed.
   """
-  @spec create(Types.db_properties, Types.basic_auth, map, String.t)
-    :: {:ok, map} | {:error, String.t, Types.headers}
+  @spec create(Types.db_properties, Types.basic_auth, map, String.t) :: {:ok, map} | {:error,  map}
   def create(db_props, auth, doc_map, id) do
-    Writer.create(db_props, auth, as_json(doc_map), id) |> handle_create_response
+    response = Writer.create(db_props, auth, as_json(doc_map), id)
+    response |> handle_create_response
   end
 
   @doc """
@@ -95,8 +96,7 @@ defmodule Couchdb.Connector do
   Fetching the uuid from CouchDB does of course incur a performance penalty as
   compared to providing one.
   """
-  @spec create_generate(Types.db_properties, Types.basic_auth, map)
-    :: {:ok, map} | {:error, String.t, Types.headers}
+  @spec create_generate(Types.db_properties, Types.basic_auth, map) :: {:ok, map} | {:error, map}
   def create_generate(db_props, auth, doc_map) do
     {:ok, uuid_json} = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])

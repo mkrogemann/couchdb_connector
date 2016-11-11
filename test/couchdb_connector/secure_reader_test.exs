@@ -1,5 +1,6 @@
 defmodule Couchdb.Connector.SecureReaderTest do
   use ExUnit.Case
+  use Couchdb.Connector.TestSupport.Macros
 
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.TestConfig
@@ -20,14 +21,20 @@ defmodule Couchdb.Connector.SecureReaderTest do
 
   test "get/3: ensure that document exists using basic authentication" do
     TestPrep.secure_database
-    { :ok, json } = Reader.get(TestConfig.database_properties, TestSupport.test_user, "foo")
-    { :ok, json_map } = Poison.decode json
+    {:ok, json} = retry_on_error(
+      fn() ->
+        Reader.get(TestConfig.database_properties, TestSupport.test_user, "foo")
+      end)
+    {:ok, json_map} = Poison.decode json
     assert json_map["test_key"] == "test_value"
   end
 
   test "fetch_uuid/1: get a single uuid from a secured database server" do
     TestPrep.secure_database
-    { :ok, json } = Reader.fetch_uuid(TestConfig.database_properties)
+    {:ok, json} = retry_on_error(
+      fn() ->
+        Reader.fetch_uuid(TestConfig.database_properties)
+      end)
     uuid = hd(Poison.decode!(json)["uuids"])
     assert String.length(uuid) == 32
   end

@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/locolupo/couchdb_connector.svg)](https://travis-ci.org/locolupo/couchdb_connector)
 [![Coverage Status](https://coveralls.io/repos/locolupo/couchdb_connector/badge.svg?branch=master&service=github)](https://coveralls.io/github/locolupo/couchdb_connector?branch=master)
 [![Hex.pm](https://img.shields.io/hexpm/v/couchdb_connector.svg?style=flat-square)](https://hex.pm/packages/couchdb_connector)
-[![Stories in Ready](https://badge.waffle.io/locolupo/couchdb_connector.png?label=ready&title=Ready)](https://waffle.io/locolupo/couchdb_connector)
 [![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/couchdb_connector/)
+[![Deps Status](https://beta.hexfaktor.org/badge/prod/github/locolupo/couchdb_connector.svg)](https://beta.hexfaktor.org/github/locolupo/couchdb_connector)
 
 ## Description
 
@@ -24,6 +24,8 @@ Basic support for view operations is provided by the View module.
 All create and update operations expect valid JSON documents. All read
 operations return JSON strings exactly as they come from CouchDB.
 
+In addition to this representation, Release 0.4 introduced a second format for documents. Users can now also retrieve and ingest documents represented as nested Maps.
+
 The connector also offers functions to manage users and admins. These functions
 have been implemented to support testing of authentication and most users will
 probably manage users through different tools.
@@ -33,8 +35,8 @@ authentication scheme.
 
 ## Supported platforms
 
-This library has been tested successfully with Elixir release versions 1.0.5,
-1.1.1 and 1.2.5, using CouchDB version 1.6.1.
+The current release of the connector has been tested successfully with Elixir release versions
+1.2.6 and 1.3.2, using Erlang OTP 18.2.1 and CouchDB version 1.6.1.
 
 ## Installation
 
@@ -44,7 +46,7 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
 
 ```Elixir
 def deps do
-  [{:couchdb_connector, "~> 0.3.0"}]
+  [{:couchdb_connector, "~> 0.4.0"}]
 end
 ```
 
@@ -61,7 +63,7 @@ end
 For the subsequent steps, let's assume that we work in iex and that we define these database properties:
 
 ```Elixir
-db_props = %{protocol: "http", hostname: "localhost",database: "couchdb_connector_dev", port: 5984}
+db_props = %{protocol: "http", hostname: "localhost", database: "couchdb_connector_dev", port: 5984}
 ```
 
 ### Create a database
@@ -124,6 +126,36 @@ You should then see something like
     {"Cache-Control", "must-revalidate"}]}
 ```
 
+### Write to a database — Input given as Map
+
+Starting with version 0.4, you can now also pass in the document as a Map instead of using the JSON String representation. To do so, make use of the top-level API given in the module Couchdb.Connector:
+
+```Elixir
+Couchdb.Connector.create(TestConfig.database_properties, %{"key" => "value"}, "42")
+```
+
+The response should look similar to this:
+
+```Elixir
+{:ok,
+ %{headers: %{"Cache-Control" => "must-revalidate", "Content-Length" => "65",
+     "Content-Type" => "text/plain; charset=utf-8",
+     "Date" => "Thu, 10 Nov 2016 22:22:18 GMT",
+     "ETag" => "\"1-59414e77c768bc202142ac82c2f129de\"",
+     "Location" => "http://127.0.0.1:5984/couchdb_connector_dev/42",
+     "Server" => "CouchDB/1.6.1 (Erlang OTP/19)"},
+   payload: %{"id" => "42", "ok" => true,
+     "rev" => "1-59414e77c768bc202142ac82c2f129de"}}}
+```
+
+In other words, the connector wraps headers and payload in nested Maps — Cool! Note that the handling is uniform regardless of whether an operation succeeds or fails. An error response will look the same as a success response does, with the exception of the :error atom replacing the :ok atom.
+
+```Elixir
+{:error,
+  %{headers: => %{...},
+    payload: %{"error" => "...", ...}}}
+```
+
 ### Read from a database
 
 Given we have a document under the id "unique_id" in the database that we created in one of the steps above, the following "GET" should return the desired document.
@@ -151,6 +183,28 @@ You should see something this:
 
 ```Elixir
 {:error,  "{\"error\":\"not_found\",\"reason\":\"missing\"}\n"}
+```
+
+### Read from a database — Response wrapped in a Map
+
+Also starting with version 0.4, you can now retrieve a CouchDB document given as a Map instead of the JSON String representation. To do so, make use of the top-level API given in the module Couchdb.Connector:
+
+```Elixir
+Couchdb.Connector.get(TestConfig.database_properties, "42")
+```
+
+The response should look similar to this:
+
+```Elixir
+{:ok,
+ %{"_id" => "42", "_rev" => "1-59414e77c768bc202142ac82c2f129de",
+   "key" => "value"}}
+```
+
+The error case (document does not exist) looks like this:
+
+```Elixir
+{:error, %{"error" => "not_found", "reason" => "missing"}}
 ```
 
 ### Create a View
@@ -228,6 +282,5 @@ In case that database never existed, you should see
 Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
 
 - enhance view handling and query capabilities
-- implement wrappers to take / return Maps instead of JSON strings only
 - cookie auth, oauth auth
 - attachment support

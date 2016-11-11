@@ -65,7 +65,7 @@ defmodule Couchdb.Connector.Admin do
   end
 
   defp do_create_user(url, json) do
-    HTTPoison.put! url, json, [ Headers.json_header ]
+    HTTPoison.put! url, json, [Headers.json_header]
   end
 
   defp user_to_json(user_auth, roles) do
@@ -90,7 +90,7 @@ defmodule Couchdb.Connector.Admin do
   end
 
   defp do_create_admin(url, password) do
-    HTTPoison.put! url, "\"" <> password <> "\"", [ Headers.www_form_header ]
+    HTTPoison.put! url, "\"" <> password <> "\"", [Headers.www_form_header]
   end
 
   @doc """
@@ -177,7 +177,7 @@ defmodule Couchdb.Connector.Admin do
   end
 
   defp do_set_security(url, json) do
-    HTTPoison.put! url, json, [ Headers.json_header ]
+    HTTPoison.put! url, json, [Headers.json_header]
   end
 
   defp security_to_json(admins, members) do

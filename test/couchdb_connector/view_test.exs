@@ -1,6 +1,6 @@
 defmodule Couchdb.Connector.ViewTest do
   use ExUnit.Case
-  use Couchdb.Connector.TestSupport
+  use Couchdb.Connector.TestSupport.Macros
 
   @retries 10
 
@@ -17,7 +17,10 @@ defmodule Couchdb.Connector.ViewTest do
   end
 
   test "fetch_all/3: ensure that view works as expected" do
-    {:ok, json} = View.fetch_all TestConfig.database_properties, "test_view", "test_fetch"
+    {:ok, json} = retry_on_error(
+      fn() ->
+        View.fetch_all(TestConfig.database_properties, "test_view", "test_fetch")
+      end)
     {:ok, result_map} = Poison.decode json
     assert result_map["total_rows"] == 1
     [first|_] = result_map["rows"]
@@ -26,7 +29,10 @@ defmodule Couchdb.Connector.ViewTest do
 
   test "create_view/3: ensure that view gets created" do
     {:ok, code} = File.read("test/resources/views/test_view.json")
-    {:ok, result} = View.create_view TestConfig.database_properties, "test_design", code
+    {:ok, result} = retry_on_error(
+      fn() ->
+        View.create_view(TestConfig.database_properties, "test_design", code)
+      end)
     assert String.contains?(result, "\"id\":\"_design/test_design\"")
   end
 

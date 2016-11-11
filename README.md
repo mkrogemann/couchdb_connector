@@ -24,6 +24,8 @@ Basic support for view operations is provided by the View module.
 All create and update operations expect valid JSON documents. All read
 operations return JSON strings exactly as they come from CouchDB.
 
+In addition to this representation, Release 0.4 introduced a second format for documents. Users can now also retrieve and ingest documents represented as nested Maps.
+
 The connector also offers functions to manage users and admins. These functions
 have been implemented to support testing of authentication and most users will
 probably manage users through different tools.
@@ -146,7 +148,13 @@ The response should look similar to this:
      "rev" => "1-59414e77c768bc202142ac82c2f129de"}}}
 ```
 
-In other words, the connector wraps headers and payload in nested Maps — Cool!
+In other words, the connector wraps headers and payload in nested Maps — Cool! Note that the handling is uniform regardless of whether an operation succeeds or fails. An error response will look the same as a success response does, with the exception of the :error atom replacing the :ok atom.
+
+```Elixir
+{:error,
+  %{headers: => %{...},
+    payload: %{"error" => "...", ...}}}
+```
 
 ### Read from a database
 
@@ -193,10 +201,10 @@ The response should look similar to this:
    "key" => "value"}}
 ```
 
-The error case (document does not exist) still looks like this (the error message is still a String, not a Map):
+The error case (document does not exist) looks like this:
 
 ```Elixir
-{:error, "{\"error\":\"not_found\",\"reason\":\"missing\"}\n"}
+{:error, %{"error" => "not_found", "reason" => "missing"}}
 ```
 
 ### Create a View

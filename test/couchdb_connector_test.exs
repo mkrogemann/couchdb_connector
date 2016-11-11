@@ -52,7 +52,7 @@ defmodule Couchdb.ConnectorTest do
   # create with generated uuid
   test "create_generate/2: ensure that a new document gets created with a fetched id" do
     {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
-    {:ok, %{:headers => headers, :payload => payload}} = retry_on_error(
+    {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(
       fn() ->
         Connector.create_generate(TestConfig.database_properties, doc_map)
       end)
@@ -81,8 +81,28 @@ defmodule Couchdb.ConnectorTest do
   end
 
   # create with auth
+  test "create/4: ensure that a new document gets created with given id for given user" do
+    TestPrep.secure_database
+    {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
+    {:ok, %{:headers => headers, :payload => payload}} = retry_on_error(
+      fn() -> Connector.create(
+        TestConfig.database_properties, TestSupport.test_user, doc_map, "42")
+      end)
+    assert payload["id"] == "42"
+    assert id_from_url(header_value(headers, "Location")) == "42"
+  end
 
   # create with generated uuid and auth
+  test "create_generate/3: ensure that a new document gets created with a fetched id for given user" do
+    TestPrep.secure_database
+    {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
+    {:ok, %{:headers => headers, :payload => payload}} = retry_on_error(
+      fn() -> Connector.create_generate(
+        TestConfig.database_properties, TestSupport.test_user, doc_map)
+      end)
+    assert String.length(payload["id"]) == 32
+    assert String.starts_with?(payload["rev"], "1-")
+  end
 
   # update with auth
 

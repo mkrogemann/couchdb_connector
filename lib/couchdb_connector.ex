@@ -83,10 +83,25 @@ defmodule Couchdb.Connector do
   be guaranteed.
   """
   @spec create(Types.db_properties, Types.basic_auth, map, String.t)
-    :: {:ok, map, Types.headers} | {:error, String.t, Types.headers}
+    :: {:ok, map} | {:error, String.t, Types.headers}
   def create(db_props, auth, doc_map, id) do
-    {:ok, json} = db_props
-    |> Writer.create(as_json(doc_map), id)
-    as_map(json)
+    case Writer.create(db_props, auth, as_json(doc_map), id) do
+      {:ok, json, headers} -> {:ok, %{:payload => as_map(json), :headers => as_map(headers)}}
+      {:error, json, headers} -> {:error, as_map(json), headers}
+    end
+  end
+
+  @doc """
+  Create a new document from given map with a CouchDB generated id, using the
+  provided basic authentication parameters.
+  Fetching the uuid from CouchDB does of course incur a performance penalty as
+  compared to providing one.
+  """
+  @spec create_generate(Types.db_properties, Types.basic_auth, map)
+    :: {:ok, map} | {:error, String.t, Types.headers}
+  def create_generate(db_props, auth, doc_map) do
+    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
+    uuid = hd(Poison.decode!(uuid_json)["uuids"])
+    create(db_props, auth, doc_map, uuid)
   end
 end

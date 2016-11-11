@@ -49,6 +49,13 @@ defmodule Couchdb.ConnectorTest do
     assert id_from_url(header_value(headers, "Location")) == "42"
   end
 
+  test "create/3: ensure that wrong database properties results in an error on write" do
+    wrong_database_properties = %{TestConfig.database_properties | :database => "non-existing"}
+    {:error, %{:headers => headers, :payload => payload}} =
+      Connector.create wrong_database_properties, %{"key" => "value"}, "42"
+    assert payload["reason"] == "no_db_file"
+  end
+
   # create with generated uuid
   test "create_generate/2: ensure that a new document gets created with a fetched id" do
     {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
@@ -58,6 +65,12 @@ defmodule Couchdb.ConnectorTest do
       end)
     assert String.length(payload["id"]) == 32
     assert String.starts_with?(payload["rev"], "1-")
+  end
+
+  # update
+  test "update without authentication" do
+    IO.puts " TO BE IMPLEMENTED"
+    assert true
   end
 
   # tests for secured database
@@ -105,5 +118,8 @@ defmodule Couchdb.ConnectorTest do
   end
 
   # update with auth
-
+  test "update with authentication" do
+    IO.puts " TO BE IMPLEMENTED"
+    assert true
+  end
 end

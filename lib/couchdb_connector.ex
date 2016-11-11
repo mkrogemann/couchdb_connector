@@ -58,12 +58,8 @@ defmodule Couchdb.Connector do
     Writer.create(db_props, as_json(doc_map), id) |> handle_create_response
   end
 
-  defp handle_create_response({:ok, json, headers}) do
-    {:ok, %{:payload => as_map(json), :headers => as_map(headers)}}
-  end
-
-  defp handle_create_response({:error, json, headers}) do
-    {:error, as_map(json), headers}
+  defp handle_create_response({status, json, headers}) do
+    {status, %{:payload => as_map(json), :headers => as_map(headers)}}
   end
 
   @doc """

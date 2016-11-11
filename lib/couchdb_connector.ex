@@ -55,10 +55,15 @@ defmodule Couchdb.Connector do
   """
   @spec create(Types.db_properties, map, String.t) :: {:ok, map} | {:error, String.t, Types.headers}
   def create(db_props, doc_map, id) do
-    case Writer.create(db_props, as_json(doc_map), id) do
-      {:ok, json, headers} -> {:ok, %{:payload => as_map(json), :headers => as_map(headers)}}
-      {:error, json, headers} -> {:error, as_map(json), headers}
-    end
+    Writer.create(db_props, as_json(doc_map), id) |> handle_create_response
+  end
+
+  defp handle_create_response({:ok, json, headers}) do
+    {:ok, %{:payload => as_map(json), :headers => as_map(headers)}}
+  end
+
+  defp handle_create_response({:error, json, headers}) do
+    {:error, as_map(json), headers}
   end
 
   @doc """
@@ -85,10 +90,7 @@ defmodule Couchdb.Connector do
   @spec create(Types.db_properties, Types.basic_auth, map, String.t)
     :: {:ok, map} | {:error, String.t, Types.headers}
   def create(db_props, auth, doc_map, id) do
-    case Writer.create(db_props, auth, as_json(doc_map), id) do
-      {:ok, json, headers} -> {:ok, %{:payload => as_map(json), :headers => as_map(headers)}}
-      {:error, json, headers} -> {:error, as_map(json), headers}
-    end
+    Writer.create(db_props, auth, as_json(doc_map), id) |> handle_create_response
   end
 
   @doc """

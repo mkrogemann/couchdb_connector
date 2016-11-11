@@ -16,7 +16,7 @@ defmodule Couchdb.Connector do
   Retrieve the document given by database properties and id, returning it
   as a Map, using no authentication.
   """
-  @spec get(Types.db_properties, String.t) :: {:ok, map} | {:error, String.t}
+  @spec get(Types.db_properties, String.t) :: {:ok, map} | {:error, map}
   def get(db_props, id) do
     db_props
     |> Reader.get(id)
@@ -27,7 +27,7 @@ defmodule Couchdb.Connector do
   Retrieve the document given by database properties and id, returning it
   as a Map, using the given basic auth credentials for authentication.
   """
-  @spec get(Types.db_properties, Types.basic_auth, String.t) :: {:ok, map} | {:error, String.t}
+  @spec get(Types.db_properties, Types.basic_auth, String.t) :: {:ok, map} | {:error, map}
   def get(db_props, basic_auth, id) do
     db_props
     |> Reader.get(basic_auth, id)

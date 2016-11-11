@@ -32,10 +32,9 @@ defmodule Couchdb.ConnectorTest do
   end
 
   test "get/2: ensure an error is returned for missing document" do
-    {:error, json} = retry_on_error(
+    {:error, err_map} = retry_on_error(
       fn() -> Connector.get(TestConfig.database_properties, "unicorn") end)
-    {:ok, json_map} = Poison.decode json
-    assert json_map["reason"] == "missing"
+    assert err_map["reason"] == "missing"
   end
 
   # create

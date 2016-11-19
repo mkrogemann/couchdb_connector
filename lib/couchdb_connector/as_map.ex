@@ -28,6 +28,7 @@ defimpl Couchdb.Connector.AsMap, for: BitString do
   def as_map(json) do
     case Poison.decode(json) do
       {:ok, decoded} -> decoded
+      # poison 1.5 and 2.0 can produce these errors
       {:error, :invalid} ->
         raise RuntimeError, message:
         """
@@ -39,6 +40,30 @@ defimpl Couchdb.Connector.AsMap, for: BitString do
         """
         Document returned by CouchDB is invalid
         token: #{token}
+        json: #{json}
+        """
+      # poison 3.0 can produce these errors
+      {:error, :invalid, pos} ->
+        raise RuntimeError, message:
+        """
+        Document returned by CouchDB is invalid
+        pos: #{pos}
+        json: #{json}
+        """
+      {:error, {:invalid, token, pos}} ->
+        raise RuntimeError, message:
+        """
+        Document returned by CouchDB is invalid
+        token: #{token}
+        pos: #{pos}
+        json: #{json}
+        """
+      # catch all
+      {:error, any} ->
+        raise RuntimeError, message:
+        """
+        Document returned by CouchDB is invalid
+        reason: #{inspect(any)}
         json: #{json}
         """
     end

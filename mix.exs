@@ -4,7 +4,7 @@ defmodule Couchdb.Connector.Mixfile do
   def project do
     [
       app: :couchdb_connector,
-      version: "0.4.0",
+      version: "0.4.1",
       elixir: "~> 1.2",
       build_embedded: Mix.env == :prod,
       start_permanent: Mix.env == :prod,
@@ -23,7 +23,7 @@ defmodule Couchdb.Connector.Mixfile do
   defp deps do
     [
       {:httpoison, "~> 0.8 or ~> 0.9 or ~> 0.10"},
-      {:poison, "~> 1.5 or ~> 2.0"},
+      {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0"},
       {:excoveralls, "~> 0.5", only: [:dev, :test]},
       {:credo, "~> 0.5", only: [:dev, :test]},
       {:earmark, "~> 1.0", only: :dev},

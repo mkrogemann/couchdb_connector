@@ -46,7 +46,7 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
 
 ```Elixir
 def deps do
-  [{:couchdb_connector, "~> 0.4.0"}]
+  [{:couchdb_connector, "~> 0.4.1"}]
 end
 ```
 
@@ -279,7 +279,7 @@ In case that database never existed, you should see
 
 ## Next
 
-Love to hear from you. Meanwhile, here are some things we'd like to tackle next:
+Love to hear from you. Meanwhile, here are some things I'd like to tackle next:
 
 - enhance view handling and query capabilities
 - cookie auth, oauth auth

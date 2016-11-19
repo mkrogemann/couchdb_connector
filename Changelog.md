@@ -1,3 +1,9 @@
+Version 0.4.1 - released 2016-11-20
+-------------
+
+- Bugfix: Add Percent-encoding to query path
+- Allow the use of poison 3.0 in addition to 1.5 and 2.0
+
 Version 0.4.0 - released 2016-11-11
 -------------
 

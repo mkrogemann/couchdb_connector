@@ -109,7 +109,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec query_path(String.t, String.t, atom) :: String.t
   def query_path view_base_url, key, stale do
-    "#{view_base_url}?key=\"#{key}\"&stale=#{Atom.to_string(stale)}"
+    "#{view_base_url}?key=\"#{URI.encode_www_form(key)}\"&stale=#{Atom.to_string(stale)}"
   end
 
   @doc """

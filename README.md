@@ -281,6 +281,7 @@ In case that database never existed, you should see
 
 Love to hear from you. Meanwhile, here are some things I'd like to tackle next:
 
+- pool connections to CouchDB
 - enhance view handling and query capabilities
 - cookie auth, oauth auth
 - attachment support

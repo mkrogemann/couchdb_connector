@@ -50,7 +50,7 @@ defmodule Couchdb.ConnectorTest do
 
   test "create/3: ensure that wrong database properties results in an error on write" do
     wrong_database_properties = %{TestConfig.database_properties | :database => "non-existing"}
-    {:error, %{:headers => headers, :payload => payload}} =
+    {:error, %{:headers => _headers, :payload => payload}} =
       Connector.create wrong_database_properties, %{"key" => "value"}, "42"
     assert payload["reason"] == "no_db_file"
   end
@@ -67,9 +67,25 @@ defmodule Couchdb.ConnectorTest do
   end
 
   # update
-  test "update without authentication" do
-    IO.puts " TO BE IMPLEMENTED"
-    assert true
+  test "update/2: ensure that a document that contains an id can be updated" do
+    {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(
+      fn() -> Connector.create_generate(
+        TestConfig.database_properties, %{"key" => "original value"})
+      end)
+    id = id_from_url(headers["Location"])
+    {:ok, reloaded} = Connector.get(TestConfig.database_properties, id)
+    updated = %{reloaded | "key" => "new value"}
+    {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(fn() ->
+      Connector.update(TestConfig.database_properties, updated)
+    end)
+    assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
+  end
+
+  test "update/2: verify that a document without id raises an exception" do
+    update = %{"_rev" => "some_revision", "key" => "new value"}
+    assert_raise RuntimeError, fn ->
+      Connector.update(TestConfig.database_properties, update)
+    end
   end
 
   # tests for secured database
@@ -108,7 +124,7 @@ defmodule Couchdb.ConnectorTest do
   test "create_generate/3: ensure that a new document gets created with a fetched id for given user" do
     TestPrep.secure_database
     {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
-    {:ok, %{:headers => headers, :payload => payload}} = retry_on_error(
+    {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(
       fn() -> Connector.create_generate(
         TestConfig.database_properties, TestSupport.test_user, doc_map)
       end)
@@ -117,8 +133,18 @@ defmodule Couchdb.ConnectorTest do
   end
 
   # update with auth
-  test "update with authentication" do
-    IO.puts " TO BE IMPLEMENTED"
-    assert true
+  test "update/3: ensure that a document that contains an id can be updated" do
+    TestPrep.secure_database
+    {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(
+      fn() -> Connector.create_generate(
+        TestConfig.database_properties, TestSupport.test_user, %{"key" => "original value"})
+      end)
+    id = id_from_url(headers["Location"])
+    {:ok, reloaded} = Connector.get(TestConfig.database_properties, TestSupport.test_user, id)
+    updated = %{reloaded | "key" => "new value"}
+    {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(fn() ->
+      Connector.update(TestConfig.database_properties, TestSupport.test_user, updated)
+    end)
+    assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
 end

@@ -83,15 +83,15 @@ defmodule Couchdb.Connector.WriterTest do
   end
 
   test "update/3: ensure that an existing document with given id can be updated" do
-    {:ok, _body, headers} = retry_on_error(
-      fn() ->
-        Writer.create_generate(TestConfig.database_properties, "{\"key\": \"original value\"}")
-      end)
+    {:ok, _body, headers} = retry_on_error(fn() ->
+      Writer.create_generate(TestConfig.database_properties, "{\"key\": \"original value\"}")
+    end)
     id = id_from_url(header_value(headers, "Location"))
     revision = header_value(headers, "ETag")
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
-    {:ok, _body, headers} = retry_on_error(
-      fn() -> Writer.update(TestConfig.database_properties, update, id) end)
+    {:ok, body, headers} = retry_on_error(fn() ->
+      Writer.update(TestConfig.database_properties, update, id)
+    end)
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
 

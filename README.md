@@ -1,4 +1,4 @@
-# CouchdbConnector
+# couchdb_connector
 
 [![Build Status](https://travis-ci.org/locolupo/couchdb_connector.svg)](https://travis-ci.org/locolupo/couchdb_connector)
 [![Coverage Status](https://coveralls.io/repos/locolupo/couchdb_connector/badge.svg?branch=master&service=github)](https://coveralls.io/github/locolupo/couchdb_connector?branch=master)
@@ -36,7 +36,7 @@ authentication scheme.
 ## Supported platforms
 
 The current release of the connector has been tested successfully with Elixir release versions
-1.2.6 and 1.3.2, using Erlang OTP 18.2.1 and CouchDB version 1.6.1.
+1.2.6 and 1.3.2, using Erlang OTP 18.2.1, TODO and CouchDB version 1.6.1.
 
 ## Installation
 
@@ -46,7 +46,7 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
 
 ```Elixir
 def deps do
-  [{:couchdb_connector, "~> 0.4.1"}]
+  [{:couchdb_connector, "~> 0.4.2"}]
 end
 ```
 
@@ -205,6 +205,86 @@ The error case (document does not exist) looks like this:
 
 ```Elixir
 {:error, %{"error" => "not_found", "reason" => "missing"}}
+```
+
+### Update a document
+
+CouchDB demands that clients pass in the document's current revision to make sure that the update operation occurs on the current version of the document. An update request therefore looks like this:
+
+```Elixir
+Couchdb.Connector.Writer.update(db_props, "{\"key\": \"new value\"}", "0a89648ca060...", "1-7b2f4edf07d0...")
+```
+
+and the response should be similar to this:
+
+```Elixir
+{:ok,
+ "{\"ok\":true,\"id\":\"0a89648ca060...\",\"rev\":\"2-7b2f4edf07d0...\"}\n",
+ [{"Server", "CouchDB/1.6.1 (Erlang OTP/19)"},
+  {"Location",
+   "http://127.0.0.1:5984/couchdb_connector_test/0a89648ca060..."},
+  {"ETag", "\"2-7b2f4edf07d0...\""},
+  {"Date", "Sat, 03 Dec 2016 13:57:07 GMT"},
+  {"Content-Type", "text/plain; charset=utf-8"}, {"Content-Length", "95"},
+  {"Cache-Control", "must-revalidate"}]}
+```
+
+Note that an update increments the revision. In the example above, the new revision now starts with 2, indicating that one update has happened since the document was first created.
+Also note that the response does not contain the updated document but only states that the update succeeded.
+
+### Update a document — Response wrapped in a Map
+
+Version 0.4.2 introduced a Map based version of the update API. Let's say we have a document bound to a variable called current. Interacting with the API would then look as follows:
+
+```Elixir
+updated = %{current | "key" => "new value"}
+{:ok, %{:headers => h, :payload => p}} = Connector.update(db_props, updated)
+```
+
+The response would look similar to this:
+
+```Elixir
+{:ok,
+ %{headers: %{"Cache-Control" => "must-revalidate", "Content-Length" => "95",
+     "Content-Type" => "text/plain; charset=utf-8",
+     "Date" => "Sat, 03 Dec 2016 14:21:10 GMT",
+     "ETag" => "\"2-7b2f4edf07...\"",
+     "Location" => "http://127.0.0.1:5984/couchdb_connector_test/8b7b622e37c5c8fa9d6505ecb800197f",
+     "Server" => "CouchDB/1.6.1 (Erlang OTP/19)"},
+   payload: %{"id" => "8b7b622e37c5...", "ok" => true,
+     "rev" => "2-7b2f4edf07..."}}}
+```
+
+Basic authentication is also supported for this update API.
+
+### Delete a document
+
+In order to delete a document, you have to pass in its current revision, the same way that you saw above for the update calls.
+
+So in response to a call like this:
+
+```Elixir
+Couchdb.Connector.Writer.destroy(db_props, "42", "1-9b2e3bcc3752...")
+```
+
+You should see a response like this:
+
+```Elixir
+"{\"ok\":true,\"id\":\"42\",\"rev\":\"2-9b2e3bcc3752a3...\"}\n"
+```
+
+Note that there is a second clause that taks in basic authentication information to allow authentication against a secured database.
+
+### Delete a document — Response wrapped in a Map
+
+Since release 0.4.2, there is also an implementation of the delete functionality in place that wraps the resopnse in a Map. It is located in the top level module Couchdb.Connector and its API is identical to the JSON/String version:
+
+```Elixir
+Couchdb.Connector.destroy(db_props, "42", "1-9b2e3bcc3752...")
+```
+gives
+```
+%{"id" => "42", "ok" => true, "rev" => "2-9b2e3bcc3752a3..."}
 ```
 
 ### Create a View

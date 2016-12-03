@@ -56,10 +56,14 @@ defmodule Couchdb.Connector do
   @spec create(Types.db_properties, map, String.t) :: {:ok, map} | {:error, map}
   def create(db_props, doc_map, id) do
     response = Writer.create(db_props, as_json(doc_map), id)
-    response |> handle_create_response
+    response |> handle_write_response
   end
 
-  defp handle_create_response({status, json, headers}) do
+  defp handle_write_response({status, json}) do
+    {status, %{:payload => as_map(json), :headers => %{}}}
+  end
+
+  defp handle_write_response({status, json, headers}) do
     {status, %{:payload => as_map(json), :headers => as_map(headers)}}
   end
 
@@ -77,6 +81,21 @@ defmodule Couchdb.Connector do
   end
 
   @doc """
+  Update the given document, provided it contains an id field. Raise an error
+  if it does not. Does not use any authentication.
+  """
+  @spec update(Types.db_properties, map) :: {:ok, map} | {:error, map}
+  def update(db_props, doc_map) do
+    case Map.fetch(doc_map, "_id") do
+      {:ok, id} ->
+        Writer.update(db_props, as_json(doc_map), id) |> handle_write_response
+      :error ->
+        raise RuntimeError, message:
+          "the document to be updated must contain an \"_id\" field"
+    end
+  end
+
+  @doc """
   Create a new document from given map with given id, using the provided basic
   authentication parameters.
   Clients must make sure that the id has not been used for an existing document
@@ -87,7 +106,7 @@ defmodule Couchdb.Connector do
   @spec create(Types.db_properties, Types.basic_auth, map, String.t) :: {:ok, map} | {:error,  map}
   def create(db_props, auth, doc_map, id) do
     response = Writer.create(db_props, auth, as_json(doc_map), id)
-    response |> handle_create_response
+    response |> handle_write_response
   end
 
   @doc """
@@ -101,5 +120,30 @@ defmodule Couchdb.Connector do
     {:ok, uuid_json} = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])
     create(db_props, auth, doc_map, uuid)
+  end
+
+  @doc """
+  Update the given document, provided it contains an id field. Raise an error
+  if it does not. Makes use of the provided basic authentication parameters.
+  """
+  @spec update(Types.db_properties, Types.basic_auth, map)
+    :: {:ok, map} | {:error, map}
+  def update(db_props, auth, doc_map) do
+    case Map.fetch(doc_map, "_id") do
+      {:ok, id} ->
+        response = Writer.update(db_props, auth, as_json(doc_map), id)
+        response |> handle_write_response
+      :error ->
+        raise RuntimeError, message:
+          "the document to be updated must contain an \"_id\" field"
+    end
+  end
+
+  def destroy(db_props, id, rev) do
+    Writer.destroy(db_props, id, rev) |> handle_write_response
+  end
+
+  def destroy(db_props, auth, id, rev) do
+    Writer.destroy(db_props, auth, id, rev) |> handle_write_response
   end
 end

@@ -1,9 +1,9 @@
 defprotocol Couchdb.Connector.AsMap do
   @moduledoc """
   This protocol provides 'as_map' transformations that take either tuples of
-  status code and content (BitString is expected) as returned by the lower
-  level Couchdb Connector modules (Couchdb.Connector.Reader and
-  Couchdb.Connector.Writer).
+  status code and content (BitString is expected here) as they would be
+  returned by the lower level Couchdb Connector modules
+  (Couchdb.Connector.Reader and Couchdb.Connector.Writer).
   In case there is a sensible payload (other than errors), the protocol will
   return the payload converted into a Map.
   """

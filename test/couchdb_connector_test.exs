@@ -160,6 +160,14 @@ defmodule Couchdb.ConnectorTest do
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
 
+  test "update/3: verify that a document without id raises an exception" do
+    TestPrep.secure_database
+    update = %{"_rev" => "some_revision", "key" => "new value"}
+    assert_raise RuntimeError, fn ->
+      Connector.update(TestConfig.database_properties, TestSupport.test_user, update)
+    end
+  end
+
   # destroy with auth
   test "destroy/4: ensure that a document with given id can be deleted" do
     TestPrep.secure_database

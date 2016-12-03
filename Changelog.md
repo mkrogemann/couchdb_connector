@@ -1,3 +1,10 @@
+Version 0.4.2 - released 2016-12-04
+-------------
+
+- Add Map based update API and documentation
+- Add delegates to Writer module destroy functions in top level Connector module
+- Document destroy functions
+
 Version 0.4.1 - released 2016-11-20
 -------------
 

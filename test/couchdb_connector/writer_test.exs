@@ -89,7 +89,7 @@ defmodule Couchdb.Connector.WriterTest do
     id = id_from_url(header_value(headers, "Location"))
     revision = header_value(headers, "ETag")
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
-    {:ok, body, headers} = retry_on_error(fn() ->
+    {:ok, _body, headers} = retry_on_error(fn() ->
       Writer.update(TestConfig.database_properties, update, id)
     end)
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")

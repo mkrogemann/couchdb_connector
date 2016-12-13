@@ -139,10 +139,26 @@ defmodule Couchdb.Connector do
     end
   end
 
+  @doc """
+  Delete the document with the given id in the given revision, using no
+  authentication.
+  An error will be returned in case the document does not exist or the
+  revision is wrong.
+  """
+  @spec destroy(Types.db_properties, String.t, String.t)
+    :: {:ok, map} | {:error, map}
   def destroy(db_props, id, rev) do
     Writer.destroy(db_props, id, rev) |> handle_write_response
   end
 
+  @doc """
+  Delete the document with the given id in the given revision, using basic
+  authentication.
+  An error will be returned in case the document does not exist or the
+  revision is wrong.
+  """
+  @spec destroy(Types.db_properties, Types.basic_auth, String.t, String.t)
+    :: {:ok, map} | {:error, map}
   def destroy(db_props, auth, id, rev) do
     Writer.destroy(db_props, auth, id, rev) |> handle_write_response
   end

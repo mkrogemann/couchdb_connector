@@ -164,7 +164,7 @@ defmodule Couchdb.Connector.View do
   Staleness is set to 'update_after'.
   """
   def document_by_key db_props, design, view, key, stale \\ :update_after do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/5 is deprecated, please use document_by_key/2 instead\n"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/5 is deprecated, please use document_by_key/3 instead\n"
     document_by_key(db_props, %{design: design, view: view, key: key}, stale)
   end
 end

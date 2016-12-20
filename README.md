@@ -35,7 +35,7 @@ authentication scheme.
 
 ## Supported platforms
 
-The current release of the connector has been tested successfully with Elixir release versions 1.2.6 and 1.3.2, using Erlang OTP in versions 18.2.1 and 19.2 as well as CouchDB version 1.6.1.
+The current release of the connector has been tested successfully with Elixir release versions 1.2.6 and 1.3.4, using Erlang OTP in versions 18.2.1 and 19.2 as well as CouchDB version 1.6.1.
 
 ## Installation
 

@@ -8,8 +8,10 @@ defmodule Couchdb.Connector do
 
   import Couchdb.Connector.AsMap
   import Couchdb.Connector.AsJson
+
   alias Couchdb.Connector.Types
   alias Couchdb.Connector.Reader
+  alias Couchdb.Connector.View
   alias Couchdb.Connector.Writer
 
   @doc """
@@ -139,11 +141,103 @@ defmodule Couchdb.Connector do
     end
   end
 
+  @doc """
+  Delete the document with the given id in the given revision, using no
+  authentication.
+  An error will be returned in case the document does not exist or the
+  revision is wrong.
+  """
+  @spec destroy(Types.db_properties, String.t, String.t)
+    :: {:ok, map} | {:error, map}
   def destroy(db_props, id, rev) do
     Writer.destroy(db_props, id, rev) |> handle_write_response
   end
 
+  @doc """
+  Delete the document with the given id in the given revision, using basic
+  authentication.
+  An error will be returned in case the document does not exist or the
+  revision is wrong.
+  """
+  @spec destroy(Types.db_properties, Types.basic_auth, String.t, String.t)
+    :: {:ok, map} | {:error, map}
   def destroy(db_props, auth, id, rev) do
     Writer.destroy(db_props, auth, id, rev) |> handle_write_response
   end
+
+  @doc """
+  Returns everything found for the given view in the given design document,
+  using no authentication.
+  """
+  @spec fetch_all(Types.db_properties, String.t, String.t) :: {:ok, map} | {:error, map}
+  def fetch_all(db_props, design, view) do
+    View.fetch_all(db_props, design, view) |> as_map
+  end
+
+  @doc """
+  Returns everything found for the given view in the given design document,
+  using basic authentication.
+  """
+  @spec fetch_all(Types.db_properties, Types.basic_auth, String.t, String.t) :: {:ok, map} | {:error, map}
+  def fetch_all(db_props, auth, design, view) do
+    View.fetch_all(db_props, auth, design, view) |> as_map
+  end
+
+  @doc """
+  Find and return one document with given key in given view. Will return a
+  a Map with an empty list of documents if no document with given
+  key exists.
+  Staleness is set to 'update_after'.
+  """
+  @spec document_by_key(Types.db_properties, Types.view_key) :: {:ok, map} | {:error, map}
+  def document_by_key(db_props, view_key),
+    do: document_by_key(db_props, view_key, :update_after)
+
+  @doc """
+  Find and return one document with given key in given view. Will return a
+  Map with an empty list of documents if no document with given
+  key exists.
+  Staleness is set to 'update_after'.
+  """
+  @spec document_by_key(Types.db_properties, Types.view_key, :update_after)
+    :: {:ok, map} | {:error, map}
+  def document_by_key(db_props, view_key, :update_after),
+    do: View.unauthenticated_document_by_key(db_props, view_key, :update_after) |> as_map
+
+  @doc """
+  Find and return one document with given key in given view. Will return a
+  Map with an empty list of documents if no document with given
+  key exists.
+  Staleness is set to 'ok'.
+  """
+  @spec document_by_key(Types.db_properties, Types.view_key, :ok)
+    :: {:ok, map} | {:error, map}
+  def document_by_key(db_props, view_key, :ok),
+    do: View.unauthenticated_document_by_key(db_props, view_key, :ok) |> as_map
+
+  @doc """
+  Find and return one document with given key in given view, using basic
+  authentication.
+  Will return a Map with an empty list of documents if no document
+  with given key exists.
+  Staleness is set to 'update_after' which will perform worse than 'ok' but
+  deliver more up-to-date results.
+  """
+  @spec document_by_key(Types.db_properties, Types.basic_auth, Types.view_key,
+                        :update_after) :: {:ok, map} | {:error, map}
+  def document_by_key(db_props, auth, view_key, :update_after), do:
+    View.authenticated_document_by_key(db_props, auth, view_key, :update_after) |> as_map
+
+  @doc """
+  Find and return one document with given key in given view, using basic
+  authentication.
+  Will return a Map with an empty list of documents if no document
+  with given key exists.
+  Staleness is set to 'ok' which will perform better than 'update_after' but
+  potentially deliver stale results.
+  """
+  @spec document_by_key(Types.db_properties, Types.basic_auth, Types.view_key, :ok)
+  :: {:ok, map} | {:error, map}
+  def document_by_key(db_props, auth, view_key, :ok), do:
+    View.authenticated_document_by_key(db_props, auth, view_key, :ok) |> as_map
 end

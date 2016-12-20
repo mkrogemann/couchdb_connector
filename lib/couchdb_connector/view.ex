@@ -92,7 +92,7 @@ defmodule Couchdb.Connector.View do
   def document_by_key(db_props, auth, view_key, :ok),
     do: authenticated_document_by_key(db_props, auth, view_key, :ok)
 
-  defp authenticated_document_by_key(db_props, auth, view_key, stale) do
+  def authenticated_document_by_key(db_props, auth, view_key, stale) do
     db_props
     |> UrlHelper.view_url(auth, view_key[:design], view_key[:view])
     |> UrlHelper.query_path(view_key[:key], stale)
@@ -144,7 +144,7 @@ defmodule Couchdb.Connector.View do
   def document_by_key(db_props, auth, view_key) when is_map(auth),
     do: document_by_key(db_props, auth, view_key, :update_after)
 
-  defp unauthenticated_document_by_key(db_props, view_key, stale) do
+  def unauthenticated_document_by_key(db_props, view_key, stale) do
     db_props
     |> UrlHelper.view_url(view_key[:design], view_key[:view])
     |> UrlHelper.query_path(view_key[:key], stale)
@@ -164,7 +164,7 @@ defmodule Couchdb.Connector.View do
   Staleness is set to 'update_after'.
   """
   def document_by_key db_props, design, view, key, stale \\ :update_after do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/5 is deprecated, please use document_by_key/2 instead\n"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/5 is deprecated, please use document_by_key/3 instead\n"
     document_by_key(db_props, %{design: design, view: view, key: key}, stale)
   end
 end

@@ -1,3 +1,11 @@
+Version 0.4.3 - released 2016-12-21
+-------------
+
+- Add Map based view API and documentation
+- Complement some missing specs and test cases
+- Fix typo in View related deprecation message
+- Add function to create database secured through basic auth. Thanks to @leifg
+
 Version 0.4.2 - released 2016-12-04
 -------------
 

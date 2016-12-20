@@ -92,7 +92,7 @@ defmodule Couchdb.Connector.View do
   def document_by_key(db_props, auth, view_key, :ok),
     do: authenticated_document_by_key(db_props, auth, view_key, :ok)
 
-  defp authenticated_document_by_key(db_props, auth, view_key, stale) do
+  def authenticated_document_by_key(db_props, auth, view_key, stale) do
     db_props
     |> UrlHelper.view_url(auth, view_key[:design], view_key[:view])
     |> UrlHelper.query_path(view_key[:key], stale)
@@ -144,7 +144,7 @@ defmodule Couchdb.Connector.View do
   def document_by_key(db_props, auth, view_key) when is_map(auth),
     do: document_by_key(db_props, auth, view_key, :update_after)
 
-  defp unauthenticated_document_by_key(db_props, view_key, stale) do
+  def unauthenticated_document_by_key(db_props, view_key, stale) do
     db_props
     |> UrlHelper.view_url(view_key[:design], view_key[:view])
     |> UrlHelper.query_path(view_key[:key], stale)

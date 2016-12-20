@@ -35,8 +35,7 @@ authentication scheme.
 
 ## Supported platforms
 
-The current release of the connector has been tested successfully with Elixir release versions
-1.2.6 and 1.3.2, using Erlang OTP 18.2.1, TODO and CouchDB version 1.6.1.
+The current release of the connector has been tested successfully with Elixir release versions 1.2.6 and 1.3.2, using Erlang OTP in versions 18.2.1 and 19.2 as well as CouchDB version 1.6.1.
 
 ## Installation
 
@@ -46,7 +45,7 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
 
 ```Elixir
 def deps do
-  [{:couchdb_connector, "~> 0.4.2"}]
+  [{:couchdb_connector, "~> 0.4.3"}]
 end
 ```
 

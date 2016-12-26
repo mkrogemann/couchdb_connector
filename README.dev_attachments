@@ -1,0 +1,36 @@
+Temp file.
+
+Plans for adding attachment support to couchdb_connector.
+
+I am considering two options.  One of them is cleaner in concept and the 
+other is easier in code.  Both suffer from |> syntax problems since 
+we must pass both dbprops and a document_id for the attachment.
+
+Method 1
+--------------------
+Integrate function calls into Reader and Writer modules.  Those modules are so
+clean this is distasteful for me.  It is however simple to do with a minimum
+of code.  Something like:
+
+- establish typespecs
+- Add URL code
+- add function(s) Reader.add_attachment(dbprops, doc_id, att_file_name, ...)
+- add function(s) Writer.add_attachment(dbprops, doc_id, att_file_name, ...)
+
+
+Method 2
+------------------------------------------------
+- typespecs
+- URL code
+- AttachmentReader module
+- AttachmeentWriter module
+
+Not too dissimilar to Method 1.
+
+Please suggest thoughts in issues.
+
+
+I'll start work in a few days so speak up.
+
+uDude.
+

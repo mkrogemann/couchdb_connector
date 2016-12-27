@@ -47,17 +47,37 @@ defmodule Couchdb.Connector.UrlHelper do
   Produces the URL to a specific document contained in given database.
   """
   @spec document_url(Types.db_properties, String.t) :: String.t
-  def document_url db_props, id do
+  def document_url(db_props, id) do
     "#{database_server_url(db_props)}/#{db_props[:database]}/#{id}"
   end
 
-  @doc """
-  Produces the URL to a specific document contained in given database, making
-  use of basic authentication.
-  """
-  @spec document_url(Types.db_properties, Types.basic_auth, String.t) :: String.t
+  @spec document_url(Types.db_properties, Types.basic_auth, String.t) :: String
+.t
   def document_url(db_props, auth, id) do
     "#{database_url(db_props, auth)}/#{id}"
+  end
+
+  @doc """
+  Produces a url for a specific attachment in the database 
+  using no authentication. See attachment_url/5 for more information.
+  """
+  @spec attachment_url(Types.db_properties, String.t, String.t, String.t) 
+    :: String.t
+  def attachment_url(db_props, id, att_name, rev) do
+    "#{document_url(db_props, id)}/#{att_name}?rev=#{rev}"
+  end
+
+
+  @doc """
+  Produces the URL to a specific attachment of a document contained in 
+  given database, making use of basic authentication. Attachments in 
+  CouchDB apply to a specific revision of a document.  Note that the 
+  attachment name is local to the code and not on the server.
+  """
+  @spec attachment_url(Types.db_properties, Types.basic_auth, String.t, 
+                       String.t, String.t) :: String.t
+  def attachment_url(db_props, auth, id, att_name, rev) do
+    "#{document_url(db_props, auth, id)}/#{att_name}?rev=#{rev}"
   end
 
   @doc """

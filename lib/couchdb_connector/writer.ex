@@ -135,6 +135,26 @@ defmodule Couchdb.Connector.Writer do
     end
   end
 
+  # MFK
+  # has_attachment?
+  @spec update_attachment(Types.db_properties, Types.basic_auth, String.t, 
+                          String.t, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def update_attachment(db_props, auth, json, id, att_name, rev) 
+    when is_map(auth) do
+    #TODO write code
+    {doc_map, id} = parse_and_extract_id(json)
+    case id do
+      {:ok, id} ->
+        db_props
+        |> UrlHelper.document_url(auth, id, att_name, rev)
+        |> do_update_attachment(Poison.encode!(doc_map))
+      :error ->
+        raise RuntimeError, message:
+          "the document to be updated must contain an \"_id\" field"
+    end
+  end
+
   @doc """
   Update the given document that is stored under the given id, using no
   authentication.
@@ -145,6 +165,14 @@ defmodule Couchdb.Connector.Writer do
     db_props
     |> UrlHelper.document_url(id)
     |> do_update(json)
+  end
+
+  @spec update_attachment(Types.db_properties, String.t, String.t, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def update_attachment(db_props, json, id, att_name, rev) do
+    db_props
+    |> UrlHelper.attachment_url(id, att_name, rev)
+    |> do_update_attachment(json)
   end
 
   @doc """
@@ -168,6 +196,27 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
+  Update the given attachment, using no authentication.
+  Note that an _id field must be contained in the document.
+  A missing _id field will trigger a RuntimeError as will
+  prior existence of a document.
+  """
+  @spec update_attachment(Types.db_properties, String.t, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def update_attachment(db_props, json, att_name, rev) do
+    {doc_map, id} = parse_and_extract_id(json)
+    case id do
+      {:ok, id} ->
+        db_props
+        |> UrlHelper.attachment_url(id, att_name, rev)
+        |> do_update_attachment(Poison.encode!(doc_map))
+      :error ->
+        raise RuntimeError, message:
+          "the document to be updated must contain an \"_id\" field"
+    end
+  end
+
+  @doc """
   Update the given document that is stored under the given id, using basic
   authentication.
   """
@@ -179,10 +228,28 @@ defmodule Couchdb.Connector.Writer do
     |> do_update(json)
   end
 
+  @doc """
+  Update the given attachment that is stored under the given id, 
+  attachment name and revision, using basic authentication.
+  """
+  @spec update_attachment(Types.db_properties, Types.basic_auth, String.t, 
+                          String.t, String.t, String.t)
+    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
+  def update_attachment(db_props, auth, json, id, att_name, rev) do
+    db_props
+    |> UrlHelper.attachment_url(auth, id, att_name, rev)
+    |> do_update(json)
+  end
+
   defp do_update(url, json) do
     url
     |> HTTPoison.put!(json, [Headers.json_header])
     |> Handler.handle_put(:include_headers)
+  end
+
+  #MFK
+  defp do_update_attachment(url, json) do
+    do_update(url, json)
   end
 
   defp parse_and_extract_id(json) do

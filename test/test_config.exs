@@ -10,15 +10,15 @@ defmodule Couchdb.Connector.TestConfig do
   end
 
   def database_url do
-    "#{database_server_url}/#{database_properties[:database]}"
+    "#{database_server_url()}/#{database_properties()[:database]}"
   end
 
   def database_server_url do
-    "#{database_properties[:protocol]}://#{database_properties[:hostname]}:#{database_properties[:port]}"
+    "#{database_properties()[:protocol]}://#{database_properties()[:hostname]}:#{database_properties()[:port]}"
   end
 
   def db_exists do
-    url = "#{database_server_url}/#{database_properties[:database]}"
+    url = "#{database_server_url()}/#{database_properties()[:database]}"
     case HTTPoison.get url do
       {:ok, %HTTPoison.Response{status_code: 200}} ->
         true

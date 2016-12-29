@@ -37,22 +37,6 @@ end
 defmodule Couchdb.Connector.TestSupport do
   require Logger
 
-  def test_user() do
-    %{user: "jan", password: "relax"}
-  end
-
-  def test_admin() do
-    %{user: "anna", password: "secret"}
-  end
-
-  def test_view_key do
-    test_view_key("test_name")
-  end
-
-  def test_view_key(key) do
-    %{design: "test_view", view: "test_fetch", key: key}
-  end
-
   # Couchdb sometimes surprises us with errors like this one:
   # {:error, %HTTPoison.Error{id: nil, reason: :closed}}
   # These closed connections happen a lot on Travis which makes triggers

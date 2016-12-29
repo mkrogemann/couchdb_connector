@@ -5,7 +5,6 @@ defmodule Couchdb.ConnectorTest do
   alias Couchdb.Connector
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -122,7 +121,7 @@ defmodule Couchdb.ConnectorTest do
   test "get/3: ensure that document exists using basic authentication" do
     TestPrep.secure_database
     {:ok, doc_map} = retry_on_error(fn() ->
-      Connector.get(TestConfig.database_properties, TestSupport.test_user, "foo")
+      Connector.get(TestConfig.database_properties, TestConfig.test_user, "foo")
     end)
     assert doc_map["test_key"] == "test_value"
   end
@@ -133,7 +132,7 @@ defmodule Couchdb.ConnectorTest do
     {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
     {:ok, %{:headers => headers, :payload => payload}} = retry_on_error(fn() ->
       Connector.create(
-        TestConfig.database_properties, TestSupport.test_user, doc_map, "42")
+        TestConfig.database_properties, TestConfig.test_user, doc_map, "42")
       end)
     assert payload["id"] == "42"
     assert id_from_url(header_value(headers, "Location")) == "42"
@@ -145,7 +144,7 @@ defmodule Couchdb.ConnectorTest do
     {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
     {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
       Connector.create_generate(
-        TestConfig.database_properties, TestSupport.test_user, doc_map)
+        TestConfig.database_properties, TestConfig.test_user, doc_map)
       end)
     assert String.length(payload["id"]) == 32
     assert String.starts_with?(payload["rev"], "1-")
@@ -156,13 +155,13 @@ defmodule Couchdb.ConnectorTest do
     TestPrep.secure_database
     {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(fn() ->
       Connector.create_generate(
-        TestConfig.database_properties, TestSupport.test_user, %{"key" => "original value"})
+        TestConfig.database_properties, TestConfig.test_user, %{"key" => "original value"})
       end)
     id = id_from_url(headers["Location"])
-    {:ok, reloaded} = Connector.get(TestConfig.database_properties, TestSupport.test_user, id)
+    {:ok, reloaded} = Connector.get(TestConfig.database_properties, TestConfig.test_user, id)
     updated = %{reloaded | "key" => "new value"}
     {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(fn() ->
-      Connector.update(TestConfig.database_properties, TestSupport.test_user, updated)
+      Connector.update(TestConfig.database_properties, TestConfig.test_user, updated)
     end)
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
@@ -171,7 +170,7 @@ defmodule Couchdb.ConnectorTest do
     TestPrep.secure_database
     update = %{"_rev" => "some_revision", "key" => "new value"}
     assert_raise RuntimeError, fn ->
-      Connector.update(TestConfig.database_properties, TestSupport.test_user, update)
+      Connector.update(TestConfig.database_properties, TestConfig.test_user, update)
     end
   end
 
@@ -179,21 +178,21 @@ defmodule Couchdb.ConnectorTest do
   test "destroy/4: ensure that a document with given id can be deleted" do
     TestPrep.secure_database
     {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
-      Connector.create(TestConfig.database_properties, TestSupport.test_user, %{"key" => "value"}, "42")
+      Connector.create(TestConfig.database_properties, TestConfig.test_user, %{"key" => "value"}, "42")
     end)
     revision = payload["rev"]
     {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
-      Connector.destroy(TestConfig.database_properties, TestSupport.test_user, "42", revision)
+      Connector.destroy(TestConfig.database_properties, TestConfig.test_user, "42", revision)
     end)
     assert String.starts_with?(payload["rev"], "2-")
     {:error, %{"error" => "not_found", "reason" => "deleted"}} =
-      Connector.get(TestConfig.database_properties, TestSupport.test_user, "42")
+      Connector.get(TestConfig.database_properties, TestConfig.test_user, "42")
   end
 
   test "destroy/4: attempting to delete a non-existing document triggers an error" do
     TestPrep.secure_database
     {:error, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
-      Connector.destroy(TestConfig.database_properties, TestSupport.test_user, "42", "any_rev")
+      Connector.destroy(TestConfig.database_properties, TestConfig.test_user, "42", "any_rev")
     end)
     assert payload["reason"] == "missing"
   end

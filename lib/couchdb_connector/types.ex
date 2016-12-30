@@ -20,6 +20,9 @@ defmodule Couchdb.Connector.Types do
   @typedoc "Username and password for basic authentication"
   @type basic_auth :: %{user: String.t, password: String.t}
 
+  @typedoc "User information"
+  @type user_info :: %{user: String.t, password: String.t}
+
   @typedoc """
   Design name, view name and lookup key are often used together in view
   queries so it makes sense to wrap them in a type.

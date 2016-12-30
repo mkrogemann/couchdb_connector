@@ -8,7 +8,8 @@ defmodule Couchdb.Connector.Types do
   Database properties: host, port, protocol (http|https), database name
   """
   @type db_properties :: %{protocol: String.t, hostname: String.t,
-                           database: String.t, port: non_neg_integer}
+                           database: String.t, port: non_neg_integer,
+                           user: String.t, password: String.t}
 
   @typedoc "CouchDB user role is just a string, user_roles a list of strings."
   @type user_roles :: [String.t]

@@ -272,7 +272,11 @@ You should see a response like this:
 "{\"ok\":true,\"id\":\"42\",\"rev\":\"2-9b2e3bcc3752a3...\"}\n"
 ```
 
-Note that there is a second clause that taks in basic authentication information to allow authentication against a secured database.
+Basic authentication information need to be put in the database properties:
+
+```Elixir
+db_props = %{protocol: "http", hostname: "localhost", database: "couchdb_connector_dev", port: 5984, user: "admin", password: "secret"}
+```
 
 ### Delete a document — Response wrapped in a Map
 

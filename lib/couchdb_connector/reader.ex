@@ -41,9 +41,8 @@ defmodule Couchdb.Connector.Reader do
   """
   @spec get(Types.db_properties, Types.basic_auth, String.t) :: {:ok, String.t} | {:error, String.t}
   def get(db_props, basic_auth, id) do
-    db_props
-    |> UrlHelper.document_url(basic_auth, id)
-    |> do_get
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Reader.get/3 is deprecated, please use get/2 instead\n"
+    get(Map.merge(db_props, basic_auth), id)
   end
 
   @doc """

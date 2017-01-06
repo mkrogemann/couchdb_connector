@@ -37,10 +37,8 @@ defmodule Couchdb.Connector.View do
   """
   @spec fetch_all(Types.db_properties, Types.basic_auth, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def fetch_all(db_props, auth, design, view) do
-    db_props
-    |> UrlHelper.view_url(auth, design, view)
-    |> HTTPoison.get!
-    |> Handler.handle_get
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.fetch_all/4 is deprecated, please use fetch_all/3 instead\n"
+    fetch_all(Map.merge(db_props, auth), design, view)
   end
 
   @doc """
@@ -49,10 +47,8 @@ defmodule Couchdb.Connector.View do
   """
   @spec create_view(Types.db_properties, Types.basic_auth, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
   def create_view(db_props, admin_auth, design, code) do
-    db_props
-    |> UrlHelper.design_url(admin_auth, design)
-    |> HTTPoison.put!(code)
-    |> Handler.handle_put
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.create_view/4 is deprecated, please use create_view/3 instead\n"
+    create_view(Map.merge(db_props, admin_auth), design, code)
   end
 
   @doc """
@@ -76,8 +72,10 @@ defmodule Couchdb.Connector.View do
   """
   @spec document_by_key(Types.db_properties, Types.basic_auth, Types.view_key, :update_after)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, auth, view_key, :update_after),
-    do: authenticated_document_by_key(db_props, auth, view_key, :update_after)
+  def document_by_key(db_props, auth, view_key, :update_after) do
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/4 is deprecated, please use document_by_key/3 instead\n"
+    document_by_key(Map.merge(db_props, auth), view_key, :update_after)
+  end
 
   @doc """
   Find and return one document with given key in given view, using basic
@@ -89,14 +87,15 @@ defmodule Couchdb.Connector.View do
   """
   @spec document_by_key(Types.db_properties, Types.basic_auth, Types.view_key, :ok)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, auth, view_key, :ok),
-    do: authenticated_document_by_key(db_props, auth, view_key, :ok)
+  def document_by_key(db_props, auth, view_key, :ok) do
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/4 is deprecated, please use document_by_key/3 instead\n"
+    document_by_key(Map.merge(db_props, auth), view_key, :ok)
+  end
 
+  # TODO: evaluate if this method actually needs to be public, otherwise delete
   def authenticated_document_by_key(db_props, auth, view_key, stale) do
-    db_props
-    |> UrlHelper.view_url(auth, view_key[:design], view_key[:view])
-    |> UrlHelper.query_path(view_key[:key], stale)
-    |> do_document_by_key
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.authenticated_document_by_key/4 is deprecated, please use unauthenticated_document_by_key/3 instead\n"
+    unauthenticated_document_by_key(Map.merge(db_props, auth), view_key, stale)
   end
 
   @doc """
@@ -141,9 +140,12 @@ defmodule Couchdb.Connector.View do
   """
   @spec document_by_key(Types.db_properties, Types.basic_auth, Types.view_key)
     :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, auth, view_key) when is_map(auth),
-    do: document_by_key(db_props, auth, view_key, :update_after)
+  def document_by_key(db_props, auth, view_key) when is_map(auth) do
+    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/3 is deprecated, please use document_by_key/2 instead\n"
+    document_by_key(Map.merge(db_props, auth), view_key)
+  end
 
+  # TODO as with the new api, this method can be used authenticated and unauthenticated
   def unauthenticated_document_by_key(db_props, view_key, stale) do
     db_props
     |> UrlHelper.view_url(view_key[:design], view_key[:view])

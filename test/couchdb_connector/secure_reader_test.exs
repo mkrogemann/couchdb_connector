@@ -5,7 +5,6 @@ defmodule Couchdb.Connector.SecureReaderTest do
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -23,7 +22,7 @@ defmodule Couchdb.Connector.SecureReaderTest do
     TestPrep.secure_database
     {:ok, json} = retry_on_error(
       fn() ->
-        Reader.get(TestConfig.database_properties, TestSupport.test_user, "foo")
+        Reader.get(TestConfig.database_properties, TestConfig.test_user, "foo")
       end)
     {:ok, json_map} = Poison.decode json
     assert json_map["test_key"] == "test_value"

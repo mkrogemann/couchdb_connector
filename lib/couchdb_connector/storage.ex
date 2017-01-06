@@ -32,10 +32,8 @@ defmodule Couchdb.Connector.Storage do
   using the provided basic authentication parameters.
   """
   def storage_up db_props, auth do
-    db_props
-    |> UrlHelper.database_url(auth)
-    |> HTTPoison.put!("{}", [Headers.json_header])
-    |> Handler.handle_put
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Storage.storage_up/2 is deprecated, please use storage_up/1 instead\n"
+    storage_up(Map.merge(db_props, auth))
   end
 
   @doc """
@@ -53,9 +51,7 @@ defmodule Couchdb.Connector.Storage do
   using the provided basic authentication parameters.
   """
   def storage_down db_props, auth do
-    db_props
-    |> UrlHelper.database_url(auth)
-    |> HTTPoison.delete!
-    |> Handler.handle_delete
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Storage.storage_down/2 is deprecated, please use storage_down/1 instead\n"
+    storage_down(Map.merge(db_props, auth))
   end
 end

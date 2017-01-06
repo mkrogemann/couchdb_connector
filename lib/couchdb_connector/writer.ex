@@ -39,9 +39,8 @@ defmodule Couchdb.Connector.Writer do
   @spec create(Types.db_properties, Types.basic_auth, String.t, String.t)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def create(db_props, auth, json, id) do
-    db_props
-    |> UrlHelper.document_url(auth, id)
-    |> do_create(json)
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Writer.create/4 is deprecated, please use create/3 instead\n"
+    create(Map.merge(db_props, auth), json, id)
   end
 
   @doc """
@@ -68,9 +67,8 @@ defmodule Couchdb.Connector.Writer do
   @spec create_generate(Types.db_properties, Types.basic_auth, String.t)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def create_generate(db_props, auth, json) do
-    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
-    uuid = hd(Poison.decode!(uuid_json)["uuids"])
-    create(db_props, auth, json, uuid)
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Writer.create_generate/3 is deprecated, please use create_generate/2 instead\n"
+    create_generate(Map.merge(db_props, auth), json)
   end
 
   @doc """
@@ -123,16 +121,8 @@ defmodule Couchdb.Connector.Writer do
   @spec update(Types.db_properties, Types.basic_auth, String.t)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update(db_props, auth, json) when is_map(auth) do
-    {doc_map, id} = parse_and_extract_id(json)
-    case id do
-      {:ok, id} ->
-        db_props
-        |> UrlHelper.document_url(auth, id)
-        |> do_update(Poison.encode!(doc_map))
-      :error ->
-        raise RuntimeError, message:
-          "the document to be updated must contain an \"_id\" field"
-    end
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Write.update/3 is deprecated, please use update/2 instead\n"
+    update(Map.merge(db_props, auth), json)
   end
 
   @doc """
@@ -174,9 +164,8 @@ defmodule Couchdb.Connector.Writer do
   @spec update(Types.db_properties, Types.basic_auth, String.t, String.t)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update(db_props, auth, json, id) do
-    db_props
-    |> UrlHelper.document_url(auth, id)
-    |> do_update(json)
+    IO.write :stderr, "\nwarning: Couchdb.Connector.Write.update/4 is deprecated, please use update/3 instead\n"
+    update(Map.merge(db_props, auth), json, id)
   end
 
   defp do_update(url, json) do

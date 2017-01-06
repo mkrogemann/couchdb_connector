@@ -7,7 +7,6 @@ defmodule Couchdb.Connector.SecureViewTest do
   alias Couchdb.Connector.View
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -25,7 +24,7 @@ defmodule Couchdb.Connector.SecureViewTest do
     {:ok, json} = retry_on_error(
       fn() ->
         View.fetch_all(
-          TestConfig.database_properties, TestSupport.test_user, "test_view", "test_fetch")
+          TestConfig.database_properties, TestConfig.test_user, "test_view", "test_fetch")
       end)
     {:ok, result_map} = Poison.decode json
     assert result_map["total_rows"] == 1
@@ -37,7 +36,7 @@ defmodule Couchdb.Connector.SecureViewTest do
     {:ok, code} = File.read("test/resources/views/test_view.json")
     {:ok, result} = retry_on_error(
       fn() -> View.create_view(
-        TestConfig.database_properties, TestSupport.test_admin, "test_design", code)
+        TestConfig.database_properties, TestConfig.test_admin, "test_design", code)
       end)
     assert String.contains?(result, "\"id\":\"_design/test_design\"")
   end
@@ -46,7 +45,7 @@ defmodule Couchdb.Connector.SecureViewTest do
     result = retry(@retries,
       fn(_) ->
         View.document_by_key(
-          TestConfig.database_properties, TestSupport.test_user, TestSupport.test_view_key, :update_after
+          TestConfig.database_properties, TestConfig.test_user, TestConfig.test_view_key, :update_after
         )
       end,
       fn(response) ->
@@ -66,10 +65,10 @@ defmodule Couchdb.Connector.SecureViewTest do
   end
 
   test "document_by_key/3: ensure that function exists. document may or may not be found" do
-    View.document_by_key TestConfig.database_properties, TestSupport.test_user, TestSupport.test_view_key
+    View.document_by_key TestConfig.database_properties, TestConfig.test_user, TestConfig.test_view_key
   end
 
   test "document_by_key/4: ensure that function exists. document may or may not be found" do
-    View.document_by_key TestConfig.database_properties, TestSupport.test_user, TestSupport.test_view_key, :ok
+    View.document_by_key TestConfig.database_properties, TestConfig.test_user, TestConfig.test_view_key, :ok
   end
 end

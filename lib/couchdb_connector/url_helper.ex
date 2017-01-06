@@ -1,4 +1,6 @@
 defmodule Couchdb.Connector.UrlHelper do
+  @default_db_properties %{user: nil, password: nil}
+
   @moduledoc """
   Provides URL helper functions that compose URLs based on given database
   properties and additional parameters, such as document IDs, usernames, etc.
@@ -14,7 +16,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec database_server_url(Types.db_properties) :: String.t
   def database_server_url db_props do
-    "#{db_props[:protocol]}://#{db_props[:hostname]}:#{db_props[:port]}"
+    @default_db_properties |> Map.merge(db_props) |> do_database_server_url
   end
 
   @doc """
@@ -23,7 +25,16 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec database_server_url(Types.db_properties, Types.basic_auth) :: String.t
   def database_server_url(db_props, auth) do
-    "#{db_props[:protocol]}://#{auth[:user]}:#{auth[:password]}@#{db_props[:hostname]}:#{db_props[:port]}"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.UrlHelper.database_server_url/2 is deprecated, please use database_server_url/1 instead\n"
+    database_server_url(Map.merge(db_props, auth))
+  end
+
+  defp do_database_server_url db_props = %{user: nil} do
+    "#{db_props[:protocol]}://#{db_props[:hostname]}:#{db_props[:port]}"
+  end
+
+  defp do_database_server_url db_props do
+    "#{db_props[:protocol]}://#{db_props[:user]}:#{db_props[:password]}@#{db_props[:hostname]}:#{db_props[:port]}"
   end
 
   @doc """
@@ -40,7 +51,8 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec database_url(Types.db_properties, Types.basic_auth) :: String.t
   def database_url(db_props, auth) do
-    "#{database_server_url(db_props, auth)}/#{db_props[:database]}"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.UrlHelper.database_url/2 is deprecated, please use database_url/1 instead\n"
+    database_url(Map.merge(db_props, auth))
   end
 
   @doc """
@@ -57,7 +69,8 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec document_url(Types.db_properties, Types.basic_auth, String.t) :: String.t
   def document_url(db_props, auth, id) do
-    "#{database_url(db_props, auth)}/#{id}"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.UrlHelper.document_url/3 is deprecated, please use document_url/2 instead\n"
+    document_url(Map.merge(db_props, auth), id)
   end
 
   @doc """
@@ -82,7 +95,8 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec design_url(Types.db_properties, Types.basic_auth, String.t) :: String.t
   def design_url db_props, auth, design do
-    "#{database_server_url(db_props, auth)}/#{db_props[:database]}/_design/#{design}"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.UrlHelper.design_url/3 is deprecated, please use design_url/2 instead\n"
+    design_url(Map.merge(db_props, auth), design)
   end
 
   @doc """
@@ -100,7 +114,8 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec view_url(Types.db_properties, Types.basic_auth, String.t, String.t) :: String.t
   def view_url db_props, auth, design, view do
-    "#{design_url(db_props, auth, design)}/_view/#{view}"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.UrlHelper.view_url/4 is deprecated, please use view_url/3 instead\n"
+    view_url(Map.merge(db_props, auth), design, view)
   end
 
   @doc """
@@ -126,7 +141,8 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec user_url(Types.db_properties, Types.basic_auth, String.t) :: String.t
   def user_url(db_props, admin_auth, username) do
-    "#{database_server_url(db_props, admin_auth)}/_users/org.couchdb.user:#{username}"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.UrlHelper.user_url/3 is deprecated, please use user_url/2 instead\n"
+    user_url(Map.merge(db_props, admin_auth), username)
   end
 
   @doc """
@@ -142,7 +158,17 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec admin_url(Types.db_properties, String.t, String.t) :: String.t
   def admin_url db_props, admin_name, password do
-    "#{database_server_url(db_props, %{user: admin_name, password: password})}/_config/admins/#{admin_name}"
+    admin_url(Map.merge(db_props, %{user: admin_name, password: password}), admin_name)
+  end
+
+
+  @doc """
+  Produces the URL to the database's security object. Requires admin
+  credentials.
+  """
+  @spec security_url(Types.db_properties) :: String.t
+  def security_url db_props do
+    "#{database_url(db_props)}/_security"
   end
 
   @doc """
@@ -151,6 +177,7 @@ defmodule Couchdb.Connector.UrlHelper do
   """
   @spec security_url(Types.db_properties, Types.basic_auth) :: String.t
   def security_url db_props, admin_auth do
-    "#{database_url(db_props, admin_auth)}/_security"
+    IO.write :stderr, "\nwarning: Couchdb.Connector.UrlHelper.security_url/2 is deprecated, please use security_url/1 instead\n"
+    security_url(Map.merge(db_props, admin_auth))
   end
 end

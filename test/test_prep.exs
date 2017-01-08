@@ -32,12 +32,12 @@ defmodule Couchdb.Connector.TestPrep do
 
   def ensure_test_user do
     TestSupport.retry_on_error(fn() ->
-      Admin.create_user(TestConfig.database_properties(), TestConfig.test_admin(), TestConfig.test_user(), ["members"])
+      Admin.create_user(Map.merge(TestConfig.database_properties(), TestConfig.test_admin()), TestConfig.test_user(), ["members"])
     end)
   end
 
   def delete_test_user do
-    case Admin.user_info(TestConfig.database_properties(), TestConfig.test_admin(), "jan") do
+    case Admin.user_info(Map.merge(TestConfig.database_properties(), TestConfig.test_admin()), "jan") do
       {:ok, body} ->
         {:ok, body_map} = Poison.decode body
         HTTPoison.delete UrlHelper.user_url(TestConfig.database_properties(), TestConfig.test_admin(), "jan")
@@ -48,7 +48,7 @@ defmodule Couchdb.Connector.TestPrep do
   end
 
   def delete_test_admin do
-    case Admin.admin_info(TestConfig.database_properties(), TestConfig.test_admin()) do
+    case Admin.admin_info(Map.merge(TestConfig.database_properties(), TestConfig.test_admin())) do
       {:ok, _} ->
         HTTPoison.delete(UrlHelper.admin_url(TestConfig.database_properties(), "anna", "secret"))
       {:error, body} ->
@@ -64,7 +64,7 @@ defmodule Couchdb.Connector.TestPrep do
 
   def ensure_test_security do
     TestSupport.retry_on_error(fn() ->
-      Admin.set_security(TestConfig.database_properties(), TestConfig.test_admin(), ["anna"], ["jan"])
+      Admin.set_security(Map.merge(TestConfig.database_properties(), TestConfig.test_admin()), ["anna"], ["jan"])
     end)
   end
 

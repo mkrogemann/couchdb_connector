@@ -54,6 +54,8 @@ defmodule Couchdb.Connector.Admin do
   Create a new user with given username, password and roles. In case of success,
   the function will respond with {:ok, body, headers}. In case of failures (e.g.
   if user already exists), the response will be {:error, body, headers}.
+  Please note that the credentials used in db_properties must be the credentials
+  of an admin user.
   """
   @spec create_user(Types.db_properties, Types.user_info, Types.user_roles)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
@@ -62,18 +64,6 @@ defmodule Couchdb.Connector.Admin do
     |> UrlHelper.user_url(user_auth[:user])
     |> do_create_user(user_to_json(user_auth, roles))
     |> Handler.handle_put(:include_headers)
-  end
-
-  @doc """
-  Create a new user with given username, password and roles. In case of success,
-  the function will respond with {:ok, body, headers}. In case of failures (e.g.
-  if user already exists), the response will be {:error, body, headers}.
-  """
-  @spec create_user(Types.db_properties, Types.basic_auth, Types.user_info, Types.user_roles)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create_user(db_props, admin_auth, user_auth, roles) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Admin.create_user/4 is deprecated, please use create_user/3 instead\n"
-    create_user(Map.merge(db_props, admin_auth), user_auth, roles)
   end
 
   defp do_create_user(url, json) do
@@ -119,17 +109,6 @@ defmodule Couchdb.Connector.Admin do
   end
 
   @doc """
-  Returns the public information for the given user or an error in case the
-  user does not exist.
-  """
-  @spec user_info(Types.db_properties, Types.basic_auth, String.t)
-    :: {:ok, String.t} | {:error, String.t}
-  def user_info(db_props, admin_auth, username) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Admin.user_info/3 is deprecated, please use user_info/2 instead\n"
-    user_info(Map.merge(db_props, admin_auth), username)
-  end
-
-  @doc """
   Returns hashed information for the given admin or an error in case the admin
   does not exist or if the given credentials are wrong.
   """
@@ -140,17 +119,6 @@ defmodule Couchdb.Connector.Admin do
     |> UrlHelper.admin_url(db_props[:user])
     |> HTTPoison.get!
     |> Handler.handle_get
-  end
-
-  @doc """
-  Returns hashed information for the given admin or an error in case the admin
-  does not exist or if the given credentials are wrong.
-  """
-  @spec admin_info(Types.db_properties, Types.basic_auth)
-    :: {:ok, String.t} | {:error, String.t}
-  def admin_info db_props, admin_auth do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Admin.admin_info/2 is deprecated, please use admin_info/1 instead\n"
-    admin_info(Map.merge(db_props, admin_auth))
   end
 
   @doc """
@@ -166,17 +134,6 @@ defmodule Couchdb.Connector.Admin do
         do_destroy_user(db_props, username, user["_rev"])
       error -> error
     end
-  end
-
-  @doc """
-  Deletes the given user from the database server or returns an error in case
-  the user cannot be found. Requires admin basic auth credentials.
-  """
-  @spec destroy_user(Types.db_properties, Types.basic_auth, String.t)
-  :: {:ok, String.t} | {:error, String.t}
-  def destroy_user(db_props, admin_auth, username) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Admin.destroy_user/3 is deprecated, please use destroy_user/3 instead\n"
-    destroy_user(Map.merge(db_props, admin_auth), username)
   end
 
   defp do_destroy_user(db_props, username, rev) do
@@ -220,18 +177,6 @@ defmodule Couchdb.Connector.Admin do
     |> UrlHelper.security_url
     |> do_set_security(security_to_json(admins, members))
     |> Handler.handle_put
-  end
-
-  @doc """
-  Set the security object for a given database. Security object includes admins
-  and members for the database.
-  """
-  # TODO: add user roles
-  @spec set_security(Types.db_properties, Types.basic_auth, list(String.t), list(String.t))
-    :: {:ok, String.t} | {:error, String.t}
-  def set_security(db_props, admin_auth, admins, members) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Admin.set_security/4 is deprecated, please use set_security/3 instead\n"
-    set_security(Map.merge(db_props, admin_auth), admins, members)
   end
 
   defp do_set_security(url, json) do

@@ -13,7 +13,7 @@ defmodule Couchdb.Connector.UrlHelper do
   alias Couchdb.Connector.Types
 
   @doc """
-  Produces the URL to the server given in db_props, including authentication.
+  Produces the URL to the server given in db_props.
   """
   @spec database_server_url(Types.db_properties) :: String.t
   def database_server_url db_props do
@@ -46,7 +46,7 @@ defmodule Couchdb.Connector.UrlHelper do
 
   @doc """
   Produces an URL that can be used to retrieve the given number of UUIDs from
-  CouchDB. Authentication is not required.
+  CouchDB. This endpoint does not require authentication.
   """
   @spec fetch_uuid_url(Types.db_properties, non_neg_integer) :: String.t
   def fetch_uuid_url db_props, count \\ 1 do
@@ -54,7 +54,7 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to a specific design document, using no authentication.
+  Produces the URL to a specific design document.
   """
   @spec design_url(Types.db_properties, String.t) :: String.t
   def design_url db_props, design do
@@ -62,8 +62,7 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to a specific view from a given design document, using no
-  authentication.
+  Produces the URL to a specific view from a given design document.
   """
   @spec view_url(Types.db_properties, String.t, String.t) :: String.t
   def view_url db_props, design, view do
@@ -80,7 +79,7 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to a specific user, providing no authentication.
+  Produces the URL to a specific user.
   """
   @spec user_url(Types.db_properties, String.t) :: String.t
   def user_url db_props, username do
@@ -88,7 +87,7 @@ defmodule Couchdb.Connector.UrlHelper do
   end
 
   @doc """
-  Produces the URL to a specific admin, using no authentication
+  Produces the URL to a specific admin.
   """
   @spec admin_url(Types.db_properties, String.t) :: String.t
   def admin_url db_props, username do

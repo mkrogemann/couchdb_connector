@@ -7,7 +7,6 @@ defmodule Couchdb.ConnectorViewTest do
   alias Couchdb.Connector
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -71,11 +70,11 @@ defmodule Couchdb.ConnectorViewTest do
     assert first["value"]["name"] == "test_name"
   end
 
-  test "fetch_all/4: ensure that view works as expected with authentication" do
+  test "fetch_all/3: ensure that view works as expected with authentication" do
     TestPrep.secure_database()
     {:ok, result_map} = retry_on_error(
       fn() ->
-        Connector.fetch_all(TestConfig.database_properties, TestConfig.test_user, "test_view", "test_fetch")
+        Connector.fetch_all(Map.merge(TestConfig.database_properties, TestConfig.test_user), "test_view", "test_fetch")
       end)
     assert result_map["total_rows"] == 1
     [first|_] = result_map["rows"]

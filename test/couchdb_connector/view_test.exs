@@ -85,25 +85,4 @@ defmodule Couchdb.Connector.ViewTest do
   test "document_by_key/3: ensure that function exists. document may or may not be found" do
     View.document_by_key TestConfig.database_properties, TestConfig.test_view_key, :ok
   end
-
-  test "document_by_key/5: ensure that view returns document for given key" do
-    result = retry(@retries,
-      fn(_) ->
-        View.document_by_key TestConfig.database_properties, "test_view", "test_fetch", "test_name"
-      end,
-      fn(response) ->
-        case response do
-          {:ok, body} ->
-            doc = Poison.decode! body
-            rows = doc["rows"]
-            case length(rows) do
-              0 -> false
-              _ -> hd(rows)["id"] == "test_id"
-            end
-          _ -> false
-        end
-      end
-    )
-    assert result, "document not found in view after #{@retries} tries"
-  end
 end

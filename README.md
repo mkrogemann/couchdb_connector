@@ -69,7 +69,8 @@ db_props = %{protocol: "http", hostname: "localhost", database: "couchdb_connect
 HTTP Basic authentication was first introduced in release version 0.3. Some versions and improvements later, the current best practice is to put the Basic auth credentials into the database properties like so:
 
 ```Elixir
-db_props = %{protocol: "http", hostname: "localhost", database: "couchdb_connector_dev", port: 5984, user: "username", password: "secret"}
+db_props = %{protocol: "http", hostname: "localhost", database: "couchdb_connector_dev", port: 5984,
+user: "username", password: "secret"}
 ```
 
 Support for this configuration feature has been introduced in release version 0.4.4. It relieves users from having to add the credentials to each authenticated function call. Authentication can now be dealt with once and in one place only.

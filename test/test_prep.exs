@@ -40,7 +40,7 @@ defmodule Couchdb.Connector.TestPrep do
     case Admin.user_info(Map.merge(TestConfig.database_properties(), TestConfig.test_admin()), "jan") do
       {:ok, body} ->
         {:ok, body_map} = Poison.decode body
-        HTTPoison.delete UrlHelper.user_url(TestConfig.database_properties(), TestConfig.test_admin(), "jan")
+        HTTPoison.delete UrlHelper.user_url(Map.merge(TestConfig.database_properties(), TestConfig.test_admin()), "jan")
           <> "?rev=#{body_map["_rev"]}"
       {:error, body} ->
         {:error, body}

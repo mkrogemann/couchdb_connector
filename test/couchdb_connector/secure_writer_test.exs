@@ -89,7 +89,7 @@ defmodule Couchdb.Connector.SecureWriterTest do
     revision = String.replace(header_value(headers, "ETag"), "\"", "")
     {:ok, body} = retry_on_error(
       fn() -> Writer.destroy(
-        TestConfig.database_properties, TestConfig.test_user, "42", revision)
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), "42", revision)
       end)
     {:ok, body_map} = Poison.decode body
     assert String.starts_with?(body_map["rev"], "2-")

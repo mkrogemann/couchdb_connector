@@ -182,7 +182,7 @@ defmodule Couchdb.ConnectorTest do
     end)
     revision = payload["rev"]
     {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
-      Connector.destroy(TestConfig.database_properties, TestConfig.test_user, "42", revision)
+      Connector.destroy(Map.merge(TestConfig.database_properties, TestConfig.test_user), "42", revision)
     end)
     assert String.starts_with?(payload["rev"], "2-")
     {:error, %{"error" => "not_found", "reason" => "deleted"}} =
@@ -192,7 +192,7 @@ defmodule Couchdb.ConnectorTest do
   test "destroy/4: attempting to delete a non-existing document triggers an error" do
     TestPrep.secure_database
     {:error, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
-      Connector.destroy(TestConfig.database_properties, TestConfig.test_user, "42", "any_rev")
+      Connector.destroy(Map.merge(TestConfig.database_properties, TestConfig.test_user), "42", "any_rev")
     end)
     assert payload["reason"] == "missing"
   end

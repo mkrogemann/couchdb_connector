@@ -28,15 +28,6 @@ defmodule Couchdb.Connector.Storage do
   end
 
   @doc """
-  Create a database with parameters as given in the db_props map
-  using the provided basic authentication parameters.
-  """
-  def storage_up db_props, auth do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Storage.storage_up/2 is deprecated, please use storage_up/1 instead\n"
-    storage_up(Map.merge(db_props, auth))
-  end
-
-  @doc """
   Delete the database with the properties as given in the db_props map.
   """
   def storage_down db_props do
@@ -44,14 +35,5 @@ defmodule Couchdb.Connector.Storage do
     |> UrlHelper.database_url
     |> HTTPoison.delete!
     |> Handler.handle_delete
-  end
-
-  @doc """
-  Delete the database with the properties as given in the db_props map
-  using the provided basic authentication parameters.
-  """
-  def storage_down db_props, auth do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Storage.storage_down/2 is deprecated, please use storage_down/1 instead\n"
-    storage_down(Map.merge(db_props, auth))
   end
 end

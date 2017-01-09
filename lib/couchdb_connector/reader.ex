@@ -25,8 +25,7 @@ defmodule Couchdb.Connector.Reader do
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
   @doc """
-  Retrieve the document given by database properties and id, using no
-  authentication.
+  Retrieve the document given by database properties and id.
   """
   @spec get(Types.db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
   def get(db_props, id) do
@@ -36,17 +35,8 @@ defmodule Couchdb.Connector.Reader do
   end
 
   @doc """
-  Retrieve the document given by database properties and id, using the given
-  basic auth credentials for authentication.
-  """
-  @spec get(Types.db_properties, Types.basic_auth, String.t) :: {:ok, String.t} | {:error, String.t}
-  def get(db_props, basic_auth, id) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Reader.get/3 is deprecated, please use get/2 instead\n"
-    get(Map.merge(db_props, basic_auth), id)
-  end
-
-  @doc """
   Fetch a single uuid from CouchDB for use in a a subsequent create operation.
+  This operation requires no authentication.
   """
   @spec fetch_uuid(Types.db_properties) :: {:ok, String.t} | {:error, String.t}
   def fetch_uuid(db_props) do

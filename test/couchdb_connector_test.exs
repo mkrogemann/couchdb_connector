@@ -118,10 +118,10 @@ defmodule Couchdb.ConnectorTest do
     assert String.length(uuid) == 32
   end
 
-  test "get/3: ensure that document exists using basic authentication" do
+  test "get/2: ensure that document exists using basic authentication" do
     TestPrep.secure_database
     {:ok, doc_map} = retry_on_error(fn() ->
-      Connector.get(TestConfig.database_properties, TestConfig.test_user, "foo")
+      Connector.get(Map.merge(TestConfig.database_properties, TestConfig.test_user), "foo")
     end)
     assert doc_map["test_key"] == "test_value"
   end
@@ -158,7 +158,7 @@ defmodule Couchdb.ConnectorTest do
         TestConfig.database_properties, TestConfig.test_user, %{"key" => "original value"})
       end)
     id = id_from_url(headers["Location"])
-    {:ok, reloaded} = Connector.get(TestConfig.database_properties, TestConfig.test_user, id)
+    {:ok, reloaded} = Connector.get(Map.merge(TestConfig.database_properties, TestConfig.test_user), id)
     updated = %{reloaded | "key" => "new value"}
     {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(fn() ->
       Connector.update(TestConfig.database_properties, TestConfig.test_user, updated)
@@ -186,7 +186,7 @@ defmodule Couchdb.ConnectorTest do
     end)
     assert String.starts_with?(payload["rev"], "2-")
     {:error, %{"error" => "not_found", "reason" => "deleted"}} =
-      Connector.get(TestConfig.database_properties, TestConfig.test_user, "42")
+      Connector.get(Map.merge(TestConfig.database_properties, TestConfig.test_user), "42")
   end
 
   test "destroy/4: attempting to delete a non-existing document triggers an error" do

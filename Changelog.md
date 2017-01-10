@@ -1,3 +1,8 @@
+Version 0.4.5 - released 2017-01-10
+-------------
+
+- Bugfix: Add special handling for integer keys to views to fix #40
+
 Version 0.4.4 - released 2017-01-08
 -------------
 

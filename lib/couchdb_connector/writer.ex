@@ -27,24 +27,8 @@ defmodule Couchdb.Connector.Writer do
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
-
   @doc """
-  Create a new document with given json and given id, using the provided basic
-  authentication parameters.
-  Clients must make sure that the id has not been used for an existing document
-  in CouchDB.
-  Either provide a UUID or consider using create_generate in case uniqueness cannot
-  be guaranteed.
-  """
-  @spec create(Types.db_properties, Types.basic_auth, String.t, String.t)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create(db_props, auth, json, id) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Writer.create/4 is deprecated, please use create/3 instead\n"
-    create(Map.merge(db_props, auth), json, id)
-  end
-
-  @doc """
-  Create a new document with given json and given id, using no authentication.
+  Create a new document with given json and given id.
   Clients must make sure that the id has not been used for an existing document
   in CouchDB.
   Either provide a UUID or consider using create_generate in case uniqueness cannot
@@ -59,21 +43,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Create a new document with given json and a CouchDB generated id, using basic
-  authentication.
-  Fetching the uuid from CouchDB does of course incur a performance penalty as
-  compared to providing one.
-  """
-  @spec create_generate(Types.db_properties, Types.basic_auth, String.t)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create_generate(db_props, auth, json) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Writer.create_generate/3 is deprecated, please use create_generate/2 instead\n"
-    create_generate(Map.merge(db_props, auth), json)
-  end
-
-  @doc """
-  Create a new document with given json and a CouchDB generated id, using no
-  authentication.
+  Create a new document with given json and a CouchDB generated id.
   Fetching the uuid from CouchDB does of course incur a performance penalty as
   compared to providing one.
   """
@@ -83,17 +53,6 @@ defmodule Couchdb.Connector.Writer do
     {:ok, uuid_json} = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])
     create(db_props, json, uuid)
-  end
-
-  @doc """
-  This function has been deprecated in version 0.3.0 and will be removed in a
-  future release.
-  """
-  @spec create(Types.db_properties, String.t)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create(db_props, json) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Write.create/2 is deprecated, please use create_generate/2 instead\n"
-    create_generate(db_props, json)
   end
 
   defp do_create(url, json) do
@@ -114,20 +73,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Update the given document, using basic authentication.
-  Note that an _id field must be contained in the document.
-  A missing _id field will trigger a RuntimeError.
-  """
-  @spec update(Types.db_properties, Types.basic_auth, String.t)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def update(db_props, auth, json) when is_map(auth) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Write.update/3 is deprecated, please use update/2 instead\n"
-    update(Map.merge(db_props, auth), json)
-  end
-
-  @doc """
-  Update the given document that is stored under the given id, using no
-  authentication.
+  Update the given document that is stored under the given id.
   """
   @spec update(Types.db_properties, String.t, String.t)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
@@ -138,7 +84,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Update the given document, using no authentication.
+  Update the given document.
   Note that an _id field must be contained in the document.
   A missing _id field will trigger a RuntimeError.
   """
@@ -157,17 +103,6 @@ defmodule Couchdb.Connector.Writer do
     end
   end
 
-  @doc """
-  Update the given document that is stored under the given id, using basic
-  authentication.
-  """
-  @spec update(Types.db_properties, Types.basic_auth, String.t, String.t)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def update(db_props, auth, json, id) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Write.update/4 is deprecated, please use update/3 instead\n"
-    update(Map.merge(db_props, auth), json, id)
-  end
-
   defp do_update(url, json) do
     url
     |> HTTPoison.put!(json, [Headers.json_header])
@@ -180,8 +115,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Delete the document with the given id in the given revision, using basic
-  authentication.
+  Delete the document with the given id in the given revision.
   An error will be returned in case the document does not exist or the
   revision is wrong.
   """
@@ -194,8 +128,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Delete the document with the given id in the given revision, using no
-  authentication.
+  Delete the document with the given id in the given revision.
   An error will be returned in case the document does not exist or the
   revision is wrong.
   """

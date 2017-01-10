@@ -132,7 +132,7 @@ defmodule Couchdb.ConnectorTest do
     {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
     {:ok, %{:headers => headers, :payload => payload}} = retry_on_error(fn() ->
       Connector.create(
-        TestConfig.database_properties, TestConfig.test_user, doc_map, "42")
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), doc_map, "42")
       end)
     assert payload["id"] == "42"
     assert id_from_url(header_value(headers, "Location")) == "42"
@@ -144,7 +144,7 @@ defmodule Couchdb.ConnectorTest do
     {:ok, doc_map} = Poison.decode("{\"key\": \"value\"}")
     {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
       Connector.create_generate(
-        TestConfig.database_properties, TestConfig.test_user, doc_map)
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), doc_map)
       end)
     assert String.length(payload["id"]) == 32
     assert String.starts_with?(payload["rev"], "1-")
@@ -155,13 +155,13 @@ defmodule Couchdb.ConnectorTest do
     TestPrep.secure_database
     {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(fn() ->
       Connector.create_generate(
-        TestConfig.database_properties, TestConfig.test_user, %{"key" => "original value"})
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), %{"key" => "original value"})
       end)
     id = id_from_url(headers["Location"])
     {:ok, reloaded} = Connector.get(Map.merge(TestConfig.database_properties, TestConfig.test_user), id)
     updated = %{reloaded | "key" => "new value"}
     {:ok, %{:headers => headers, :payload => _payload}} = retry_on_error(fn() ->
-      Connector.update(TestConfig.database_properties, TestConfig.test_user, updated)
+      Connector.update(Map.merge(TestConfig.database_properties, TestConfig.test_user), updated)
     end)
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
@@ -178,7 +178,7 @@ defmodule Couchdb.ConnectorTest do
   test "destroy/4: ensure that a document with given id can be deleted" do
     TestPrep.secure_database
     {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
-      Connector.create(TestConfig.database_properties, TestConfig.test_user, %{"key" => "value"}, "42")
+      Connector.create(Map.merge(TestConfig.database_properties, TestConfig.test_user), %{"key" => "value"}, "42")
     end)
     revision = payload["rev"]
     {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->

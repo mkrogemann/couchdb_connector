@@ -81,21 +81,6 @@ defmodule Couchdb.Connector.View do
   def document_by_key(db_props, view_key, :ok),
     do: unauthenticated_document_by_key(db_props, view_key, :ok)
 
-  @doc """
-  Find and return one document with given key in given view, using basic
-  authentication.
-  Will return a JSON document with an empty list of documents if no document
-  with given key exists.
-  Staleness is set to 'update_after' which will perform worse than 'ok' but
-  deliver more up-to-date results.
-  """
-  @spec document_by_key(Types.db_properties, Types.basic_auth, Types.view_key)
-    :: {:ok, String.t} | {:error, String.t}
-  def document_by_key(db_props, auth, view_key) when is_map(auth) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.View.document_by_key/3 is deprecated, please use document_by_key/2 instead\n"
-    document_by_key(Map.merge(db_props, auth), view_key)
-  end
-
   # TODO as with the new api, this method can be used authenticated and unauthenticated
   def unauthenticated_document_by_key(db_props, view_key, stale) do
     db_props

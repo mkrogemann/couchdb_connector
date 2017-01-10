@@ -56,6 +56,28 @@ defmodule Couchdb.Connector.ViewTest do
     assert result, "document not found in view after #{@retries} tries"
   end
 
+  test "document_by_key/3: ensure that view returns document for given integer key" do
+    TestPrep.ensure_document "{\"name\": 1234}", "int_test_id"
+    result = retry(@retries,
+      fn(_) ->
+        View.document_by_key TestConfig.database_properties, TestConfig.test_view_key(1234), :update_after
+      end,
+      fn(response) ->
+        case response do
+          {:ok, body} ->
+            doc = Poison.decode! body
+            rows = doc["rows"]
+            case length(rows) do
+              0 -> false
+              _ -> hd(rows)["id"] == "int_test_id"
+            end
+          _ -> false
+        end
+      end
+    )
+    assert result, "document not found in view after #{@retries} tries"
+  end
+
   test "document_by_key/3: ensure that view returns empty list of rows for missing key" do
     key = "missing"
     result = retry(@retries,

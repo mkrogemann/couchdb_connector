@@ -88,31 +88,4 @@ defmodule Couchdb.ConnectorViewTest do
   test "document_by_key/3: ensure that function exists. document may or may not be found" do
     Connector.document_by_key(TestConfig.database_properties, TestConfig.test_view_key, :ok)
   end
-
-  test "document_by_key/4: ensure that view returns document for given key" do
-    TestPrep.secure_database
-    result = retry(@retries,
-      fn(_) ->
-        Connector.document_by_key(
-          TestConfig.database_properties, TestConfig.test_user, TestConfig.test_view_key, :update_after
-        )
-      end,
-      fn(response) ->
-        case response do
-          {:ok, doc_map} ->
-            rows = doc_map["rows"]
-            case length(rows) do
-              0 -> false
-              _ -> hd(rows)["id"] == "test_id"
-            end
-          _ -> false
-        end
-      end
-    )
-    assert result, "document not found in view after #{@retries} tries"
-  end
-
-  test "document_by_key/4: ensure that function exists. document may or may not be found" do
-    Connector.document_by_key TestConfig.database_properties, TestConfig.test_user, TestConfig.test_view_key, :ok
-  end
 end

@@ -170,12 +170,12 @@ defmodule Couchdb.ConnectorTest do
     TestPrep.secure_database
     update = %{"_rev" => "some_revision", "key" => "new value"}
     assert_raise RuntimeError, fn ->
-      Connector.update(TestConfig.database_properties, TestConfig.test_user, update)
+      Connector.update(Map.merge(TestConfig.database_properties, TestConfig.test_user), update)
     end
   end
 
   # destroy with auth
-  test "destroy/4: ensure that a document with given id can be deleted" do
+  test "destroy/3: ensure that a document with given id can be deleted with authentication" do
     TestPrep.secure_database
     {:ok, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
       Connector.create(Map.merge(TestConfig.database_properties, TestConfig.test_user), %{"key" => "value"}, "42")
@@ -189,7 +189,7 @@ defmodule Couchdb.ConnectorTest do
       Connector.get(Map.merge(TestConfig.database_properties, TestConfig.test_user), "42")
   end
 
-  test "destroy/4: attempting to delete a non-existing document triggers an error" do
+  test "destroy/3: attempting to delete a non-existing document triggers an error with authentication" do
     TestPrep.secure_database
     {:error, %{:headers => _headers, :payload => payload}} = retry_on_error(fn() ->
       Connector.destroy(Map.merge(TestConfig.database_properties, TestConfig.test_user), "42", "any_rev")

@@ -122,7 +122,7 @@ defmodule Couchdb.Connector do
   @spec document_by_key(Types.db_properties, Types.view_key, :update_after)
     :: {:ok, map} | {:error, map}
   def document_by_key(db_props, view_key, :update_after),
-    do: View.unauthenticated_document_by_key(db_props, view_key, :update_after) |> as_map
+    do: View.do_document_by_key(db_props, view_key, :update_after) |> as_map
 
   @doc """
   Find and return one document with given key in given view. Will return a
@@ -133,5 +133,5 @@ defmodule Couchdb.Connector do
   @spec document_by_key(Types.db_properties, Types.view_key, :ok)
     :: {:ok, map} | {:error, map}
   def document_by_key(db_props, view_key, :ok),
-    do: View.unauthenticated_document_by_key(db_props, view_key, :ok) |> as_map
+    do: View.do_document_by_key(db_props, view_key, :ok) |> as_map
 end

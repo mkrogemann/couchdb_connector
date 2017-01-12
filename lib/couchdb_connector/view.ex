@@ -62,7 +62,7 @@ defmodule Couchdb.Connector.View do
   @spec document_by_key(Types.db_properties, Types.view_key, :update_after)
     :: {:ok, String.t} | {:error, String.t}
   def document_by_key(db_props, view_key, :update_after),
-    do: unauthenticated_document_by_key(db_props, view_key, :update_after)
+    do: do_document_by_key(db_props, view_key, :update_after)
 
   @doc """
   Find and return one document with given key in given view. Will return a
@@ -73,10 +73,17 @@ defmodule Couchdb.Connector.View do
   @spec document_by_key(Types.db_properties, Types.view_key, :ok)
     :: {:ok, String.t} | {:error, String.t}
   def document_by_key(db_props, view_key, :ok),
-    do: unauthenticated_document_by_key(db_props, view_key, :ok)
+    do: do_document_by_key(db_props, view_key, :ok)
 
-  # TODO as with the new api, this method can be used authenticated and unauthenticated
-  def unauthenticated_document_by_key(db_props, view_key, stale) do
+  @doc """
+  Find and return one document with given key in given view, using the given
+  staleness setting.
+  Will return a JSON document with an empty list of documents if no document
+  with given key exists.
+  """
+  @spec do_document_by_key(Types.db_properties, Types.view_key, :ok | :update_after)
+    :: {:ok, String.t} | {:error, String.t}
+  def do_document_by_key(db_props, view_key, stale) do
     db_props
     |> UrlHelper.view_url(view_key[:design], view_key[:view])
     |> UrlHelper.query_path(view_key[:key], stale)

@@ -43,12 +43,6 @@ defmodule Couchdb.Connector.View do
     |> Handler.handle_put
   end
 
-  # TODO: evaluate if this method actually needs to be public, otherwise delete
-  def authenticated_document_by_key(db_props, auth, view_key, stale) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.View.authenticated_document_by_key/4 is deprecated, please use unauthenticated_document_by_key/3 instead\n"
-    unauthenticated_document_by_key(Map.merge(db_props, auth), view_key, stale)
-  end
-
   @doc """
   Find and return one document with given key in given view. Will return a
   JSON document with an empty list of documents if no document with given

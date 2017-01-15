@@ -27,5 +27,5 @@ defmodule Couchdb.Connector.Types do
   Design name, view name and lookup key are often used together in view
   queries so it makes sense to wrap them in a type.
   """
-  @type view_key :: %{design: String.t, view: String.t, key: String.t}
+  @type view_key :: %{design: String.t, view: String.t, key: any}
 end

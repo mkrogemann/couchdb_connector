@@ -1,3 +1,9 @@
+Version 0.5.0 - released 2017-01-15
+-------------
+
+- Remove deprecated functions using individual authentication params.
+- Bugfix: Add special handling for integer keys to views to fix #40
+
 Version 0.4.4 - released 2017-01-08
 -------------
 

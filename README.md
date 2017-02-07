@@ -370,3 +370,5 @@ Love to hear from you. Meanwhile, here are some things I'd like to tackle next:
 - enhance view handling and query capabilities
 - cookie auth, oauth auth
 - attachment support
+- improve documentation
+- complete function specs

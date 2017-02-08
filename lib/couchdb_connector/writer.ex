@@ -135,14 +135,11 @@ defmodule Couchdb.Connector.Writer do
     end
   end
 
-  # MFK
-  # has_attachment?
   @spec update_attachment(Types.db_properties, Types.basic_auth, String.t, 
                           String.t, String.t, String.t)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update_attachment(db_props, auth, json, id, att_name, rev) 
     when is_map(auth) do
-    #TODO write code
     {doc_map, id} = parse_and_extract_id(json)
     case id do
       {:ok, id} ->
@@ -171,7 +168,7 @@ defmodule Couchdb.Connector.Writer do
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update_attachment(db_props, json, id, att_name, rev) do
     db_props
-    |> UrlHelper.attachment_url(id, att_name, rev)
+    |> UrlHelper.attachment_insert_url(id, att_name, rev)
     |> do_update_attachment(json)
   end
 
@@ -208,7 +205,7 @@ defmodule Couchdb.Connector.Writer do
     case id do
       {:ok, id} ->
         db_props
-        |> UrlHelper.attachment_url(id, att_name, rev)
+        |> UrlHelper.attachment_insert_url(id, att_name, rev)
         |> do_update_attachment(Poison.encode!(doc_map))
       :error ->
         raise RuntimeError, message:
@@ -237,7 +234,7 @@ defmodule Couchdb.Connector.Writer do
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update_attachment(db_props, auth, json, id, att_name, rev) do
     db_props
-    |> UrlHelper.attachment_url(auth, id, att_name, rev)
+    |> UrlHelper.attachment_insert_url(auth, id, att_name, rev)
     |> do_update(json)
   end
 
@@ -247,7 +244,6 @@ defmodule Couchdb.Connector.Writer do
     |> Handler.handle_put(:include_headers)
   end
 
-  #MFK
   defp do_update_attachment(url, json) do
     do_update(url, json)
   end

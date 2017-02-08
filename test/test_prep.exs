@@ -30,6 +30,44 @@ defmodule Couchdb.Connector.TestPrep do
     end)
   end
 
+  # TODO: rev .... I will have to capture the revision from
+  #            the authors work. This is because attachments 
+  #            are first attached to a paarticular revision of
+  #            a document then they continue to follow new revisions. So we
+  #            want the latest (test) revision to attach too.
+  #
+  #            Note: we are using the query string form of attachments
+  #            you can also use the IF-Match header (see
+  #            http://docs.couchdb.org/en/2.0.0/api/document/attachments.html
+  def ensure_test_attachment(doc_id, rev) do
+    {:ok, _} = TestSupport.retry_on_error(fn() -> 
+      image_loc = Application.get_env(:couchdb_connector, :attachment)
+      att = test_att_name(image_loc)
+      headers = ["Content-Type": "image/png"]
+      att_url = "#{TestConfig.database_url}/#{doc_id}/#{att}?rev=#{rev}"
+      HTTPoison.put(att_url, {:file, image_loc}, 
+                     [{"Content-Type", "image/png"}])
+    end)
+  end
+
+  def delete_test_attachment(doc_id, rev) do
+    {:ok, _} = TestSupport.retry_on_error(fn() -> 
+      image_loc = Application.get_env(:couchdb_connector, :attachment)
+      att = test_att_name(image_loc)
+      att_url = "#{TestConfig.database_url}/#{doc_id}/#{att}?rev=#{rev}"
+      HTTPoison.delete(att_url, {:file, image_loc}) 
+    end)
+  end
+
+  # given the location of the image on the disk, extract the image name
+  # and use that as our att name.
+  defp test_att_name(image_loc) do
+    image_loc 
+    |> String.reverse
+    |> String.split("/")
+    |> hd
+  end
+
   # TODO: duplicate functions
   defp test_admin do
     %{user: "anna", password: "secret"}

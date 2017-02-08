@@ -1,0 +1,46 @@
+MFK:  We need to make some changes to test the new attachment handling.
+
+X # make sure we have attachments in the resources file to use.
+X test_prep: ensure_test_attachment
+
+X  # BEGIN URL TESTS
+X  url_helper_test: attachment_insert_url/4  (success test no auth)
+X  url_helper_test: attachment_fetch_url/3   (success test no auth)
+X  # END BEGIN URL TESTS
+
+#BEGIN READ TESTS
+# reads are in couchdb_connector/reader_test.exs
+
+# has_attachment
+reader_test: has_attachment?/2  (failure test no auth)
+reader_test: has_attachment?/2  (success test no auth)
+reader_test: has_attachment?/3  (failure test with auth)
+reader_test: has_attachment?/3  (success test with auth)
+
+# get_attachment
+reader_test: get_attachment/3   (failure test no auth)
+reader_test: get_attachment/3   (success test no auth)
+reader_test: get_attachment/4   (failure test with auth)
+reader_test: get_attachment/4   (success test with auth)
+
+# END READ TESTS
+
+
+
+# BEGIN WRITE TESTS
+writer_test:  update_attachment(db_props, auth, json, id, att_name, rev)/6
+             (fail test with auth)
+writer_test:  update_attachment(db_props, auth, json, id, att_name, rev)/6 
+             (success test with auth)
+
+writer_test: update_attachment(db_props, json, id, att_name, rev)/5 
+             (fail test no auth)
+writer_test: update_attachment(db_props, json, id, att_name, rev)/5 
+             (success test no auth)
+
+writer_test: update_attachment(db_props, json, att_name, rev)/4 
+            (failure test no auth, _id from json)
+writer_test: update_attachment(db_props, json, att_name, rev)/4 
+            (success test no auth, _id from json)
+
+# END BEGIN WRITE TESTS

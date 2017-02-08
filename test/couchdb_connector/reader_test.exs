@@ -6,9 +6,11 @@ defmodule Couchdb.Connector.ReaderTest do
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
 
+  # MFK see NOTES file
   setup context do
     TestPrep.ensure_database
     TestPrep.ensure_document "{\"test_key\": \"test_value\"}", "foo"
+    #TODO: WE NEED A "TestPrep.ensure_attachment" function.
     on_exit context, fn ->
       TestPrep.delete_database
     end

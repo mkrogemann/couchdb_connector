@@ -36,18 +36,6 @@ defmodule Couchdb.Connector.Reader do
   end
   
   @doc """
-  Retrieve the document attachment given by database properties, id, 
-  and attachment_name using no authentication.
-  """
-  @spec get_attachment(Types.db_properties, String.t, String.t) 
-  :: {:ok, String.t} | {:error, String.t}
-  def get_attachment(db_props, id, attachment_name) do
-    db_props
-    |> UrlHelper.attachment_fetch_url(id)
-    |> do_attachment_get
-  end
-  
-  @doc """
   Retrieve the document given by database properties and id, using the given
   basic auth credentials for authentication.
   """
@@ -59,23 +47,41 @@ defmodule Couchdb.Connector.Reader do
   end
 
   @doc """
+  Retrieve the document attachment given by database properties, id, 
+  and attachment_name using no authentication.
+  """
+  @spec get_attachment(Types.db_properties, String.t, String.t, String.t)
+  :: {:ok, String.t} | {:error, String.t}
+  def get_attachment(db_props, id, attachment, rev) do
+    db_props
+    |> UrlHelper.attachment_url(id, attachment, rev)
+    |> do_attachment_get
+  end
+  
+  @doc """
   Retrieve the attachment given by database properties, id, and attachment
   name using the given basic auth credentials for authentication.
   """
   @spec get_attachment(Types.db_properties, Types.basic_auth, String.t, 
-                       String.t) :: {:ok, String.t} | {:error, String.t}
-  def get_attachment(db_props, basic_auth, id, att) do
+                  String.t, String.t) :: {:ok, String.t} | {:error, String.t}
+  def get_attachment(db_props, basic_auth, id, att, rev) do
     db_props
-    |> UrlHelper.attachment_fetch_url(basic_auth, id, att)
+    |> UrlHelper.attachment_url(basic_auth, id, att, rev)
     |> do_attachment_get
   end
 
-  # MFK
-  @spec  has_attachment?(Types.db_properties, String.t) 
-  :: :ok | {:error, String.t}
-  def has_attachment?(db_props, id) do
-    # TODO MFK write the code
-    {:error, "function not implemented"}
+  @doc """
+  Return true if the given document (id/rev) has the attachment name passed;
+  otherwise, false is returned.
+  """
+  @spec  has_attachment?(Types.db_properties, String.t, String.t, String.t) 
+  :: true | false
+  def has_attachment?(db_props, id, attachment, rev) do
+    {status, _body, _headers} = 
+      db_props
+      |> UrlHelper.attachment_url(id, attachment, rev)
+      |> do_attachment_get
+    status == :ok
   end
 
   @doc """

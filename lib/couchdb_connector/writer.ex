@@ -144,7 +144,7 @@ defmodule Couchdb.Connector.Writer do
     case id do
       {:ok, id} ->
         db_props
-        |> UrlHelper.document_url(auth, id, att_name, rev)
+        |> UrlHelper.attachment_url(auth, id, att_name, rev)
         |> do_update_attachment(Poison.encode!(doc_map))
       :error ->
         raise RuntimeError, message:
@@ -168,7 +168,7 @@ defmodule Couchdb.Connector.Writer do
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update_attachment(db_props, json, id, att_name, rev) do
     db_props
-    |> UrlHelper.attachment_insert_url(id, att_name, rev)
+    |> UrlHelper.attachment_url(id, att_name, rev)
     |> do_update_attachment(json)
   end
 
@@ -205,7 +205,7 @@ defmodule Couchdb.Connector.Writer do
     case id do
       {:ok, id} ->
         db_props
-        |> UrlHelper.attachment_insert_url(id, att_name, rev)
+        |> UrlHelper.attachment_url(id, att_name, rev)
         |> do_update_attachment(Poison.encode!(doc_map))
       :error ->
         raise RuntimeError, message:
@@ -234,7 +234,7 @@ defmodule Couchdb.Connector.Writer do
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
   def update_attachment(db_props, auth, json, id, att_name, rev) do
     db_props
-    |> UrlHelper.attachment_insert_url(auth, id, att_name, rev)
+    |> UrlHelper.attachment_url(auth, id, att_name, rev)
     |> do_update(json)
   end
 
@@ -281,7 +281,21 @@ defmodule Couchdb.Connector.Writer do
     |> do_destroy(rev)
   end
 
+
+  @spec destroy_attachment(Types.db_properties, String.t, String.t, String.t)
+  :: {:ok, String.t} | {:error, String.t}
+  def destroy_attachment(db_props, id, attachment, rev) do
+    db_props
+    |> UrlHelper.attachment_url(id, attachment, rev)
+    |> do_destroy_url
+  end
+
   defp do_destroy(url, rev) do
     Handler.handle_delete(HTTPoison.delete!(url <> "?rev=#{rev}"))
   end
+
+  defp do_destroy_url(url) do
+    Handler.handle_delete(HTTPoison.delete!(url))
+  end
+
 end

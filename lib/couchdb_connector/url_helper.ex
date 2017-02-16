@@ -61,20 +61,10 @@ defmodule Couchdb.Connector.UrlHelper do
   Produces a url to insert a specific attachment in the database 
   using no authentication. See attachment_url/5 for more information.
   """
-  @spec attachment_insert_url(Types.db_properties, String.t, String.t, String.t)
+  @spec attachment_url(Types.db_properties, String.t, String.t, String.t)
   :: String.t
-  def attachment_insert_url(db_props, id, att_name, rev) do
+  def attachment_url(db_props, id, att_name, rev) do
     "#{document_url(db_props, id)}/#{att_name}?rev=#{rev}"
-  end
-
-  @doc """
-  Produces a url to fetch a specific attachment in the database 
-  using no authentication. See attachment_url/5 for more information.
-  """
-  @spec attachment_fetch_url(Types.db_properties, String.t, String.t, String.t)
-  :: String.t
-  def attachment_fetch_url(db_props, id, att_name, rev) do
-    "#{document_url(db_props, id)}/#{att_name}"
   end
 
   @doc """
@@ -83,24 +73,10 @@ defmodule Couchdb.Connector.UrlHelper do
   Attachments inserted in CouchDB apply to a specific revision of a document.  
   Note that the attachment name is local to the code and not on the server.
   """
-  @spec attachment_insert_url(Types.db_properties, Types.basic_auth, String.t, 
+  @spec attachment_url(Types.db_properties, Types.basic_auth, String.t, 
                        String.t, String.t) :: String.t
-  def attachment_insert_url(db_props, auth, id, att_name, rev) do
+  def attachment_url(db_props, auth, id, att_name, rev) do
     "#{document_url(db_props, auth, id)}/#{att_name}?rev=#{rev}"
-  end
-
-  # MFK
-  @doc """
-  Produces the URL to retrieve a specific attachment of a 
-  document contained in given database, making use of basic authentication. 
-  Attachments inserted in CouchDB apply to a specific revision of a document.  
-  Note that the attachment name is local to the code and not on the server.
-  However, the revision of the document is not needed for retrieval.
-  """
-  @spec attachment_fetch_url(Types.db_properties, Types.basic_auth, String.t, 
-                       String.t) :: String.t
-  def attachment_fetch_url(db_props, auth, id, att_name) do
-    "#{document_url(db_props, auth, id)}/#{att_name}"
   end
 
   @doc """

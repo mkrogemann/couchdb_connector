@@ -54,14 +54,6 @@ defmodule Couchdb.Connector.WriterTest do
     assert String.length(body_map["id"]) == 32
   end
 
-  test "create/2: ensure that a new document gets created with a fetched id for deprecated API" do
-    {:ok, body, _headers} = retry_on_error(
-      fn() -> Writer.create(TestConfig.database_properties, "{\"key\": \"value\"}") end)
-    {:ok, body_map} = Poison.decode body
-    assert String.starts_with?(body_map["rev"], "1-")
-    assert String.length(body_map["id"]) == 32
-  end
-
   test "update/2: ensure that a document that contains an existing id can be updated" do
     {:ok, _body, headers} = retry_on_error(
       fn() -> Writer.create_generate(

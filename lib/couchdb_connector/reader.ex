@@ -25,8 +25,7 @@ defmodule Couchdb.Connector.Reader do
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
   @doc """
-  Retrieve the document given by database properties and id, using no
-  authentication.
+  Retrieve the document given by database properties and id.
   """
   @spec get(Types.db_properties, String.t) :: {:ok, String.t} | {:error, String.t}
   def get(db_props, id) do
@@ -86,6 +85,7 @@ defmodule Couchdb.Connector.Reader do
 
   @doc """
   Fetch a single uuid from CouchDB for use in a a subsequent create operation.
+  This operation requires no authentication.
   """
   @spec fetch_uuid(Types.db_properties) :: {:ok, String.t} | {:error, String.t}
   def fetch_uuid(db_props) do

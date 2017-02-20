@@ -54,12 +54,14 @@ defmodule Couchdb.Connector.Admin do
   Create a new user with given username, password and roles. In case of success,
   the function will respond with {:ok, body, headers}. In case of failures (e.g.
   if user already exists), the response will be {:error, body, headers}.
+  Please note that the credentials used in db_properties must be the credentials
+  of an admin user.
   """
-  @spec create_user(Types.db_properties, Types.basic_auth, Types.basic_auth, Types.user_roles)
+  @spec create_user(Types.db_properties, Types.user_info, Types.user_roles)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create_user(db_props, admin_auth, user_auth, roles) do
+  def create_user(db_props, user_auth, roles) do
     db_props
-    |> UrlHelper.user_url(admin_auth, user_auth[:user])
+    |> UrlHelper.user_url(user_auth[:user])
     |> do_create_user(user_to_json(user_auth, roles))
     |> Handler.handle_put(:include_headers)
   end
@@ -80,12 +82,12 @@ defmodule Couchdb.Connector.Admin do
   the function will respond with an empty body. In case of failures (e.g.
   if admin already exists), the response will be {:error, body, headers}.
   """
-  @spec create_admin(Types.db_properties, Types.basic_auth)
+  @spec create_admin(Types.db_properties, Types.user_info)
     :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create_admin(db_props, admin_auth) do
+  def create_admin(db_props, admin_info) do
     db_props
-    |> UrlHelper.admin_url(admin_auth[:user])
-    |> do_create_admin(admin_auth[:password])
+    |> UrlHelper.admin_url(admin_info[:user])
+    |> do_create_admin(admin_info[:password])
     |> Handler.handle_put(:include_headers)
   end
 
@@ -97,11 +99,11 @@ defmodule Couchdb.Connector.Admin do
   Returns the public information for the given user or an error in case the
   user does not exist.
   """
-  @spec user_info(Types.db_properties, Types.basic_auth, String.t)
+  @spec user_info(Types.db_properties, String.t)
     :: {:ok, String.t} | {:error, String.t}
-  def user_info(db_props, admin_auth, username) do
+  def user_info(db_props, username) do
     db_props
-    |> UrlHelper.user_url(admin_auth, username)
+    |> UrlHelper.user_url(username)
     |> HTTPoison.get!
     |> Handler.handle_get
   end
@@ -110,11 +112,11 @@ defmodule Couchdb.Connector.Admin do
   Returns hashed information for the given admin or an error in case the admin
   does not exist or if the given credentials are wrong.
   """
-  @spec admin_info(Types.db_properties, Types.basic_auth)
+  @spec admin_info(Types.db_properties)
     :: {:ok, String.t} | {:error, String.t}
-  def admin_info db_props, admin_auth do
+  def admin_info db_props do
     db_props
-    |> UrlHelper.admin_url(admin_auth[:user], admin_auth[:password])
+    |> UrlHelper.admin_url(db_props[:user])
     |> HTTPoison.get!
     |> Handler.handle_get
   end
@@ -123,20 +125,20 @@ defmodule Couchdb.Connector.Admin do
   Deletes the given user from the database server or returns an error in case
   the user cannot be found. Requires admin basic auth credentials.
   """
-  @spec destroy_user(Types.db_properties, Types.basic_auth, String.t)
+  @spec destroy_user(Types.db_properties, String.t)
   :: {:ok, String.t} | {:error, String.t}
-  def destroy_user(db_props, admin_auth, username) do
-    case user_info(db_props, admin_auth, username) do
+  def destroy_user(db_props, username) do
+    case user_info(db_props, username) do
       {:ok, user_json} ->
         user = Poison.decode! user_json
-        do_destroy_user(db_props, admin_auth, username, user["_rev"])
+        do_destroy_user(db_props, username, user["_rev"])
       error -> error
     end
   end
 
-  defp do_destroy_user(db_props, admin_auth, username, rev) do
+  defp do_destroy_user(db_props, username, rev) do
     db_props
-    |> UrlHelper.user_url(admin_auth, username)
+    |> UrlHelper.user_url(username)
     |> do_http_delete(rev)
     |> Handler.handle_delete
   end
@@ -162,16 +164,17 @@ defmodule Couchdb.Connector.Admin do
     |> Handler.handle_delete
   end
 
+
   @doc """
   Set the security object for a given database. Security object includes admins
   and members for the database.
   """
   # TODO: add user roles
-  @spec set_security(Types.db_properties, Types.basic_auth, list(String.t), list(String.t))
+  @spec set_security(Types.db_properties, list(String.t), list(String.t))
     :: {:ok, String.t} | {:error, String.t}
-  def set_security(db_props, admin_auth, admins, members) do
+  def set_security(db_props, admins, members) do
     db_props
-    |> UrlHelper.security_url(admin_auth)
+    |> UrlHelper.security_url
     |> do_set_security(security_to_json(admins, members))
     |> Handler.handle_put
   end

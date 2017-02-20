@@ -30,12 +30,11 @@ The connector also offers functions to manage users and admins. These functions
 have been implemented to support testing of authentication and most users will
 probably manage users through different tools.
 
-Basic access authentication (basic auth) is currently the only supported
-authentication scheme.
+HTTP Basic access authentication (Basic auth) is currently the only supported authentication scheme.
 
 ## Supported platforms
 
-The current release of the connector has been tested successfully with Elixir release versions 1.2.6 and 1.3.4, using Erlang OTP in versions 18.2.1 and 19.2 as well as CouchDB version 1.6.1.
+The current release of the connector has been tested successfully with Elixir release versions 1.2.6, 1.3.4 and 1.4.0, using Erlang OTP in versions 18.2.1 and 19.2 as well as CouchDB version 1.6.1.
 
 ## Installation
 
@@ -45,7 +44,7 @@ The module is [available in Hex](https://hex.pm/packages/couchdb_connector), the
 
 ```Elixir
 def deps do
-  [{:couchdb_connector, "~> 0.4.3"}]
+  [{:couchdb_connector, "~> 0.5.0"}]
 end
 ```
 
@@ -64,6 +63,17 @@ For the subsequent steps, let's assume that we work in iex and that we define th
 ```Elixir
 db_props = %{protocol: "http", hostname: "localhost", database: "couchdb_connector_dev", port: 5984}
 ```
+
+### Authentication
+
+HTTP Basic authentication was first introduced in release version 0.3. Some versions and improvements later, the current best practice is to put the Basic auth credentials into the database properties like so:
+
+```Elixir
+db_props = %{protocol: "http", hostname: "localhost", database: "couchdb_connector_dev", port: 5984,
+user: "username", password: "secret"}
+```
+
+Support for this configuration feature has been introduced in release version 0.4.4. It relieves users from having to add the credentials to each authenticated function call. Authentication can now be dealt with once and in one place only.
 
 ### Create a database
 
@@ -254,8 +264,6 @@ The response would look similar to this:
      "rev" => "2-7b2f4edf07..."}}}
 ```
 
-Basic authentication is also supported for this update API.
-
 ### Delete a document
 
 In order to delete a document, you have to pass in its current revision, the same way that you saw above for the update calls.
@@ -271,8 +279,6 @@ You should see a response like this:
 ```Elixir
 "{\"ok\":true,\"id\":\"42\",\"rev\":\"2-9b2e3bcc3752a3...\"}\n"
 ```
-
-Note that there is a second clause that taks in basic authentication information to allow authentication against a secured database.
 
 ### Delete a document — Response wrapped in a Map
 
@@ -364,3 +370,5 @@ Love to hear from you. Meanwhile, here are some things I'd like to tackle next:
 - enhance view handling and query capabilities
 - cookie auth, oauth auth
 - attachment support
+- improve documentation
+- complete function specs

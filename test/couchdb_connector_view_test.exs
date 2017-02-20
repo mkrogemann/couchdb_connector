@@ -7,7 +7,6 @@ defmodule Couchdb.ConnectorViewTest do
   alias Couchdb.Connector
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -23,7 +22,7 @@ defmodule Couchdb.ConnectorViewTest do
   test "document_by_key/3: ensure that view returns document for given key" do
     result = retry(@retries,
       fn(_) ->
-        Connector.document_by_key(TestConfig.database_properties, TestSupport.test_view_key, :update_after)
+        Connector.document_by_key(TestConfig.database_properties, TestConfig.test_view_key, :update_after)
       end,
       fn(response) ->
         case response do
@@ -44,7 +43,7 @@ defmodule Couchdb.ConnectorViewTest do
     key = "missing"
     result = retry(@retries,
       fn(_) ->
-        Connector.document_by_key(TestConfig.database_properties, TestSupport.test_view_key(key), :update_after)
+        Connector.document_by_key(TestConfig.database_properties, TestConfig.test_view_key(key), :update_after)
       end,
       fn(response) ->
         case response do
@@ -71,11 +70,11 @@ defmodule Couchdb.ConnectorViewTest do
     assert first["value"]["name"] == "test_name"
   end
 
-  test "fetch_all/4: ensure that view works as expected with authentication" do
+  test "fetch_all/3: ensure that view works as expected with authentication" do
     TestPrep.secure_database()
     {:ok, result_map} = retry_on_error(
       fn() ->
-        Connector.fetch_all(TestConfig.database_properties, TestSupport.test_user, "test_view", "test_fetch")
+        Connector.fetch_all(Map.merge(TestConfig.database_properties, TestConfig.test_user), "test_view", "test_fetch")
       end)
     assert result_map["total_rows"] == 1
     [first|_] = result_map["rows"]
@@ -83,37 +82,10 @@ defmodule Couchdb.ConnectorViewTest do
   end
 
   test "document_by_key/2: ensure that function exists. document may or may not be found" do
-    Connector.document_by_key(TestConfig.database_properties, TestSupport.test_view_key)
+    Connector.document_by_key(TestConfig.database_properties, TestConfig.test_view_key)
   end
 
   test "document_by_key/3: ensure that function exists. document may or may not be found" do
-    Connector.document_by_key(TestConfig.database_properties, TestSupport.test_view_key, :ok)
-  end
-
-  test "document_by_key/4: ensure that view returns document for given key" do
-    TestPrep.secure_database
-    result = retry(@retries,
-      fn(_) ->
-        Connector.document_by_key(
-          TestConfig.database_properties, TestSupport.test_user, TestSupport.test_view_key, :update_after
-        )
-      end,
-      fn(response) ->
-        case response do
-          {:ok, doc_map} ->
-            rows = doc_map["rows"]
-            case length(rows) do
-              0 -> false
-              _ -> hd(rows)["id"] == "test_id"
-            end
-          _ -> false
-        end
-      end
-    )
-    assert result, "document not found in view after #{@retries} tries"
-  end
-
-  test "document_by_key/4: ensure that function exists. document may or may not be found" do
-    Connector.document_by_key TestConfig.database_properties, TestSupport.test_user, TestSupport.test_view_key, :ok
+    Connector.document_by_key(TestConfig.database_properties, TestConfig.test_view_key, :ok)
   end
 end

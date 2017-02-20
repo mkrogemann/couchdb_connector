@@ -1,3 +1,15 @@
+Version 0.5.0 - released 2017-01-15
+-------------
+
+- Remove deprecated functions using individual authentication params.
+- Bugfix: Add special handling for integer keys to views to fix #40
+
+Version 0.4.4 - released 2017-01-08
+-------------
+
+- Improved authentication handling: You can now add basic auth credentials to db properties, eliminating need to authenticate each function call. Thanks to @leifg
+- This change makes a number of authenticated functions redundant. These functions have been deprecated and will be removed in release version 0.5
+
 Version 0.4.3 - released 2016-12-21
 -------------
 

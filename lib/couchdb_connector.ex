@@ -16,23 +16,12 @@ defmodule Couchdb.Connector do
 
   @doc """
   Retrieve the document given by database properties and id, returning it
-  as a Map, using no authentication.
+  as a Map.
   """
   @spec get(Types.db_properties, String.t) :: {:ok, map} | {:error, map}
   def get(db_props, id) do
     db_props
     |> Reader.get(id)
-    |> as_map
-  end
-
-  @doc """
-  Retrieve the document given by database properties and id, returning it
-  as a Map, using the given basic auth credentials for authentication.
-  """
-  @spec get(Types.db_properties, Types.basic_auth, String.t) :: {:ok, map} | {:error, map}
-  def get(db_props, basic_auth, id) do
-    db_props
-    |> Reader.get(basic_auth, id)
     |> as_map
   end
 
@@ -49,11 +38,10 @@ defmodule Couchdb.Connector do
   end
 
   @doc """
-  Create a new document from given map with given id, using no authentication.
+  Create a new document from given map with given id.
   Clients must make sure that the id has not been used for an existing document
   in CouchDB.
-  Either provide a UUID or consider using create_generate in case uniqueness cannot
-  be guaranteed.
+  Either provide a UUID or consider using create_generate in case uniqueness cannot be guaranteed.
   """
   @spec create(Types.db_properties, map, String.t) :: {:ok, map} | {:error, map}
   def create(db_props, doc_map, id) do
@@ -70,8 +58,7 @@ defmodule Couchdb.Connector do
   end
 
   @doc """
-  Create a new document from given map with a CouchDB generated id, using no
-  authentication.
+  Create a new document from given map with a CouchDB generated id.
   Fetching the uuid from CouchDB does of course incur a performance penalty as
   compared to providing one.
   """
@@ -84,7 +71,7 @@ defmodule Couchdb.Connector do
 
   @doc """
   Update the given document, provided it contains an id field. Raise an error
-  if it does not. Does not use any authentication.
+  if it does not.
   """
   @spec update(Types.db_properties, map) :: {:ok, map} | {:error, map}
   def update(db_props, doc_map) do
@@ -98,52 +85,7 @@ defmodule Couchdb.Connector do
   end
 
   @doc """
-  Create a new document from given map with given id, using the provided basic
-  authentication parameters.
-  Clients must make sure that the id has not been used for an existing document
-  in CouchDB.
-  Either provide a UUID or consider using create_generate in case uniqueness cannot
-  be guaranteed.
-  """
-  @spec create(Types.db_properties, Types.basic_auth, map, String.t) :: {:ok, map} | {:error,  map}
-  def create(db_props, auth, doc_map, id) do
-    response = Writer.create(db_props, auth, as_json(doc_map), id)
-    response |> handle_write_response
-  end
-
-  @doc """
-  Create a new document from given map with a CouchDB generated id, using the
-  provided basic authentication parameters.
-  Fetching the uuid from CouchDB does of course incur a performance penalty as
-  compared to providing one.
-  """
-  @spec create_generate(Types.db_properties, Types.basic_auth, map) :: {:ok, map} | {:error, map}
-  def create_generate(db_props, auth, doc_map) do
-    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
-    uuid = hd(Poison.decode!(uuid_json)["uuids"])
-    create(db_props, auth, doc_map, uuid)
-  end
-
-  @doc """
-  Update the given document, provided it contains an id field. Raise an error
-  if it does not. Makes use of the provided basic authentication parameters.
-  """
-  @spec update(Types.db_properties, Types.basic_auth, map)
-    :: {:ok, map} | {:error, map}
-  def update(db_props, auth, doc_map) do
-    case Map.fetch(doc_map, "_id") do
-      {:ok, id} ->
-        response = Writer.update(db_props, auth, as_json(doc_map), id)
-        response |> handle_write_response
-      :error ->
-        raise RuntimeError, message:
-          "the document to be updated must contain an \"_id\" field"
-    end
-  end
-
-  @doc """
-  Delete the document with the given id in the given revision, using no
-  authentication.
+  Delete the document with the given id in the given revision.
   An error will be returned in case the document does not exist or the
   revision is wrong.
   """
@@ -154,33 +96,11 @@ defmodule Couchdb.Connector do
   end
 
   @doc """
-  Delete the document with the given id in the given revision, using basic
-  authentication.
-  An error will be returned in case the document does not exist or the
-  revision is wrong.
-  """
-  @spec destroy(Types.db_properties, Types.basic_auth, String.t, String.t)
-    :: {:ok, map} | {:error, map}
-  def destroy(db_props, auth, id, rev) do
-    Writer.destroy(db_props, auth, id, rev) |> handle_write_response
-  end
-
-  @doc """
-  Returns everything found for the given view in the given design document,
-  using no authentication.
+  Returns everything found for the given view in the given design document.
   """
   @spec fetch_all(Types.db_properties, String.t, String.t) :: {:ok, map} | {:error, map}
   def fetch_all(db_props, design, view) do
     View.fetch_all(db_props, design, view) |> as_map
-  end
-
-  @doc """
-  Returns everything found for the given view in the given design document,
-  using basic authentication.
-  """
-  @spec fetch_all(Types.db_properties, Types.basic_auth, String.t, String.t) :: {:ok, map} | {:error, map}
-  def fetch_all(db_props, auth, design, view) do
-    View.fetch_all(db_props, auth, design, view) |> as_map
   end
 
   @doc """
@@ -202,7 +122,7 @@ defmodule Couchdb.Connector do
   @spec document_by_key(Types.db_properties, Types.view_key, :update_after)
     :: {:ok, map} | {:error, map}
   def document_by_key(db_props, view_key, :update_after),
-    do: View.unauthenticated_document_by_key(db_props, view_key, :update_after) |> as_map
+    do: View.do_document_by_key(db_props, view_key, :update_after) |> as_map
 
   @doc """
   Find and return one document with given key in given view. Will return a
@@ -213,31 +133,5 @@ defmodule Couchdb.Connector do
   @spec document_by_key(Types.db_properties, Types.view_key, :ok)
     :: {:ok, map} | {:error, map}
   def document_by_key(db_props, view_key, :ok),
-    do: View.unauthenticated_document_by_key(db_props, view_key, :ok) |> as_map
-
-  @doc """
-  Find and return one document with given key in given view, using basic
-  authentication.
-  Will return a Map with an empty list of documents if no document
-  with given key exists.
-  Staleness is set to 'update_after' which will perform worse than 'ok' but
-  deliver more up-to-date results.
-  """
-  @spec document_by_key(Types.db_properties, Types.basic_auth, Types.view_key,
-                        :update_after) :: {:ok, map} | {:error, map}
-  def document_by_key(db_props, auth, view_key, :update_after), do:
-    View.authenticated_document_by_key(db_props, auth, view_key, :update_after) |> as_map
-
-  @doc """
-  Find and return one document with given key in given view, using basic
-  authentication.
-  Will return a Map with an empty list of documents if no document
-  with given key exists.
-  Staleness is set to 'ok' which will perform better than 'update_after' but
-  potentially deliver stale results.
-  """
-  @spec document_by_key(Types.db_properties, Types.basic_auth, Types.view_key, :ok)
-  :: {:ok, map} | {:error, map}
-  def document_by_key(db_props, auth, view_key, :ok), do:
-    View.authenticated_document_by_key(db_props, auth, view_key, :ok) |> as_map
+    do: View.do_document_by_key(db_props, view_key, :ok) |> as_map
 end

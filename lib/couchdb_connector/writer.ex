@@ -27,25 +27,8 @@ defmodule Couchdb.Connector.Writer do
   alias Couchdb.Connector.UrlHelper
   alias Couchdb.Connector.ResponseHandler, as: Handler
 
-
   @doc """
-  Create a new document with given json and given id, using the provided basic
-  authentication parameters.
-  Clients must make sure that the id has not been used for an existing document
-  in CouchDB.
-  Either provide a UUID or consider using create_generate in case uniqueness cannot
-  be guaranteed.
-  """
-  @spec create(Types.db_properties, Types.basic_auth, String.t, String.t)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create(db_props, auth, json, id) do
-    db_props
-    |> UrlHelper.document_url(auth, id)
-    |> do_create(json)
-  end
-
-  @doc """
-  Create a new document with given json and given id, using no authentication.
+  Create a new document with given json and given id.
   Clients must make sure that the id has not been used for an existing document
   in CouchDB.
   Either provide a UUID or consider using create_generate in case uniqueness cannot
@@ -60,22 +43,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Create a new document with given json and a CouchDB generated id, using basic
-  authentication.
-  Fetching the uuid from CouchDB does of course incur a performance penalty as
-  compared to providing one.
-  """
-  @spec create_generate(Types.db_properties, Types.basic_auth, String.t)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create_generate(db_props, auth, json) do
-    {:ok, uuid_json} = Reader.fetch_uuid(db_props)
-    uuid = hd(Poison.decode!(uuid_json)["uuids"])
-    create(db_props, auth, json, uuid)
-  end
-
-  @doc """
-  Create a new document with given json and a CouchDB generated id, using no
-  authentication.
+  Create a new document with given json and a CouchDB generated id.
   Fetching the uuid from CouchDB does of course incur a performance penalty as
   compared to providing one.
   """
@@ -85,17 +53,6 @@ defmodule Couchdb.Connector.Writer do
     {:ok, uuid_json} = Reader.fetch_uuid(db_props)
     uuid = hd(Poison.decode!(uuid_json)["uuids"])
     create(db_props, json, uuid)
-  end
-
-  @doc """
-  This function has been deprecated in version 0.3.0 and will be removed in a
-  future release.
-  """
-  @spec create(Types.db_properties, String.t)
-    :: {:ok, String.t, Types.headers} | {:error, String.t, Types.headers}
-  def create(db_props, json) do
-    IO.write :stderr, "\nwarning: Couchdb.Connector.Write.create/2 is deprecated, please use create_generate/2 instead\n"
-    create_generate(db_props, json)
   end
 
   defp do_create(url, json) do
@@ -173,7 +130,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Update the given document, using no authentication.
+  Update the given document.
   Note that an _id field must be contained in the document.
   A missing _id field will trigger a RuntimeError.
   """
@@ -254,22 +211,7 @@ defmodule Couchdb.Connector.Writer do
   end
 
   @doc """
-  Delete the document with the given id in the given revision, using basic
-  authentication.
-  An error will be returned in case the document does not exist or the
-  revision is wrong.
-  """
-  @spec destroy(Types.db_properties, Types.basic_auth, String.t, String.t)
-    :: {:ok, String.t} | {:error, String.t}
-  def destroy(db_props, auth, id, rev) do
-    db_props
-    |> UrlHelper.document_url(auth, id)
-    |> do_destroy(rev)
-  end
-
-  @doc """
-  Delete the document with the given id in the given revision, using no
-  authentication.
+  Delete the document with the given id in the given revision.
   An error will be returned in case the document does not exist or the
   revision is wrong.
   """

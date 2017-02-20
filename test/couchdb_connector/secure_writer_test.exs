@@ -6,7 +6,6 @@ defmodule Couchdb.Connector.SecureWriterTest do
   alias Couchdb.Connector.Reader
   alias Couchdb.Connector.TestConfig
   alias Couchdb.Connector.TestPrep
-  alias Couchdb.Connector.TestSupport
 
   setup context do
     TestPrep.ensure_database
@@ -23,7 +22,7 @@ defmodule Couchdb.Connector.SecureWriterTest do
     TestPrep.secure_database
     {:ok, body, headers} = retry_on_error(
       fn() -> Writer.create(
-        TestConfig.database_properties, TestSupport.test_user, "{\"key\": \"value\"}", "42")
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), "{\"key\": \"value\"}", "42")
       end)
     {:ok, body_map} = Poison.decode body
     assert body_map["id"] == "42"
@@ -34,7 +33,7 @@ defmodule Couchdb.Connector.SecureWriterTest do
     TestPrep.secure_database
     {:ok, body, _headers} = retry_on_error(
       fn() -> Writer.create_generate(
-        TestConfig.database_properties, TestSupport.test_user, "{\"key\": \"value\"}")
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), "{\"key\": \"value\"}")
       end)
     {:ok, body_map} = Poison.decode body
     assert String.starts_with?(body_map["rev"], "1-")
@@ -46,14 +45,14 @@ defmodule Couchdb.Connector.SecureWriterTest do
     {:ok, _body, headers} = retry_on_error(
       fn() ->
         Writer.create_generate(
-          TestConfig.database_properties, TestSupport.test_user, "{\"key\": \"original value\"}")
+          Map.merge(TestConfig.database_properties, TestConfig.test_user), "{\"key\": \"original value\"}")
       end)
     id = id_from_url(header_value(headers, "Location"))
     revision = header_value(headers, "ETag")
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
     {:ok, _body, headers} = retry_on_error(
       fn() ->
-        Writer.update(TestConfig.database_properties, TestSupport.test_user, update)
+        Writer.update(Map.merge(TestConfig.database_properties, TestConfig.test_user), update)
       end)
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
@@ -61,7 +60,7 @@ defmodule Couchdb.Connector.SecureWriterTest do
   test "update/3: verify that a document without id raises an exception" do
     update = "{\"_rev\": \"some_revision\", \"key\": \"new value\"}"
     assert_raise RuntimeError, fn ->
-      Writer.update(TestConfig.database_properties, TestSupport.test_user, update)
+      Writer.update(Map.merge(TestConfig.database_properties, TestConfig.test_user), update)
     end
   end
 
@@ -69,14 +68,14 @@ defmodule Couchdb.Connector.SecureWriterTest do
     TestPrep.secure_database
     {:ok, _body, headers} = retry_on_error(
       fn() -> Writer.create_generate(
-        TestConfig.database_properties, TestSupport.test_user, "{\"key\": \"original value\"}")
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), "{\"key\": \"original value\"}")
       end)
     id = id_from_url(header_value(headers, "Location"))
     revision = header_value(headers, "ETag")
     update = "{\"_id\": \"#{id}\", \"_rev\": #{revision}, \"key\": \"new value\"}"
     {:ok, _body, headers} = retry_on_error(
       fn() -> Writer.update(
-        TestConfig.database_properties, TestSupport.test_user, update, id)
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), update, id)
       end)
     assert String.starts_with?(header_value(headers, "ETag"), "\"2-")
   end
@@ -85,12 +84,12 @@ defmodule Couchdb.Connector.SecureWriterTest do
     TestPrep.secure_database
     {:ok, _, headers} = retry_on_error(
       fn() -> Writer.create(
-        TestConfig.database_properties, TestSupport.test_user, "{\"key\": \"value\"}", "42")
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), "{\"key\": \"value\"}", "42")
       end)
     revision = String.replace(header_value(headers, "ETag"), "\"", "")
     {:ok, body} = retry_on_error(
       fn() -> Writer.destroy(
-        TestConfig.database_properties, TestSupport.test_user, "42", revision)
+        Map.merge(TestConfig.database_properties, TestConfig.test_user), "42", revision)
       end)
     {:ok, body_map} = Poison.decode body
     assert String.starts_with?(body_map["rev"], "2-")

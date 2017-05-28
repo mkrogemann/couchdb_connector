@@ -99,7 +99,7 @@ In case the database already exists of course, you would see
 Now that the database exits, we can create documents in it.
 
 ```Elixir
-Couchdb.Connector.Writer.create(db_props, "{\"key\": \"value\"}")
+Couchdb.Connector.Writer.create_generate(db_props, "{\"key\": \"value\"}")
 ```
 
 You should see something similar to this

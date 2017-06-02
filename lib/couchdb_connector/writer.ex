@@ -56,20 +56,8 @@ defmodule Couchdb.Connector.Writer do
   end
 
   defp do_create(url, json) do
-    safe_json = couchdb_safe(json)
-    response = HTTPoison.put!(url, safe_json, [Headers.json_header])
+    response = HTTPoison.put!(url, json, [Headers.json_header])
     Handler.handle_put(response, :include_headers)
-  end
-
-  # In the case that clients present both an id value and the json document
-  # to be stored for the given id, we MUST make sure that the document does
-  # not contain a nil _id field at the top level
-  defp couchdb_safe(json) do
-    map = Poison.Parser.parse!(json)
-    case Map.get(map, "_id") do
-      nil -> Poison.encode!(Map.delete(map, "_id"))
-      _ -> Poison.encode!(map)
-    end
   end
 
   @doc """

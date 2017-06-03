@@ -40,8 +40,16 @@ defmodule Couchdb.Connector.UrlHelper do
   Produces the URL to a specific document contained in given database.
   """
   @spec document_url(Types.db_properties, String.t) :: String.t
-  def document_url db_props, id do
-    "#{database_server_url(db_props)}/#{db_props[:database]}/#{id}"
+  def document_url db_props, doc_id do
+    "#{database_server_url(db_props)}/#{db_props[:database]}/#{doc_id}"
+  end
+
+  @doc """
+  Produces the URL to a specific document attachment contained in given database.
+  """
+  @spec attchment_url(Types.db_properties, String.t, String.t) :: String.t
+  def attchment_url db_props, doc_id, att_name do
+    "#{database_server_url(db_props)}/#{db_props[:database]}/#{doc_id}/#{att_name}"
   end
 
   @doc """

@@ -33,6 +33,55 @@ defmodule Couchdb.Connector.Reader do
     |> UrlHelper.document_url(id)
     |> do_get
   end
+  
+  @doc """
+  Retrieve the document given by database properties and id, using the given
+  basic auth credentials for authentication.
+  """
+  @spec get(Types.db_properties, Types.basic_auth, String.t) :: {:ok, String.t} | {:error, String.t}
+  def get(db_props, basic_auth, id) do
+    db_props
+    |> UrlHelper.document_url(basic_auth, id)
+    |> do_get
+  end
+
+  @doc """
+  Retrieve the document attachment given by database properties, id, 
+  and attachment_name using no authentication.
+  """
+  @spec get_attachment(Types.db_properties, String.t, String.t, String.t)
+  :: {:ok, String.t} | {:error, String.t}
+  def get_attachment(db_props, id, attachment, rev) do
+    db_props
+    |> UrlHelper.attachment_url(id, attachment, rev)
+    |> do_attachment_get
+  end
+  
+  @doc """
+  Retrieve the attachment given by database properties, id, and attachment
+  name using the given basic auth credentials for authentication.
+  """
+  @spec get_attachment(Types.db_properties, Types.basic_auth, String.t, 
+                  String.t, String.t) :: {:ok, String.t} | {:error, String.t}
+  def get_attachment(db_props, basic_auth, id, att, rev) do
+    db_props
+    |> UrlHelper.attachment_url(basic_auth, id, att, rev)
+    |> do_attachment_get
+  end
+
+  @doc """
+  Return true if the given document (id/rev) has the attachment name passed;
+  otherwise, false is returned.
+  """
+  @spec  has_attachment?(Types.db_properties, String.t, String.t, String.t) 
+  :: true | false
+  def has_attachment?(db_props, id, attachment, rev) do
+    {status, _body, _headers} = 
+      db_props
+      |> UrlHelper.attachment_url(id, attachment, rev)
+      |> do_attachment_get
+    status == :ok
+  end
 
   @doc """
   Fetch a single uuid from CouchDB for use in a a subsequent create operation.
@@ -49,5 +98,9 @@ defmodule Couchdb.Connector.Reader do
     url
     |> HTTPoison.get!
     |> Handler.handle_get
+  end
+
+  defp do_attachment_get(url) do
+    do_get(url)
   end
 end

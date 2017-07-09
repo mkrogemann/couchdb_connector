@@ -24,7 +24,7 @@ defmodule Couchdb.Connector.Mixfile do
     [
       {:httpoison, "~> 0.8 or ~> 0.9 or ~> 0.10"},
       {:poison, "~> 1.5 or ~> 2.0 or ~> 3.0"},
-      {:excoveralls, "~> 0.6", only: [:dev, :test]},
+      {:excoveralls, "~> 0.7", only: [:dev, :test]},
       {:credo, "~> 0.8", only: [:dev, :test]},
       {:earmark, "~> 1.1", only: :dev},
       {:ex_doc, "~> 0.16", only: :dev},
@@ -41,9 +41,9 @@ defmodule Couchdb.Connector.Mixfile do
   defp package do
     [
       files: ["lib", "mix.exs", "README*", "LICENSE*"],
-      maintainers: ["Markus Krogemann", "Marcel Wolf"],
+      maintainers: ["Markus Krogemann"],
       licenses: ["Apache 2.0"],
-      links: %{"GitHub" => "https://github.com/locolupo/couchdb_connector"}
+      links: %{"GitHub" => "https://github.com/mkrogemann/couchdb_connector"}
     ]
   end
 end

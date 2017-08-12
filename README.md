@@ -2,9 +2,10 @@
 
 [![Build Status](https://travis-ci.org/mkrogemann/couchdb_connector.svg)](https://travis-ci.org/mkrogemann/couchdb_connector)
 [![Coverage Status](https://coveralls.io/repos/mkrogemann/couchdb_connector/badge.svg?branch=master&service=github)](https://coveralls.io/github/mkrogemann/couchdb_connector?branch=master)
-[![Hex.pm](https://img.shields.io/hexpm/v/couchdb_connector.svg?style=flat-square)](https://hex.pm/packages/couchdb_connector)
+[![Hex.pm](https://img.shields.io/hexpm/v/couchdb_connector.svg)](https://hex.pm/packages/couchdb_connector)
 [![API Docs](https://img.shields.io/badge/api-docs-yellow.svg?style=flat)](https://hexdocs.pm/couchdb_connector/)
 [![Deps Status](https://beta.hexfaktor.org/badge/prod/github/mkrogemann/couchdb_connector.svg)](https://beta.hexfaktor.org/github/mkrogemann/couchdb_connector)
+[![Hex.pm](https://img.shields.io/hexpm/dt/couchdb_connector.svg?style=plastic)](https://hex.pm/packages/couchdb_connector)
 
 ## Description
 

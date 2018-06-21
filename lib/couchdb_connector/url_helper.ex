@@ -72,9 +72,32 @@ defmodule Couchdb.Connector.UrlHelper do
   @doc """
   Produces the URL to a specific view from a given design document.
   """
-  @spec view_url(Types.db_properties, String.t, String.t) :: String.t
-  def view_url db_props, design, view do
-    "#{design_url(db_props, design)}/_view/#{view}"
+  @spec view_url(Types.db_properties, String.t, String.t, Keyword.t) :: String.t
+  def view_url db_props, design, view, args \\ [] do
+    "#{design_url(db_props, design)}/_view/#{view}#{query(args)}"
+  end
+
+  defp to_bin(i) when is_integer(i), do: Integer.to_string(i)
+  defp to_bin(f) when is_float(f), do: Float.to_string(f)
+  defp to_bin(a) when is_atom(a), do: Atom.to_string(a)
+  defp to_bin(b) when is_binary(b), do: b
+
+  defp prepare({key, value}) do
+    "#{prepare_value(key)}=#{prepare_value(value)}"
+  end
+
+  defp prepare_value(value) do
+    value
+    |> to_bin()
+    |> URI.encode_www_form()
+  end
+
+  defp query([]), do: ""
+  defp query(args) do
+    query = args
+            |> Enum.map(&(prepare(&1)))
+            |> Enum.join("&")
+    "?#{query}"
   end
 
   @doc """

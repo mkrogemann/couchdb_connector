@@ -22,12 +22,12 @@ defmodule Couchdb.Connector.View do
   @doc """
   Returns everything found for the given view in the given design document.
   """
-  @spec fetch_all(Types.db_properties, String.t, String.t) :: {:ok, String.t} | {:error, String.t}
-  def fetch_all(db_props, design, view) do
+  @spec fetch_all(Types.db_properties, String.t, String.t, Keyword.t) :: {:ok, String.t} | {:error, String.t}
+  def fetch_all(db_props, design, view, args \\ []) do
     db_props
-    |> UrlHelper.view_url(design, view)
-    |> HTTPoison.get!
-    |> Handler.handle_get
+    |> UrlHelper.view_url(design, view, args)
+    |> HTTPoison.get!()
+    |> Handler.handle_get()
   end
 
   @doc """

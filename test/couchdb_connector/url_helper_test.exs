@@ -14,7 +14,7 @@ defmodule Couchdb.Connector.UrlHelperTest do
   end
 
   test "view_url/3 with args" do
-    dbprops = [protocol: "http", hostname: "localhost", port: 80, database: "myapp"]
+    dbprops = %{protocol: "http", hostname: "localhost", port: 80, database: "myapp"}
     design = "users"
     view = "active_users"
     args = [limit: 10, skip: 5] # simulate a 5 elements page and page 2

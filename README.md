@@ -1,5 +1,8 @@
 # couchdb_connector
 
+Please note: This project is now in maintenance mode. I will continue to take bug reports and act on them in as timely a manner as I can.
+If additional features are desired, please feel free to submit feature requests in the form of issues. I intend to cut one further release shortly that will likely contain work that addresses the currently open 2 issues and 1 PR.
+
 [![Build Status](https://travis-ci.org/mkrogemann/couchdb_connector.svg)](https://travis-ci.org/mkrogemann/couchdb_connector)
 [![Coverage Status](https://coveralls.io/repos/mkrogemann/couchdb_connector/badge.svg?branch=master&service=github)](https://coveralls.io/github/mkrogemann/couchdb_connector?branch=master)
 [![Hex.pm](https://img.shields.io/hexpm/v/couchdb_connector.svg)](https://hex.pm/packages/couchdb_connector)
